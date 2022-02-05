@@ -4,6 +4,6 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.launcher;
 
 public class EntryPoint {
     public static void main(String[] args) {
-        launcher.init();
+        launcher.init(args);
     }
 }

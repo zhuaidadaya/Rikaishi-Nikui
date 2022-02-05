@@ -1,0 +1,21 @@
+{
+    "config.note.ui": "this is ui database of rikaishi nikui launcher\n -这是rikaishi nikui启动器的ui数据库\ndo not modify this database\n -不要修改此数据库",
+    "config.note": "this is database of rikaishi nikui launcher\n -这是rikaishi nikui启动器的数据库\nyou can modify this database information if you understand how to modify\n -你可以在清楚如何修改的情况下修改此数据库内容\n\ndocument: https://github.com/zhuaidadaya/Rikaishi-Nikui/wiki\n -参考文档: https://github.com/zhuaidadaya/Rikaishi-Nikui/wiki\n",
+    "happened.error": "rikaishi nikui launcher遇到了意外的错误: ",
+    "happened.error.tip": "如果你修改过配置文件, 重启后会恢复正常, 但你将会丢失配置\n若没有修改过, 则可能是rikaishi nikui launcher出现了内部问题, 请创建一个issue让我们知道\n\n在下一次启动之前, rikaishi nikui launcher不会再修改配置文件\n你可以将其复制到其他位置或修复内容以保留配置",
+    "happened.error.at": {
+        "text": "     at %s",
+        "color": {
+            "r": 152,
+            "g": 12,
+            "b": 10,
+            "alpha": 255
+        }
+    },
+    "main.button": {
+        "text": "主页"
+    },
+    "main.frame": {
+        "text": "main frame"
+    }
+}
