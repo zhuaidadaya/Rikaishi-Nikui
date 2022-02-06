@@ -12,16 +12,18 @@ import com.github.zhuaidadaya.rikaishinikui.ui.list.RikaishiNikuiScrollStringLis
 import com.github.zhuaidadaya.rikaishinikui.ui.list.RikaishiNikuiStringList;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiButtonPanel;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiPanel;
+import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiTextPanel;
 import com.github.zhuaidadaya.utils.config.EncryptionType;
 import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Random;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
@@ -38,6 +40,7 @@ public class RikaishiNikuiLauncher {
 
     public RikaishiNikuiPanel mainVersionPanel;
     public RikaishiNikuiScrollStringList versionList;
+    public RikaishiNikuiTextPanel versionDetailsPanel;
 
     public ObjectRBTreeSet<String> options = new ObjectRBTreeSet<>();
     private boolean running = false;
@@ -66,14 +69,18 @@ public class RikaishiNikuiLauncher {
             mainPanel = new RikaishiNikuiPanel("main");
             mainButtonPanel = new RikaishiNikuiButtonPanel("main");
             mainInformationPanel = new RikaishiNikuiPanel("main");
-            versionList = new RikaishiNikuiScrollStringList(new RikaishiNikuiStringList("main"));
 
+            mainVersionPanel = new RikaishiNikuiPanel();
+            versionList = new RikaishiNikuiScrollStringList(new RikaishiNikuiStringList("main"));
+            versionDetailsPanel = new RikaishiNikuiTextPanel("main");
 
             try {
                 loadUiAsConfig();
 
                 rending();
             } catch (Exception ex) {
+                ex.printStackTrace();
+
                 defaultMainInformationPanel();
                 defaultMainPanelButtons();
                 defaultUiConfig();
@@ -82,6 +89,12 @@ public class RikaishiNikuiLauncher {
 
                 rending();
             }
+
+            Collection<Object> strings = new ObjectRBTreeSet<>();
+            for(int i = 100; i > 0; i--) {
+                strings.add("1.18.2-" + new Random().nextInt(100));
+            }
+            versionList.setListData(strings);
 
             mainFrame.getContentPane().setBackground(RikaishiNikuiColor.BLACK);
             mainFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -158,27 +171,7 @@ public class RikaishiNikuiLauncher {
     }
 
     public void rending() {
-        rendingMainFrame();
-        rendingMainPanel();
-        rendingMainButton();
-        rendingMainInformationPanel();
-        versionList.setListData(configUi.getConfigs().keySet());
-    }
-
-    public void rendingMainButton() {
-        mainButtonPanel.apply(configUi.getConfigJSONObject("button-panel-main"));
-    }
-
-    public void rendingMainFrame() {
-        mainFrame.apply(configUi.getConfigJSONObject("frame-main"));
-    }
-
-    public void rendingMainPanel() {
-        mainPanel.apply(configUi.getConfigJSONObject("panel-main"));
-    }
-
-    public void rendingMainInformationPanel() {
-        mainInformationPanel.apply(configUi.getConfigJSONObject("information-panel-main"));
+        applyUi();
     }
 
     public void defaultUiConfig() {
@@ -195,12 +188,19 @@ public class RikaishiNikuiLauncher {
         configUi.set("frame-main", frame.toJSONObject());
     }
 
-    public void loadUiAsConfig() {
+    public void applyUi() {
         mainButtonPanel.addButtons(configUi.getConfigJSONObject("button-panel-main").getJSONObject("buttons"));
+
+        mainPanel.apply(configUi.getConfigJSONObject("panel-main"));
+        mainFrame.apply(configUi.getConfigJSONObject("frame-main"));
+        mainButtonPanel.apply(configUi.getConfigJSONObject("button-panel-main"));
         mainInformationPanel.apply(configUi.getConfigJSONObject("information-panel-main"));
         mainVersionPanel.apply(configUi.getConfigJSONObject("information-panel-main-version"));
         versionList.apply(configUi.getConfigJSONObject("list-panel-versions"));
+        versionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-main-version-details"));
+    }
 
+    public void loadUiAsConfig() {
         mainFrame.setLayout(null);
         mainPanel.setLayout(null);
         mainButtonPanel.setLayout(null);
@@ -210,33 +210,48 @@ public class RikaishiNikuiLauncher {
         mainFrame.add(mainPanel);
         mainPanel.add(mainInformationPanel);
         mainPanel.add(mainButtonPanel);
+        mainPanel.add(versionDetailsPanel);
 
         mainVersionPanel.add(versionList);
         mainInformationPanel.add(mainVersionPanel);
+
+        functionButtons();
     }
 
     public void defaultMainInformationPanel() {
-        mainInformationPanel = new RikaishiNikuiButtonPanel(1000, 770, "main");
+        mainInformationPanel = new RikaishiNikuiButtonPanel(1000, 730, "main");
         mainInformationPanel.setXY(0, 0);
         mainInformationPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("information-panel-main", mainInformationPanel.toJSONObject());
-        versionList = new RikaishiNikuiScrollStringList(new RikaishiNikuiStringList(250, 720, "main"));
+        versionList = new RikaishiNikuiScrollStringList(new RikaishiNikuiStringList(350, 720, "main"));
         versionList.disableBorder();
         versionList.setXY(0, 0);
         versionList.setListColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
         versionList.setSelectionColor(new RikaishiNikuiColor(58, 58, 58), new RikaishiNikuiColor(214, 214, 214));
         configUi.set("list-panel-versions", versionList.toJSONObject());
-        mainVersionPanel = new RikaishiNikuiPanel(200, 710, "main");
+        mainVersionPanel = new RikaishiNikuiPanel(300, 700, "main");
         mainVersionPanel.setXY(0, 0);
         mainVersionPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("information-panel-main-version", mainVersionPanel.toJSONObject());
+        versionDetailsPanel = new RikaishiNikuiTextPanel(650, 720, "main");
+        versionDetailsPanel.setXY(400, 0);
+        versionDetailsPanel.setText("az");
+        configUi.set("information-panel-main-version-details", versionDetailsPanel.toJSONObject());
+    }
+
+    public void functionButtons() {
+        mainButtonPanel.addButtons(new RikaishiNikuiButton(100, 40, "main", "main.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), true).setId(0));
+        mainButtonPanel.addButtons(new RikaishiNikuiButton(100, 40, "function#1", "某功能#1", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(1));
+        mainButtonPanel.addButtons(new RikaishiNikuiButton(100, 40, "function#2", "某功能#2", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2));
+        mainButtonPanel.addButtons(new RikaishiNikuiButton(100, 40, "function#3", "某功能#3", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(3));
+        mainButtonPanel.addButtons(new RikaishiNikuiButton(100, 40, "function#4", "某功能#4", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(4));
     }
 
     public void defaultMainPanelButtons() {
         mainButtonPanel = new RikaishiNikuiButtonPanel(1000, 40, "main");
         mainButtonPanel.setXY(0, 730);
         mainButtonPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
-        mainButtonPanel.addButtons(new RikaishiNikuiButton(100, 40, "main", "main.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)));
+        functionButtons();
         configUi.set("button-panel-main", mainButtonPanel.toJSONObject());
     }
 

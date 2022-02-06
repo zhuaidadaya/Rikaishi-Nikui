@@ -13,6 +13,11 @@ import java.util.Collection;
 import java.util.Vector;
 
 public class RikaishiNikuiStringList extends JList<String> implements RikaishiNikuiComponent {
+    private int width = 0;
+    private int height = 0;
+    private boolean followParent = true;
+    private Collection<Object> data;
+
     public RikaishiNikuiStringList() {
 
     }
@@ -59,8 +64,16 @@ public class RikaishiNikuiStringList extends JList<String> implements RikaishiNi
         return this;
     }
 
+    public void setFollowParent(boolean follow) {
+        this.followParent = follow;
+    }
+
     public void setXY(int x, int y) {
-        setBounds(x, y, getWidth(), getHeight());
+        if(!followParent) {
+            if(getX() != x || getY() != y) {
+                setBounds(x, y, getWidth(), getHeight());
+            }
+        }
     }
 
     public JSONObject toJSONObject() {
@@ -68,8 +81,8 @@ public class RikaishiNikuiStringList extends JList<String> implements RikaishiNi
 
         json.put("x", getX());
         json.put("y", getY());
-        json.put("height", getHeight());
-        json.put("width", getWidth());
+        json.put("height", height);
+        json.put("width", width);
         json.put("background-color", RikaishiNikuiColor.parse(getBackground()).toJSONObject());
         json.put("foreground-color", RikaishiNikuiColor.parse(getForeground()).toJSONObject());
         json.put("selection-background-color", RikaishiNikuiColor.parse(getSelectionBackground()).toJSONObject());
@@ -78,21 +91,30 @@ public class RikaishiNikuiStringList extends JList<String> implements RikaishiNi
         return json;
     }
 
+    public void setSize(int width, int height) {
+        if(getWidth() != width || getHeight() != height) {
+            setBounds(getX(), getY(), width, height);
+        }
+    }
+
     @Override
     public void apply(JSONObject json) {
-        setSize(json.getInt("width"), json.getInt("height"));
+//        setSize(json.getInt("width"), json.getInt("height"));
         setColor(new RikaishiNikuiColor(json.getJSONObject("background-color")), new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
         setSelectionColor(new RikaishiNikuiColor(json.getJSONObject("selection-background-color")), new RikaishiNikuiColor(json.getJSONObject("selection-foreground-color")));
         setXY(json.getInt("x"), json.getInt("y"));
     }
 
     public void setListData(Collection<Object> data) {
-        int selected = getSelectedIndex();
-        Vector<String> vector = new Vector<>();
-        for(Object s : data) {
-            vector.add(s.toString());
+        if(this.data == null || ! this.data.containsAll(data)) {
+            this.data = data;
+            int selected = getSelectedIndex();
+            Vector<String> vector = new Vector<>();
+            for(Object s : data) {
+                vector.add(s.toString());
+            }
+            setListData(vector);
+            setSelectedIndex(selected);
         }
-        setListData(vector);
-        setSelectedIndex(selected);
     }
 }

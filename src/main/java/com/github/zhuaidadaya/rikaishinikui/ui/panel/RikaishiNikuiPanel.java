@@ -28,8 +28,8 @@ public class RikaishiNikuiPanel extends JPanel implements RikaishiNikuiComponent
     }
 
     public void apply(JSONObject json) {
-        setHeight(json.getInt("height"));
-        setWidth(json.getInt("width"));
+        setXY(json.getInt("x"), json.getInt("y"));
+        setSize(json.getInt("width"), json.getInt("height"));
         setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
     }
 
@@ -56,6 +56,8 @@ public class RikaishiNikuiPanel extends JPanel implements RikaishiNikuiComponent
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
 
+        json.put("x", getX());
+        json.put("y", getY());
         json.put("height", getHeight());
         json.put("width", getWidth());
         json.put("background-color", RikaishiNikuiColor.parse(getBackground()).toJSONObject());

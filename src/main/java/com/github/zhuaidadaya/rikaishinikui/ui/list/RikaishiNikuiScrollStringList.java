@@ -83,7 +83,8 @@ public class RikaishiNikuiScrollStringList extends JScrollPane implements Rikais
         setXY(json.getInt("x"), json.getInt("y"));
         setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
         setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
-        if(json.getBoolean("disable-border"))
+        this.disableBorder = json.getBoolean("disable-border");
+        if(disableBorder)
             disableBorder();
         else
             enableBorder();

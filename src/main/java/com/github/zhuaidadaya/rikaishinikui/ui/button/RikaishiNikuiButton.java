@@ -6,6 +6,8 @@ import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.launcher;
@@ -17,6 +19,11 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
     private String text = "";
     private boolean formatted = false;
     private boolean borderPainted = true;
+    private boolean active = false;
+    private RikaishiNikuiColor activeBackground = RikaishiNikuiColor.parse(getBackground());
+    private RikaishiNikuiColor activeForeground = RikaishiNikuiColor.parse(getForeground());
+    private int id = 0;
+    private ActionListener listener;
 
     public RikaishiNikuiButton() {
         setName(UUID.randomUUID().toString());
@@ -55,22 +62,45 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         this.formatted = formatted;
     }
 
+    public RikaishiNikuiButton(int width, int height, String name, String text, boolean formatted, boolean active) {
+        setSize(width, height);
+        setName(name);
+        this.height = height;
+        this.width = width;
+        this.text = text;
+        this.formatted = formatted;
+        this.active = active;
+
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public void apply(JSONObject json) {
-        try {
-            setSize(json.getInt("width"), json.getInt("height"));
+        setSize(json.getInt("width"), json.getInt("height"));
+
+        this.text = json.getString("text");
+        this.formatted = json.getBoolean("formatted");
+        this.active = json.getBoolean("active");
+        this.borderPainted = json.getBoolean("border-painted");
+
+        if(active) {
+            setBackground(new RikaishiNikuiColor(json.getJSONObject("active-background-color")));
+            setForeground(new RikaishiNikuiColor(json.getJSONObject("active-foreground-color")));
+        } else {
             setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
             setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
-            setName(json.getString("name"));
-            this.text = json.getString("text");
-            this.formatted = json.getBoolean("formatted");
-            this.borderPainted = json.getBoolean("border-painted");
-            if(borderPainted)
-                enableBorderPainted();
-            else
-                disableBorderPainted();
-        } catch (Exception e) {
-            launcher.parseError(e, "rending button", false);
         }
+
+        setName(json.getString("name"));
+
+        if(borderPainted)
+            enableBorderPainted();
+        else
+            disableBorderPainted();
+        formatText();
+        setId(json.getInt("id"));
     }
 
     public void formatText() {
@@ -92,6 +122,15 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
 
     public void setText(Text text) {
         setText(text.getText());
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public RikaishiNikuiButton setId(int id) {
+        this.id = id;
+        return this;
     }
 
     public void setSize(int width, int height) {
@@ -128,16 +167,33 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         return this;
     }
 
+    public RikaishiNikuiButton setActiveColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+        activeBackground = background;
+        activeForeground = foreground;
+        return this;
+    }
+
+    public RikaishiNikuiButton setActiveColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground,boolean active) {
+        activeBackground = background;
+        activeForeground = foreground;
+        setActive(active);
+        return this;
+    }
+
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
         json.put("height", height);
         json.put("width", width);
+        json.put("active", active);
         json.put("background-color", RikaishiNikuiColor.parse(getBackground()).toJSONObject());
         json.put("foreground-color", RikaishiNikuiColor.parse(getForeground()).toJSONObject());
+        json.put("active-background-color", activeBackground.toJSONObject());
+        json.put("active-foreground-color", activeForeground.toJSONObject());
         json.put("text", text);
         json.put("formatted", formatted);
         json.put("border-painted", borderPainted);
         json.put("name", getName());
+        json.put("id", id);
 
         return json;
     }
