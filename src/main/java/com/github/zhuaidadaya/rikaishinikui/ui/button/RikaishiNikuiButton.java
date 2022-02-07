@@ -77,6 +77,11 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         this.active = active;
     }
 
+
+    public boolean isActive() {
+        return active;
+    }
+
     public void apply(JSONObject json) {
         setSize(json.getInt("width"), json.getInt("height"));
 
@@ -173,7 +178,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         return this;
     }
 
-    public RikaishiNikuiButton setActiveColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground,boolean active) {
+    public RikaishiNikuiButton setActiveColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground, boolean active) {
         activeBackground = background;
         activeForeground = foreground;
         setActive(active);

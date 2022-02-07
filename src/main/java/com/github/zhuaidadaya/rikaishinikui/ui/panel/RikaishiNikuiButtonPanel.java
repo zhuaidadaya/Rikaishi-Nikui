@@ -39,6 +39,18 @@ public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements Rika
         setName(name);
     }
 
+    public RikaishiNikuiButton getButton(int id) {
+        return buttonsQueue.get(id);
+    }
+
+    public RikaishiNikuiButton getActiveButton() {
+        for(RikaishiNikuiButton button : buttonsQueue.values()) {
+            if(button.isActive())
+                return button;
+        }
+        return null;
+    }
+
     public void setHeight(int height) {
         this.height = height;
     }

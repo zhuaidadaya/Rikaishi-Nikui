@@ -13,10 +13,10 @@ import java.util.Collection;
 import java.util.Vector;
 
 public class RikaishiNikuiStringList extends JList<String> implements RikaishiNikuiComponent {
-    private int width = 0;
-    private int height = 0;
+    private final int width = 0;
+    private final int height = 0;
     private boolean followParent = true;
-    private Collection<Object> data;
+    private Collection<?> data;
 
     public RikaishiNikuiStringList() {
 
@@ -69,7 +69,7 @@ public class RikaishiNikuiStringList extends JList<String> implements RikaishiNi
     }
 
     public void setXY(int x, int y) {
-        if(!followParent) {
+        if(! followParent) {
             if(getX() != x || getY() != y) {
                 setBounds(x, y, getWidth(), getHeight());
             }
@@ -99,22 +99,20 @@ public class RikaishiNikuiStringList extends JList<String> implements RikaishiNi
 
     @Override
     public void apply(JSONObject json) {
-//        setSize(json.getInt("width"), json.getInt("height"));
+        //        setSize(json.getInt("width"), json.getInt("height"));
         setColor(new RikaishiNikuiColor(json.getJSONObject("background-color")), new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
         setSelectionColor(new RikaishiNikuiColor(json.getJSONObject("selection-background-color")), new RikaishiNikuiColor(json.getJSONObject("selection-foreground-color")));
         setXY(json.getInt("x"), json.getInt("y"));
     }
 
-    public void setListData(Collection<Object> data) {
-        if(this.data == null || ! this.data.containsAll(data)) {
-            this.data = data;
-            int selected = getSelectedIndex();
-            Vector<String> vector = new Vector<>();
-            for(Object s : data) {
-                vector.add(s.toString());
-            }
-            setListData(vector);
-            setSelectedIndex(selected);
+    public void setListData(Collection<?> data) {
+        this.data = data;
+        int selected = getSelectedIndex();
+        Vector<String> vector = new Vector<>();
+        for(Object s : data) {
+            vector.add(s.toString());
         }
+        this.setListData(vector);
+        setSelectedIndex(selected);
     }
 }

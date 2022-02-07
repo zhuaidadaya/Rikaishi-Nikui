@@ -43,7 +43,7 @@ public class RikaishiNikuiScrollStringList extends JScrollPane implements Rikais
         list.setSelectionForeground(foreground);
     }
 
-    public void setListData(Collection<Object> data) {
+    public void setListData(Collection<?> data) {
         list.setListData(data);
     }
 
@@ -53,6 +53,14 @@ public class RikaishiNikuiScrollStringList extends JScrollPane implements Rikais
 
     public void setListData(String[] data) {
         list.setListData(data);
+    }
+
+    public int getSelectedIndex() {
+        return list.getSelectedIndex();
+    }
+
+    public String getSelectedValue() {
+        return list.getSelectedValue();
     }
 
     public void disableBorder() {

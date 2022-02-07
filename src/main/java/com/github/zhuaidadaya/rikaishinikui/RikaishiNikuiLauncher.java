@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
 import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
 import com.github.zhuaidadaya.rikaishinikui.language.Language;
@@ -23,7 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Random;
+import java.util.List;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
@@ -90,11 +91,22 @@ public class RikaishiNikuiLauncher {
                 rending();
             }
 
-            Collection<Object> strings = new ObjectRBTreeSet<>();
-            for(int i = 100; i > 0; i--) {
-                strings.add("1.18.2-" + new Random().nextInt(100));
+            try {
+                try {
+                    minecraftVersions = new MinecraftVersionsRecorder(config.getConfigJSONObject("versions"));
+                } catch (Exception ex) {
+                    minecraftVersions = new MinecraftVersionsRecorder();
+                    config.set("versions", minecraftVersions.toJSONObject());
+                }
+
+                if(minecraftVersions.getVersionNames().size() < 1) {
+                    versionList.setListData(List.of(textFormat.format("failed.get.versions").getText()));
+                } else {
+                    versionList.setListData(minecraftVersions.getVersionNames());
+                }
+            } catch (Exception e) {
+
             }
-            versionList.setListData(strings);
 
             mainFrame.getContentPane().setBackground(RikaishiNikuiColor.BLACK);
             mainFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -144,6 +156,7 @@ public class RikaishiNikuiLauncher {
 
     public void tick() throws Exception {
         configUi.readConfig(false);
+        config.readConfig(false);
         rending();
     }
 
@@ -172,6 +185,28 @@ public class RikaishiNikuiLauncher {
 
     public void rending() {
         applyUi();
+        setInformationText();
+    }
+
+    public void setInformationText() {
+        try {
+            try {
+                minecraftVersions.apply(config.getConfigJSONObject("versions"));
+            } catch (Exception ex) {
+                minecraftVersions = new MinecraftVersionsRecorder();
+                config.set("versions", minecraftVersions.toJSONObject());
+            }
+
+            Collection<String> names = minecraftVersions.getVersionNames();
+
+            if(names.size() < 1) {
+                versionList.setListData(List.of(textFormat.format("failed.get.versions").getText()));
+            } else {
+                versionList.setListData(names);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void defaultUiConfig() {
@@ -189,15 +224,19 @@ public class RikaishiNikuiLauncher {
     }
 
     public void applyUi() {
-        mainButtonPanel.addButtons(configUi.getConfigJSONObject("button-panel-main").getJSONObject("buttons"));
+        switch(mainButtonPanel.getActiveButton().getId()) {
+            case 0 -> {
+                mainButtonPanel.addButtons(configUi.getConfigJSONObject("button-panel-main").getJSONObject("buttons"));
 
-        mainPanel.apply(configUi.getConfigJSONObject("panel-main"));
-        mainFrame.apply(configUi.getConfigJSONObject("frame-main"));
-        mainButtonPanel.apply(configUi.getConfigJSONObject("button-panel-main"));
-        mainInformationPanel.apply(configUi.getConfigJSONObject("information-panel-main"));
-        mainVersionPanel.apply(configUi.getConfigJSONObject("information-panel-main-version"));
-        versionList.apply(configUi.getConfigJSONObject("list-panel-versions"));
-        versionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-main-version-details"));
+                mainPanel.apply(configUi.getConfigJSONObject("panel-main"));
+                mainFrame.apply(configUi.getConfigJSONObject("frame-main"));
+                mainButtonPanel.apply(configUi.getConfigJSONObject("button-panel-main"));
+                mainInformationPanel.apply(configUi.getConfigJSONObject("information-panel-main"));
+                mainVersionPanel.apply(configUi.getConfigJSONObject("information-panel-main-version"));
+                versionList.apply(configUi.getConfigJSONObject("list-panel-versions"));
+                versionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-main-version-details"));
+            }
+        }
     }
 
     public void loadUiAsConfig() {
