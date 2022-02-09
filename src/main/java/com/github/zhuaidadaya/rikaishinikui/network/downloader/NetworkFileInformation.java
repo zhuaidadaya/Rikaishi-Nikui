@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.network;
+package com.github.zhuaidadaya.rikaishinikui.network.downloader;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -6,6 +6,7 @@ public class NetworkFileInformation {
     private String sha1 = "";
     private String url = "";
     private String filePath = "";
+    private int size = -1;
 
     public NetworkFileInformation(String url, String filePath) {
         this.url = url;
@@ -18,6 +19,13 @@ public class NetworkFileInformation {
         this.sha1 = sha1;
     }
 
+    public NetworkFileInformation(String url, String filePath, String sha1, int size) {
+        this.url = url;
+        this.filePath = filePath;
+        this.sha1 = sha1;
+        this.size = size;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -28,5 +36,9 @@ public class NetworkFileInformation {
 
     public String getSha1() {
         return sha1;
+    }
+
+    public int getSize() {
+        return size;
     }
 }

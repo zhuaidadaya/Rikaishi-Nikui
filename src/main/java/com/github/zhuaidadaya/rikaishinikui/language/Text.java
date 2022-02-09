@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class Text {
     private String text = "";
-    private RikaishiNikuiColor color = RikaishiNikuiColor.parse(Color.BLACK);
+    private RikaishiNikuiColor color = null;
 
     public Text() {
 

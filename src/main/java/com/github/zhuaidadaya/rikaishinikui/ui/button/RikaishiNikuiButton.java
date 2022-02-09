@@ -7,10 +7,8 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Method;
 import java.util.UUID;
 
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.launcher;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
 
 public class RikaishiNikuiButton extends JButton implements RikaishiNikuiComponent {
@@ -73,13 +71,20 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
 
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     public void setActive(boolean active) {
         this.active = active;
     }
 
-
-    public boolean isActive() {
-        return active;
+    public RikaishiNikuiButton setActionListeners(ActionListener... listeners) {
+        for(ActionListener listener : super.getActionListeners())
+            super.removeActionListener(listener);
+        for(ActionListener listener : listeners)
+            super.addActionListener(listener);
+        return this;
     }
 
     public void apply(JSONObject json) {
@@ -87,7 +92,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
 
         this.text = json.getString("text");
         this.formatted = json.getBoolean("formatted");
-        this.active = json.getBoolean("active");
+//        this.active = json.getBoolean("active");
         this.borderPainted = json.getBoolean("border-painted");
 
         if(active) {
@@ -189,7 +194,6 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         JSONObject json = new JSONObject();
         json.put("height", height);
         json.put("width", width);
-        json.put("active", active);
         json.put("background-color", RikaishiNikuiColor.parse(getBackground()).toJSONObject());
         json.put("foreground-color", RikaishiNikuiColor.parse(getForeground()).toJSONObject());
         json.put("active-background-color", activeBackground.toJSONObject());

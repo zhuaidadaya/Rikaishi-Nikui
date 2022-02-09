@@ -4,9 +4,13 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RikaishiNikuiTaskManager {
     private final Object2ObjectRBTreeMap<UUID, RikaishiNikuiTask> tasks = new Object2ObjectRBTreeMap<>();
+    private final Object2ObjectRBTreeMap<UUID, Thread> tasksThread = new Object2ObjectRBTreeMap<>();
+    private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public RikaishiNikuiTaskManager() {
 
@@ -18,17 +22,23 @@ public class RikaishiNikuiTaskManager {
 
     public void join(RikaishiNikuiTask task) {
         tasks.put(task.getId(), task);
-        task.join();
+        task.preJoin();
+        Thread thread = new Thread(task :: join);
+        threadPool.execute(thread);
     }
 
     public void quit(RikaishiNikuiTask task) {
+        if(task.isRunning())
+            task.stop();
         tasks.remove(task.getId());
-        task.stop();
     }
 
     public void quit(UUID task) {
-        tasks.get(task).stop();
-        tasks.remove(task);
+        quit(tasks.get(task));
+    }
+
+    public void done(RikaishiNikuiTask task) {
+        task.done();
     }
 
     public void task(UUID task) {

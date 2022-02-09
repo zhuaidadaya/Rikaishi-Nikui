@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
@@ -7,6 +8,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
 
 public class MinecraftVersionsParser {
     private final JSONArray versions;
@@ -56,8 +61,26 @@ public class MinecraftVersionsParser {
         return latestRelease;
     }
 
-
     public String getLatestSnapshotId() {
         return latestSnapshot;
+    }
+
+    public Collection<MinecraftVersionInformation> getVersionsInformation(String search) {
+        Collection<MinecraftVersionInformation> versionsInformation = new LinkedHashSet<>();
+        for(MinecraftVersionParser parser : versionsMap.values()) {
+            if(parser.getId().contains(search)) {
+                MinecraftVersionInformation information = new MinecraftVersionInformation(parser.getId(), parser.getId());
+                information.setUrl(parser.getUrl());
+                information.setType("Vanilla");
+                information.setVersion(parser.getId());
+                information.setStatus("status.download.ready");
+                versionsInformation.add(information);
+            }
+        }
+        return versionsInformation;
+    }
+
+    public Collection<MinecraftVersionInformation> getVersionsInformation() {
+        return getVersionsInformation("");
     }
 }

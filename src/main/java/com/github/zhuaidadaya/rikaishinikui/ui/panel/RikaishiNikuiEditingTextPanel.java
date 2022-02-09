@@ -9,23 +9,23 @@ import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
 
-public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiComponent {
+public class RikaishiNikuiEditingTextPanel extends JTextPane implements RikaishiNikuiComponent {
     private String text;
-    private Document doc = new DefaultStyledDocument();
+    private final Document doc = new DefaultStyledDocument();
 
-    public RikaishiNikuiTextPanel() {
+    public RikaishiNikuiEditingTextPanel() {
 
     }
 
-    public RikaishiNikuiTextPanel(String name) {
+    public RikaishiNikuiEditingTextPanel(String name) {
         setName(name);
     }
 
-    public RikaishiNikuiTextPanel(int width, int height) {
+    public RikaishiNikuiEditingTextPanel(int width, int height) {
         setSize(width, height);
     }
 
-    public RikaishiNikuiTextPanel(int width, int height, String name) {
+    public RikaishiNikuiEditingTextPanel(int width, int height, String name) {
         setSize(width, height);
         setName(name);
     }
@@ -33,6 +33,12 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
     public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+    }
+
+    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground, RikaishiNikuiColor caretColor) {
+        setBackground(background);
+        setForeground(foreground);
+        setCaretColor(caretColor);
     }
 
     public void setXY(int x, int y) {
@@ -48,16 +54,18 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
         json.put("width", getWidth());
         json.put("background-color", RikaishiNikuiColor.parse(getBackground()).toJSONObject());
         json.put("foreground-color", RikaishiNikuiColor.parse(getForeground()).toJSONObject());
+        json.put("caret-color", RikaishiNikuiColor.parse(getCaretColor()).toJSONObject());
 
         return json;
     }
 
     public void apply(JSONObject json) {
-        setEditable(false);
+        setEditable(true);
         setXY(json.getInt("x"), json.getInt("y"));
         setSize(json.getInt("width"), json.getInt("height"));
         setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
         setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
+        setCaretColor(new RikaishiNikuiColor(json.getJSONObject("caret-color")));
         repaint();
     }
 

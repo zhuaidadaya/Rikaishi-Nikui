@@ -2,7 +2,6 @@ package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
 import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
-import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiScrollPanel;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -10,11 +9,11 @@ import javax.swing.border.EmptyBorder;
 import java.util.Collection;
 import java.util.Vector;
 
-public class RikaishiNikuiScrollStringList extends JScrollPane implements RikaishiNikuiComponent {
-    private final RikaishiNikuiStringList list;
+public class RikaishiNikuiScrollObjectList extends JScrollPane implements RikaishiNikuiComponent {
+    private final RikaishiNikuiObjectList list;
     private boolean disableBorder = false;
 
-    public RikaishiNikuiScrollStringList(RikaishiNikuiStringList list) {
+    public RikaishiNikuiScrollObjectList(RikaishiNikuiObjectList list) {
         setViewportView(list);
         setSize(list.getSize());
         this.list = list;

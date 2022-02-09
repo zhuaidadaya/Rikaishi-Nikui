@@ -17,11 +17,21 @@ public abstract class RikaishiNikuiTask {
         manager.quit(this);
     }
 
+    public void done(RikaishiNikuiTaskManager manager) {
+        manager.done(this);
+    }
+
     public UUID getId() {
         return id;
     }
 
-    public abstract void join();
+    public abstract boolean isRunning();
 
-    public abstract void stop();
+    protected abstract void preJoin();
+
+    protected abstract void join();
+
+    protected abstract void stop();
+
+    protected abstract void done();
 }

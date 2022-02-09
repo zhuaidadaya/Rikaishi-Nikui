@@ -15,8 +15,118 @@
     "main.button": {
         "text": "主页"
     },
+    "download.vanilla.button": {
+        "text": "Vanilla"
+    },
     "main.frame": {
         "text": "main frame"
     },
-    "failed.get.versions": "无法获取本地游戏版本"
+    "failed.get.versions": "无法获取本地游戏版本",
+    "unknown": {
+        "text": "未知",
+        "color": {
+            "r": 152,
+            "g": 12,
+            "b": 10
+        }
+    },
+    "status.undefined": {
+        "text": "不可用",
+        "color": {
+            "r": 152,
+            "g": 12,
+            "b": 10
+        }
+    },
+    "status.downloading": {
+        "text": "下载中",
+        "color": {
+            "r": 140,
+            "g": 122,
+            "b": 165
+        }
+    },
+    "status.ready": {
+        "text": "已就绪",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "status.download.ready": {
+        "text": "可下载",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.area": {
+        "text": "应用域",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.path": {
+        "text": "路径",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.name": {
+        "text": "名称",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.type": {
+        "text": "类型",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.status": {
+        "text": "状态",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.id": {
+        "text": "id",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.version": {
+        "text": "游戏版本",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.url": {
+        "text": "链接",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "tip.search": {
+        "text": "查找版本:"
+    }
 }

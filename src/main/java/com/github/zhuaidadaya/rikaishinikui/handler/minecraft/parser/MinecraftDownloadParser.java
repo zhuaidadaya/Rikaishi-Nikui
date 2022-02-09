@@ -11,6 +11,10 @@ public class MinecraftDownloadParser {
         artifactParser = new MinecraftArtifactParser(json.getJSONObject("artifact"));
     }
 
+    public MinecraftArtifactParser getArtifactParser() {
+        return artifactParser;
+    }
+
     public String getUrl() {
         return artifactParser.getUrl();
     }

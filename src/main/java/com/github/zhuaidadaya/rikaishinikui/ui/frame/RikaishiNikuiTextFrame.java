@@ -68,16 +68,12 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
     }
 
     public void appendText(Text text, boolean clear) {
-        try {
-            Document doc = textPane.getDocument();
-            StyleContext sc = StyleContext.getDefaultStyleContext();
-            AttributeSet asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, text.getAwtColor());
-            if(clear)
-                textPane.setText("");
-            doc.insertString(doc.getLength(), text.getText(), asset);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        textPane.appendText(text,clear);
+    }
+
+    public void updateUI() {
+        textPane.updateUI();
+        textPane.updateText();
     }
 
     public void init() {

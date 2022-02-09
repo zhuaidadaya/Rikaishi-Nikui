@@ -4,15 +4,7 @@ import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.json.JSONObject;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.launcher;
 
 public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements RikaishiNikuiComponent {
     private final Int2ObjectRBTreeMap<RikaishiNikuiButton> buttonsQueue = new Int2ObjectRBTreeMap<>();
@@ -43,6 +35,12 @@ public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements Rika
         return buttonsQueue.get(id);
     }
 
+    public void cancelButtonsActive() {
+        for(RikaishiNikuiButton button : buttonsQueue.values()) {
+            button.setActive(false);
+        }
+    }
+
     public RikaishiNikuiButton getActiveButton() {
         for(RikaishiNikuiButton button : buttonsQueue.values()) {
             if(button.isActive())
@@ -71,7 +69,7 @@ public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements Rika
         this.y = y;
     }
 
-    public void addButtons(RikaishiNikuiButton... buttons) {
+    public void applyButtons(RikaishiNikuiButton... buttons) {
         for(RikaishiNikuiButton button : buttons) {
             button.setSize(button.getWidth(), height);
             button.setBounds(0, 0, button.getWidth(), height);
@@ -79,11 +77,15 @@ public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements Rika
         }
     }
 
-    public void addButtons(JSONObject json) {
+    public void applyButtons(JSONObject json) {
         for(String name : json.keySet()) {
-            RikaishiNikuiButton button = new RikaishiNikuiButton(json.getJSONObject(name));
-            buttonsQueue.put(button.getId(), button);
+            JSONObject buttonJson = json.getJSONObject(name);
+            applyButton(buttonsQueue.get(buttonJson.getInt("id")),buttonJson);
         }
+    }
+
+    public void applyButton(RikaishiNikuiButton button,JSONObject json) {
+        button.apply(json);
     }
 
     public void rendingButtons(JSONObject json) {
@@ -108,7 +110,7 @@ public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements Rika
 
         setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
 
-        addButtons(json.getJSONObject("buttons"));
+        applyButtons(json.getJSONObject("buttons"));
         rendingButtons(json.getJSONObject("buttons"));
     }
 

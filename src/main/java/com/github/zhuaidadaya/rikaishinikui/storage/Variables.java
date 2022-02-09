@@ -2,14 +2,15 @@ package com.github.zhuaidadaya.rikaishinikui.storage;
 
 import com.github.zhuaidadaya.rikaishinikui.RikaishiNikuiLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionsRecorder;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskManager;
 import com.github.zhuaidadaya.rikaishinikui.language.Language;
 import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
-import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
-import com.github.zhuaidadaya.rikaishinikui.network.RikaishiNikuiMinecraftDownloader;
+import com.github.zhuaidadaya.rikaishinikui.network.downloader.RikaishiNikuiMinecraftDownloader;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
 import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Variables {
     public static RikaishiNikuiLauncher launcher = new RikaishiNikuiLauncher();
@@ -17,10 +18,11 @@ public class Variables {
     public static Language language = Language.CHINESE;
     public static final String version = "1.0.0";
     public static final String entrust = "RikaishiNikui";
-    public static RikaishiNikuiLogger logger = new RikaishiNikuiLogger(LogManager.getLogger(entrust),"[%d] [%c/%l] %m%n","yyyy-mm-dd HH:mm:ss:SSS");
+    public static Logger logger = LogManager.getLogger(entrust);
     public static ObjectConfigUtil configUi;
     public static ObjectConfigUtil config;
     public static Object2ObjectRBTreeMap<String, RikaishiNikuiFrame> frames = new Object2ObjectRBTreeMap<>();
     public static RikaishiNikuiMinecraftDownloader minecraftDownloader = new RikaishiNikuiMinecraftDownloader();
     public static MinecraftVersionsRecorder minecraftVersions = new MinecraftVersionsRecorder();
+    public static RikaishiNikuiTaskManager taskManager = new RikaishiNikuiTaskManager();
 }

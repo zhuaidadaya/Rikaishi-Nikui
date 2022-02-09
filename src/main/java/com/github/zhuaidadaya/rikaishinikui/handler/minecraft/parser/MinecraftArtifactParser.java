@@ -20,4 +20,8 @@ public class MinecraftArtifactParser {
     public String getSha1() {
         return artifact.getString("sha1");
     }
+
+    public int getSize() {
+        return artifact.getInt("size");
+    }
 }

@@ -1,64 +1,60 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
 import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
-import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
 import java.util.Collection;
 import java.util.Vector;
 
-public class RikaishiNikuiStringList extends JList<String> implements RikaishiNikuiComponent {
+public class RikaishiNikuiObjectList extends JList<String> implements RikaishiNikuiComponent {
     private final int width = 0;
     private final int height = 0;
     private boolean followParent = true;
     private Collection<?> data;
 
-    public RikaishiNikuiStringList() {
+    public RikaishiNikuiObjectList() {
 
     }
 
-    public RikaishiNikuiStringList(String name) {
+    public RikaishiNikuiObjectList(String name) {
         setName(name);
     }
 
 
-    public RikaishiNikuiStringList(int width, int height, String name) {
+    public RikaishiNikuiObjectList(int width, int height, String name) {
         setSize(width, height);
         setName(name);
     }
 
-    public RikaishiNikuiStringList setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiObjectList setBackground(RikaishiNikuiColor color) {
         setBackground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiStringList setForeground(RikaishiNikuiColor color) {
+    public RikaishiNikuiObjectList setForeground(RikaishiNikuiColor color) {
         setForeground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiStringList setSelectionBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiObjectList setSelectionBackground(RikaishiNikuiColor color) {
         setSelectionBackground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiStringList setSelectionForeground(RikaishiNikuiColor color) {
+    public RikaishiNikuiObjectList setSelectionForeground(RikaishiNikuiColor color) {
         setSelectionForeground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiStringList setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiObjectList setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
         return this;
     }
 
-    public RikaishiNikuiStringList setSelectionColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiObjectList setSelectionColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setSelectionBackground(background);
         setSelectionForeground(foreground);
         return this;

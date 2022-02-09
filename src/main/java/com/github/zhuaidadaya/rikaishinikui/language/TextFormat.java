@@ -55,7 +55,6 @@ public class TextFormat {
             }
             return formatReturn;
         } catch (Exception e) {
-            e.printStackTrace();
             return new Text(source);
         }
     }

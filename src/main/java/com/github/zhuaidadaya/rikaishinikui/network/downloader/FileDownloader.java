@@ -1,13 +1,11 @@
-package com.github.zhuaidadaya.rikaishinikui.network;
+package com.github.zhuaidadaya.rikaishinikui.network.downloader;
 
+import com.github.zhuaidadaya.utils.file.FileUtil;
 import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
 import com.github.zhuaidadaya.utils.file.checker.FileCheckUtil;
 import com.github.zhuaidadaya.utils.resource.Resources;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Set;
@@ -20,18 +18,22 @@ public class FileDownloader {
     private int files = 0;
     private int lastFiles = 0;
     private int downloadingFiles = 0;
+    private boolean running = true;
 
     public StringBuilder downloadWithStringBuilder(String url) {
         return NetworkFileUtil.downloadToStringBuilder(url);
     }
 
-    public void downloadFiles(Set<NetworkFileInformation> files) throws IOException {
+    public void downloadFiles(Set<NetworkFileInformation> files) {
         ExecutorService threadPool = Executors.newCachedThreadPool();
 
         this.files = files.size();
         this.lastFiles = files.size();
 
         for(NetworkFileInformation information : files) {
+            if(! running) {
+                break;
+            }
             downloadingFiles++;
             if(! FileCheckUtil.sha1(information.getPath()).equals(information.getSha1())) {
                 while(downloadingFiles > 128) {
@@ -49,12 +51,14 @@ public class FileDownloader {
                             try {
                                 String url = information.getUrl();
                                 String path = information.getPath();
-//                                new FileDownloader().downloadWithThreadPool(url, path, - 1);
-                                                                NetworkFileUtil.downloadToFile(url, path);
+                                if(information.getSize() > 1024 * 1024 * 3)
+                                    downloadWithThreadPool(url, path, - 1);
+                                else
+                                    downloadWithBUf(url, path);
                                 doneFile();
                                 break;
                             } catch (Exception e) {
-                                e.printStackTrace();
+
                             }
 
                             if(tryCount == 5) {
@@ -73,18 +77,54 @@ public class FileDownloader {
         }
 
         threadPool.shutdown();
-        while(lastFiles != 0) {
+        while(lastFiles != 0 & running) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(25);
             } catch (InterruptedException e) {
 
             }
-
-            System.out.println("files>" + lastFiles);
-            System.out.println("downloading>" + lastFiles);
         }
     }
 
+    public void downloadWithBUf(String url, String filePath) throws IOException {
+        HttpURLConnection connection = null;
+        try {
+            connection = NetworkFileUtil.getHttp(url);
+            connection.setRequestProperty("Charset", "UTF-8");
+        } catch (Exception e) {
+
+        }
+
+        BufferedInputStream br;
+        if(connection != null) {
+            br = new BufferedInputStream(connection.getInputStream());
+        } else {
+            br = new BufferedInputStream(new FileInputStream(url));
+        }
+
+        File file = new File(filePath);
+
+        Resources.createParent(filePath);
+        if(! file.exists())
+            file.createNewFile();
+
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+        byte[] buf = new byte[8192];
+        int length;
+        while((length = br.read(buf)) >= 0) {
+            if(running) {
+                out.write(buf, 0, length);
+            } else {
+                break;
+            }
+        }
+        br.close();
+        out.close();
+
+        if(! running) {
+            file.delete();
+        }
+    }
 
     public void downloadWithThreadPool(String url, String filePath, int threads) throws IOException {
         ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -101,6 +141,10 @@ public class FileDownloader {
         this.lastThreads = threads;
 
         for(int i = 0; i < threads; i++) {
+            if(! running) {
+                fail();
+                break;
+            }
             long start = i * length / threads;
             long end = (i + 1) * length / threads - 1;
             if(i == threads - 1) {
@@ -113,13 +157,15 @@ public class FileDownloader {
 
         while(lastThreads != 0) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(25);
             } catch (InterruptedException e) {
 
             }
-
-            System.out.println("threads>" + lastThreads);
         }
+    }
+
+    public void cancel() {
+        running = false;
     }
 
     public void done() {
@@ -144,7 +190,12 @@ public class FileDownloader {
     public void failFile() {
         synchronized(this) {
             lastFiles--;
+            downloadingFiles--;
         }
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     public long getContentLength(String urlLocation) throws IOException {
@@ -194,12 +245,21 @@ public class FileDownloader {
                     byte[] buf = new byte[8192];
                     int length;
                     while((length = br.read(buf)) >= 0) {
-                        out.write(buf, 0, length);
+                        if(parent.isRunning()) {
+                            out.write(buf, 0, length);
+                        } else {
+                            break;
+                        }
                     }
                     br.close();
                     out.close();
 
-                    parent.done();
+                    if(parent.isRunning()) {
+                        parent.done();
+                    } else {
+                        file.delete();
+                        parent.fail();
+                    }
                     break;
                 } catch (Exception e) {
 

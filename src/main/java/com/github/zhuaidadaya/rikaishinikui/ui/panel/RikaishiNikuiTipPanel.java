@@ -9,23 +9,26 @@ import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
 
-public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiComponent {
-    private String text;
-    private Document doc = new DefaultStyledDocument();
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
 
-    public RikaishiNikuiTextPanel() {
+public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiComponent {
+    private final Document doc = new DefaultStyledDocument();
+    private String text;
+    private boolean formatted = true;
+
+    public RikaishiNikuiTipPanel() {
 
     }
 
-    public RikaishiNikuiTextPanel(String name) {
+    public RikaishiNikuiTipPanel(String name) {
         setName(name);
     }
 
-    public RikaishiNikuiTextPanel(int width, int height) {
+    public RikaishiNikuiTipPanel(int width, int height) {
         setSize(width, height);
     }
 
-    public RikaishiNikuiTextPanel(int width, int height, String name) {
+    public RikaishiNikuiTipPanel(int width, int height, String name) {
         setSize(width, height);
         setName(name);
     }
@@ -33,6 +36,12 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
     public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+    }
+
+    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground, RikaishiNikuiColor caretColor) {
+        setBackground(background);
+        setForeground(foreground);
+        setCaretColor(caretColor);
     }
 
     public void setXY(int x, int y) {
@@ -48,51 +57,48 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
         json.put("width", getWidth());
         json.put("background-color", RikaishiNikuiColor.parse(getBackground()).toJSONObject());
         json.put("foreground-color", RikaishiNikuiColor.parse(getForeground()).toJSONObject());
+        json.put("text", text);
+        json.put("formatted", formatted);
 
         return json;
     }
 
     public void apply(JSONObject json) {
-        setEditable(false);
+        setEditable(true);
         setXY(json.getInt("x"), json.getInt("y"));
         setSize(json.getInt("width"), json.getInt("height"));
         setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
         setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
+        this.formatted = json.getBoolean("formatted");
+        this.text = json.getString("text");
+        updateText();
         repaint();
+    }
+
+    public void setFormatted(boolean formatted) {
+        this.formatted = formatted;
     }
 
     public void setText(Text text) {
         this.text = text.getText();
-        appendText(text, true);
+        setDoc(text);
     }
 
     public void setText(String text) {
         this.text = text;
-        appendText(text, true, getForeground());
+        setDoc(text, getForeground());
     }
 
     public void setText(String text, Color color) {
         this.text = text;
-        appendText(text, true, color);
+        setDoc(text, color);
     }
 
-    public void appendText(String text) {
-        appendText(text, false, getForeground());
+    private void setDoc(String text, Color color) {
+        setDoc(new Text(text, color));
     }
 
-    public void appendText(Text text) {
-        appendText(text, false);
-    }
-
-    public void appendText(String text, Color color) {
-        appendText(text, false, color);
-    }
-
-    public void appendText(String text, boolean clear, Color color) {
-        appendText(new Text(text, color), clear);
-    }
-
-    public void appendText(Text text, boolean clear) {
+    private void setDoc(Text text) {
         try {
             StyleContext sc = StyleContext.getDefaultStyleContext();
             AttributeSet asset;
@@ -101,8 +107,7 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
             } catch (Exception e) {
                 asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
             }
-            if(clear)
-                doc.remove(0, doc.getLength());
+            doc.remove(0, doc.getLength());
             doc.insertString(doc.getLength(), text.getText(), asset);
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,6 +115,9 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
     }
 
     public void updateText() {
+        if(formatted) {
+            setDoc(textFormat.format(this.text));
+        }
         setDocument(doc);
     }
 }
