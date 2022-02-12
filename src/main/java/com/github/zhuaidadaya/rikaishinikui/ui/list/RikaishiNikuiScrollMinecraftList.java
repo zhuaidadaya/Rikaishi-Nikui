@@ -1,7 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
-import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;
 
@@ -96,6 +96,11 @@ public class RikaishiNikuiScrollMinecraftList extends JScrollPane implements Rik
             disableBorder();
         else
             enableBorder();
+
+        if(list.listSize() > 0 & list.getSelectedIndex() < 0) {
+            list.setSelectedIndex(0);
+        }
+
         list.apply(json.getJSONObject("list"));
     }
 }

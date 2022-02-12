@@ -12,18 +12,14 @@ public class ResourceDownloader {
     private Set<FileDownloader> activeDownloads = new HashSet<>();
     private boolean running = true;
 
-    public void downloadFile(NetworkFileInformation file, int threads) throws Exception {
+    public void downloadFile(NetworkFileInformation file, int threads) {
         File target = new File(file.getPath());
         if(file.getSha1().equals("") || ! file.getSha1().equals(FileCheckUtil.sha1(target))) {
             target.delete();
             FileDownloader downloader = new FileDownloader();
             activeDownloads.add(downloader);
             try {
-                if(threads == 0) {
-                    downloader.downloadWithBUf(file.getUrl(), file.getPath());
-                } else {
-                    downloader.downloadWithThreadPool(file.getUrl(), file.getPath(), threads);
-                }
+                downloader.downloadWithThreadPool(file.getUrl(), file.getPath(), threads);
             } catch (Exception e) {
 
             }
@@ -31,7 +27,7 @@ public class ResourceDownloader {
         }
     }
 
-    public void downloadFile(String url, String filePath) throws Exception {
+    public void downloadFile(String url, String filePath) {
         downloadFile(new NetworkFileInformation(url, filePath), - 1);
     }
 
@@ -42,7 +38,7 @@ public class ResourceDownloader {
         downloadFile(url, filePath);
     }
 
-    public void downloadFile(String url, String filePath, int threads, String sha1) throws Exception {
+    public void downloadFile(String url, String filePath, int threads, String sha1) {
         downloadFile(new NetworkFileInformation(url, filePath, sha1), threads);
     }
 
@@ -50,7 +46,7 @@ public class ResourceDownloader {
         return new FileDownloader().downloadWithStringBuilder(url);
     }
 
-    public void downloadFiles(Set<NetworkFileInformation> files) throws IOException {
+    public void downloadFiles(Set<NetworkFileInformation> files) {
         FileDownloader downloader = new FileDownloader();
         activeDownloads.add(downloader);
         try {

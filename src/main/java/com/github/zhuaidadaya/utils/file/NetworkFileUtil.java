@@ -41,7 +41,7 @@ public class NetworkFileUtil {
 
             return builder;
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
 
         return new StringBuilder();

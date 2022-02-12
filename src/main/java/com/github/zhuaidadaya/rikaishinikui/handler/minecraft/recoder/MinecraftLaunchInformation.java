@@ -1,13 +1,10 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftClassifiersParser;
 import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Random;
-import java.util.UUID;
 
 public class MinecraftLaunchInformation {
     private MinecraftVersionInformation versionInformation;

@@ -15,6 +15,6 @@ public class RikaishiNikuiScrollPanel extends JScrollPane {
         bar.setEnabled(true);
         bar.setUnitIncrement(50);
         setVerticalScrollBar(bar);
-        updateUI();
+        repaint();
     }
 }

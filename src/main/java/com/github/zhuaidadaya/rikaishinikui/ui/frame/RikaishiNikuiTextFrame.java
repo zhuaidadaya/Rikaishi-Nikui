@@ -1,20 +1,19 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.frame;
 
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
-import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiScrollPanel;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiTextPanel;
 import org.json.JSONObject;
 
 import javax.swing.*;
-import javax.swing.text.*;
 import java.awt.*;
 
-public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiComponent {
+public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
     private final RikaishiNikuiTextPanel textPane = new RikaishiNikuiTextPanel();
     private final RikaishiNikuiScrollPanel scrollPane = new RikaishiNikuiScrollPanel(textPane);
-    private String text;
 
     public RikaishiNikuiTextFrame() {
         init();
@@ -49,18 +48,11 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
     }
 
     public void setText(String text) {
-        this.text = text;
         textPane.setText(text);
-    }
-
-    public void setText(String text, Color color) {
-        this.text = text;
-        appendText(text, true, new Color(155, 144, 255));
     }
 
     public void appendText(String text, Color color) {
         appendText(text, false, color);
-
     }
 
     public void appendText(String text, boolean clear, Color color) {
@@ -68,12 +60,16 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
     }
 
     public void appendText(Text text, boolean clear) {
-        textPane.appendText(text,clear);
+        textPane.appendText(text, clear);
     }
 
-    public void updateUI() {
-        textPane.updateUI();
+    public void setText(Text text) {
+        textPane.setText(text);
+    }
+
+    public void updateText() {
         textPane.updateText();
+        textPane.repaint();
     }
 
     public void init() {
@@ -81,12 +77,26 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
 
         textPane.setEditable(false);
 
+        setLayout(null);
+        setResizable(false);
         scrollPane.getVerticalScrollBar().setValue(0);
         scrollPane.setHorizontalScrollBar(null);
         scrollPane.setViewportView(textPane);
         scrollPane.setBorder(null);
-        scrollPane.setBounds(0, 0, getWidth(), getHeight());
+        scrollPane.setBounds(0, 0, getWidth(), getHeight() - 25);
         add(scrollPane);
+    }
+
+    public void setCaretPosition(int position) {
+        textPane.setCaretPosition(position);
+    }
+
+    public void setCaretPositionToLast() {
+        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+    }
+
+    public void setCaretPositionToFirst() {
+        scrollPane.getVerticalScrollBar().setValue(0);
     }
 
     public void apply(JSONObject json) {

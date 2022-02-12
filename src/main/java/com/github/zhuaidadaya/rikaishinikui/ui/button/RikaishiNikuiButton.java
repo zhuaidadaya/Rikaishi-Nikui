@@ -1,7 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.button;
 
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
-import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;
 

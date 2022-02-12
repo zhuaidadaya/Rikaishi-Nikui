@@ -2,6 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.UUID;
 
 public class MinecraftVersionInformation {
@@ -13,6 +14,10 @@ public class MinecraftVersionInformation {
     private String type = "unknown";
     private String version = "unknown";
     private String url = "unknown";
+    private String lastLaunch = "unknown";
+    private String lockStatus = "lock.not";
+    private boolean idFormatted = true;
+    private String taskId = "unknown";
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
         this.id = id;
@@ -51,6 +56,14 @@ public class MinecraftVersionInformation {
 
     public MinecraftVersionInformation(JSONObject json) {
         apply(json);
+    }
+
+    public String getLockStatus() {
+        return lockStatus;
+    }
+
+    public void setLockStatus(String lockStatus) {
+        this.lockStatus = lockStatus;
     }
 
     public String getUrl() {
@@ -93,6 +106,14 @@ public class MinecraftVersionInformation {
         this.version = version;
     }
 
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
     public void apply(JSONObject json) {
         this.name = json.getString("name");
         this.id = json.getString("id");
@@ -102,6 +123,18 @@ public class MinecraftVersionInformation {
         this.type = json.getString("type");
         this.version = json.getString("version");
         this.url = json.getString("url");
+        this.lastLaunch = json.getString("last-launch");
+        this.idFormatted = json.getBoolean("formatted-by-id");
+        this.lockStatus = json.getString("lock-status");
+        this.taskId = json.getString("task-id");
+    }
+
+    public String getLastLaunch() {
+        return lastLaunch;
+    }
+
+    public void setLastLaunch(String lastLaunch) {
+        this.lastLaunch = lastLaunch;
     }
 
     public JSONObject toJSONObject() {
@@ -114,16 +147,56 @@ public class MinecraftVersionInformation {
         json.put("type", type);
         json.put("version", version);
         json.put("url", url);
+        json.put("last-launch", lastLaunch);
+        json.put("formatted-by-id", idFormatted);
+        json.put("lock-status", lockStatus);
+        json.put("task-id", taskId);
 
         return json;
     }
 
+    public boolean isIdFormatted() {
+        return idFormatted;
+    }
+
+    public void setIdFormatted(boolean idFormatted) {
+        this.idFormatted = idFormatted;
+    }
+
     public String formatPath() {
-        return String.format("%s/versions/%s", area, id);
+        String result = String.format("%s/versions/%s", area, id);
+        if(idFormatted & new File(result).isDirectory()) {
+            return result;
+        } else {
+            return String.format("%s/versions/%s", area, name);
+        }
     }
 
     public String formatManifest() {
-        return String.format("%s/versions/%s/%s.json", area, id, id);
+        String result = String.format("%s/versions/%s/%s.json", area, id, id);
+        if(idFormatted & new File(result).isFile()) {
+            return result;
+        } else {
+            return String.format("%s/versions/%s/%s.json", area, name, name);
+        }
+    }
+
+    public String formatClientPath() {
+        String result = String.format("%s/versions/%s/%s_client.jar", area, id, id);
+        if(idFormatted & new File(result).isFile()) {
+            return result;
+        } else {
+            return String.format("%s/versions/%s/%s_client.jar", area, name, name);
+        }
+    }
+
+    public String formatServerPath() {
+        String result = String.format("%s/versions/%s/%s_server.jar", area, id, id);
+        if(idFormatted & new File(result).isFile()) {
+            return result;
+        } else {
+            return String.format("%s/versions/%s/%s_server.jar", area, name, name);
+        }
     }
 
     public String getName() {

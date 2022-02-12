@@ -1,15 +1,16 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.panel;
 
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
-import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
 
-public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiComponent {
+public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
     private String text;
     private Document doc = new DefaultStyledDocument();
 
@@ -94,6 +95,10 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
 
     public void appendText(Text text, boolean clear) {
         try {
+            if(text.getText().equals("")) {
+                super.setText("");
+                return;
+            }
             StyleContext sc = StyleContext.getDefaultStyleContext();
             AttributeSet asset;
             try {

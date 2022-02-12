@@ -12,8 +12,64 @@
             "alpha": 255
         }
     },
+    "true": {
+        "text": "是"
+    },
+    "false": {
+        "text": "否"
+    },
     "main.button": {
         "text": "主页"
+    },
+    "launch.button": {
+        "text": "启动"
+    },
+    "cancel.button": {
+        "text": "取消"
+    },
+    "setting.button": {
+        "text": "设置"
+    },
+    "download.button": {
+        "text": "下载"
+    },
+    "refresh.button": {
+        "text": "刷新"
+    },
+    "delete.button": {
+        "text": "删除"
+    },
+    "lock.launching": {
+        "text": "启动中",
+        "color": {
+            "r": 217,
+            "g": 163,
+            "b": 67
+        }
+    },
+    "lock.not": {
+        "text": "未锁定",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "lock.canceling": {
+        "text": "取消中",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "lock.interrupted": {
+        "text": "已中断",
+        "color": {
+            "r": 152,
+            "g": 12,
+            "b": 10
+        }
     },
     "download.vanilla.button": {
         "text": "Vanilla"
@@ -38,6 +94,22 @@
             "b": 10
         }
     },
+    "status.destroyed": {
+        "text": "已损坏",
+        "color": {
+            "r": 152,
+            "g": 12,
+            "b": 10
+        }
+    },
+    "status.checking": {
+        "text": "检查中",
+        "color": {
+            "r": 140,
+            "g": 122,
+            "b": 165
+        }
+    },
     "status.downloading": {
         "text": "下载中",
         "color": {
@@ -48,6 +120,30 @@
     },
     "status.ready": {
         "text": "已就绪",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "status.interrupted": {
+        "text": "已中断",
+        "color": {
+            "r": 152,
+            "g": 12,
+            "b": 10
+        }
+    },
+    "status.interrupting": {
+        "text": "正在中断",
+        "color": {
+            "r": 217,
+            "g": 163,
+            "b": 67
+        }
+    },
+    "status.canceling": {
+        "text": "取消中",
         "color": {
             "r": 106,
             "g": 135,
@@ -126,7 +222,47 @@
             "b": 89
         }
     },
+    "minecraft.information.last-launch": {
+        "text": "上一次启动",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.formatted-by-id": {
+        "text": "使用id格式化",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.lock-status": {
+        "text": "锁定状态",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.task-id": {
+        "text": "任务id",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
     "tip.search": {
         "text": "查找版本:"
+    },
+    "minecraft.type.vanilla": {
+        "text": "原版Minecraft",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
     }
 }

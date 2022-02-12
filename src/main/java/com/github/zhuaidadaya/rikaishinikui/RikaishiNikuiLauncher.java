@@ -1,9 +1,14 @@
 package com.github.zhuaidadaya.rikaishinikui;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launch.MinecraftLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftVersionsParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftLaunchInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionsRecorder;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiDownloadRefreshTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftDownloadTask;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftTask;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
 import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
 import com.github.zhuaidadaya.rikaishinikui.language.Language;
@@ -17,6 +22,8 @@ import com.github.zhuaidadaya.rikaishinikui.ui.list.RikaishiNikuiScrollMinecraft
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
 import com.github.zhuaidadaya.utils.config.EncryptionType;
 import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
+import com.github.zhuaidadaya.utils.file.FileUtil;
+import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONObject;
 
@@ -24,8 +31,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.*;
-import java.util.List;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
@@ -36,7 +43,7 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiTextFrame errorFrame;
     public RikaishiNikuiTextFrame logFrame;
 
-    public RikaishiNikuiButtonPanel buttonPanel;
+    public RikaishiNikuiButtonPanel buttons;
 
     public RikaishiNikuiPanel mainPanel;
 
@@ -47,6 +54,8 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiTipPanel searchLocalTip;
     public RikaishiNikuiEditingTextPanel searchLocalVersion;
 
+    public RikaishiNikuiButtonPanel mainOperationButtons;
+
     public RikaishiNikuiPanel downloadInformationPanel;
     public RikaishiNikuiPanel downloadVersionPanel;
     public RikaishiNikuiScrollMinecraftList downloadVersionList;
@@ -54,7 +63,13 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiTipPanel searchDownloadTip;
     public RikaishiNikuiEditingTextPanel searchDownloadVersion;
 
+    public RikaishiNikuiButtonPanel downloadOperationButtons;
+
     public MinecraftVersionsParser downloadVersions;
+
+    public UUID REFRESH_TASK_ID = UUID.randomUUID();
+    public UUID LAUNCH_DOWNLOAD_TASK_ID = UUID.randomUUID();
+    public UUID testUUID = UUID.randomUUID();
 
     public ObjectRBTreeSet<String> options = new ObjectRBTreeSet<>();
     private boolean running = false;
@@ -79,9 +94,10 @@ public class RikaishiNikuiLauncher {
             running = true;
 
             mainFrame = new RikaishiNikuiFrame(1000, 800, "main", true, "main.frame");
+            mainFrame.setAlwaysOnTop(false);
 
             mainPanel = new RikaishiNikuiPanel("main");
-            buttonPanel = new RikaishiNikuiButtonPanel("main");
+            buttons = new RikaishiNikuiButtonPanel("main");
             mainInformationPanel = new RikaishiNikuiPanel("main");
 
             mainVersionPanel = new RikaishiNikuiPanel("main");
@@ -89,6 +105,7 @@ public class RikaishiNikuiLauncher {
             mainVersionDetailsPanel = new RikaishiNikuiTextPanel("main");
             searchLocalVersion = new RikaishiNikuiEditingTextPanel();
             searchLocalTip = new RikaishiNikuiTipPanel();
+            mainOperationButtons = new RikaishiNikuiButtonPanel();
 
             downloadInformationPanel = new RikaishiNikuiPanel("download");
             downloadVersionPanel = new RikaishiNikuiPanel("download");
@@ -96,6 +113,7 @@ public class RikaishiNikuiLauncher {
             downloadVersionDetailsPanel = new RikaishiNikuiTextPanel("download");
             searchDownloadVersion = new RikaishiNikuiEditingTextPanel();
             searchDownloadTip = new RikaishiNikuiTipPanel();
+            downloadOperationButtons = new RikaishiNikuiButtonPanel();
 
             try {
                 initUi();
@@ -103,33 +121,20 @@ public class RikaishiNikuiLauncher {
                 testRending();
             } catch (Exception ex) {
                 defaultMainInformationPanel();
-                defaultMainPanelButtons();
+                defaultButtonsUi();
 
                 defaultDownloadInformationPanel();
 
                 defaultUiConfig();
+
+                defaultConfig();
 
                 initUi();
 
                 testRending();
             }
 
-            try {
-                try {
-                    minecraftVersions = new MinecraftVersionsRecorder(config.getConfigJSONObject("versions"));
-                } catch (Exception ex) {
-                    minecraftVersions = new MinecraftVersionsRecorder();
-                    config.set("versions", minecraftVersions.toJSONObject());
-                }
-
-                if(minecraftVersions.getVersionNames().size() < 1) {
-                    //                    versionList.setListData(minecraftVersions.getBadVersion());
-                } else {
-                    mainVersionList.setListData(minecraftVersions.getVersions());
-                }
-            } catch (Exception e) {
-
-            }
+            recoveryVersionsStatus();
 
             mainFrame.getContentPane().setBackground(RikaishiNikuiColor.BLACK);
             mainFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -146,7 +151,9 @@ public class RikaishiNikuiLauncher {
 
                     synchronized(this) {
                         try {
-                            tick();
+                            if(mainFrame.isFocused()) {
+                                tick();
+                            }
                         } catch (Exception e) {
                             parseError(e, "error in tick thread, stop tick task");
                             break;
@@ -165,16 +172,25 @@ public class RikaishiNikuiLauncher {
                 shutdown = true;
             }).start();
 
+            String cache = "logs/cached/";
+            try {
+                FileUtil.deleteFiles(cache);
+            } catch (Exception e) {
+
+            }
+
             if(this.options.contains("-DlogFrameVisible"))
                 logFrame.setVisible(true);
 
-            //            RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask("1.17.1", "az1");
-            //            downloadTask.join(taskManager);
-            //            try {
-            //                Thread.sleep(15000);
-            //            } catch (InterruptedException e) {
+            mainFrame.setVisible(true);
+
+            //                                    RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask("1.16.5", "az1");
+            //                                    downloadTask.join(taskManager);
+            //                                    try {
+            //                                        Thread.sleep(15000);
+            //                                    } catch (InterruptedException e) {
             //
-            //            }
+            //                                    }
             //            Collection<String> vmOption = new ObjectRBTreeSet<>();
             //            vmOption.add("-Xmx2G");
             //            vmOption.add("-Xms2G");
@@ -190,6 +206,23 @@ public class RikaishiNikuiLauncher {
         //        minecraftDownloader.download("1.17.1", "test-1.17.1");
     }
 
+    public void recoveryVersionsStatus() {
+        setLocalInformationList();
+        detectAreaVersions();
+
+        for(MinecraftVersionInformation information : minecraftVersions.getVersions()) {
+            if(! information.getLockStatus().equals("lock.not")) {
+                information.setLockStatus("lock.not");
+            }
+            if(! information.getStatus().equals("status.undefined") & ! information.getStatus().equals("status.interrupted") & ! information.getStatus().equals("status.interrupting")) {
+                if(! information.getStatus().equals("status.ready")) {
+                    information.setStatus("status.ready");
+                }
+            }
+            minecraftVersions.add(information);
+        }
+    }
+
     public void initConfig() {
         configUi = new ObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui", "rikaishi_nikui_ui.mhf").setNote(textFormat.getText("config.note.ui")).setEncryption(false).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(50);
         config = new ObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui", "rikaishi_nikui.mhf").setNote(textFormat.getText("config.note"));
@@ -199,7 +232,6 @@ public class RikaishiNikuiLauncher {
         configUi.readConfig(false);
         config.readConfig(false);
         rending();
-        mainFrame.setVisible(true);
     }
 
     public void parseError(Throwable throwable, String source) {
@@ -212,6 +244,7 @@ public class RikaishiNikuiLauncher {
         logger.error(source, throwable);
 
         mainFrame.setVisible(false);
+        logFrame.setVisible(false);
         errorFrame.setVisible(true);
         if(shutdownCU) {
             logger.error("invaliding (UI)CU, protection the config file");
@@ -223,11 +256,40 @@ public class RikaishiNikuiLauncher {
         for(StackTraceElement s : throwable.getStackTrace())
             appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
         appendErrorFrameText(textFormat.format("happened.error.tip"), false);
-        errorFrame.updateUI();
+        errorFrame.updateText();
     }
 
     public void rending() {
         applyUi();
+    }
+
+    public void detectAreaVersions() {
+        try {
+            String area = config.getConfigString("area");
+            for(File f : new File(area + "/versions/").listFiles()) {
+                if(minecraftVersions.getVersionAsId(f.getName()) == null) {
+                    if(minecraftVersions.getVersionAsName(f.getName()) == null) {
+                        String name = f.getName();
+                        String id = name;
+                        MinecraftVersionInformation information = new MinecraftVersionInformation(id, name, "status.undefined");
+                        try {
+                            UUID.fromString(id);
+                            information.setIdFormatted(true);
+                        } catch (Exception ex) {
+                            id = UUID.randomUUID().toString();
+                            information.setIdFormatted(false);
+                        }
+                        information.setId(id);
+                        information.setName(name);
+                        information.setArea(area);
+                        information.setType("minecraft.type.vanilla");
+                        minecraftVersions.add(information);
+                    }
+                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     public void setLocalInformationList() {
@@ -238,6 +300,8 @@ public class RikaishiNikuiLauncher {
                 minecraftVersions = new MinecraftVersionsRecorder();
                 config.set("versions", minecraftVersions.toJSONObject());
             }
+
+            detectAreaVersions();
 
             Collection<MinecraftVersionInformation> names = minecraftVersions.getVersions(searchLocalVersion.getText());
 
@@ -268,17 +332,58 @@ public class RikaishiNikuiLauncher {
     public void setLocalInformationText() {
         try {
             MinecraftVersionInformation information = mainVersionList.getSelectedValue();
+            if(new File(information.formatManifest()).isFile()) {
+                if(information.getStatus().equals("status.undefined") & ! information.getStatus().equals("status.destroyed")) {
+                    information.setStatus("status.ready");
+                }
+
+                try {
+                    JSONObject gameSource = new JSONObject(NetworkFileUtil.downloadToStringBuilder(information.formatManifest()).toString());
+                    information.setVersion(gameSource.getString("id"));
+                } catch (Exception ex) {
+
+                }
+            } else {
+                information.setStatus("status.undefined");
+            }
+
+            if(information.getLockStatus().equals("lock.launching")) {
+                try {
+                    if(! taskManager.hasTask(UUID.fromString(information.getTaskId()))) {
+                        information.setLockStatus("lock.not");
+                        information.setStatus("status.ready");
+                    }
+                } catch (Exception e) {
+                    information.setLockStatus("lock.not");
+                    information.setStatus("status.ready");
+                }
+            }
+
             JSONObject inf = information.toJSONObject();
             mainVersionDetailsPanel.setText("");
             for(String s : inf.keySet()) {
-                mainVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
-                mainVersionDetailsPanel.appendText(": ");
-                mainVersionDetailsPanel.appendText(textFormat.format(inf.getString(s)), false);
-                mainVersionDetailsPanel.appendText("\n");
+                try {
+                    new JSONObject(inf.getString(s));
+                } catch (Exception e) {
+                    mainVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
+                    mainVersionDetailsPanel.appendText(": ");
+                    mainVersionDetailsPanel.appendText(textFormat.format(inf.get(s).toString()), false);
+                    mainVersionDetailsPanel.appendText("\n");
+                }
             }
             mainVersionDetailsPanel.updateText();
-        } catch (Exception ex) {
 
+            if(information.getStatus().equals("status.interrupting"))
+                throw new Exception();
+            mainOperationButtons.getButton(0).setVisible(information.getStatus().equals("status.ready") & information.getLockStatus().equals("lock.not"));
+            mainOperationButtons.getButton(1).setVisible(information.getLockStatus().equals("lock.launching") || information.getStatus().equals("status.downloading"));
+            mainOperationButtons.getButton(2).setVisible(true);
+            mainOperationButtons.getButton(3).setVisible(information.getStatus().equals("status.interrupted") || information.getStatus().equals("status.undefined"));
+        } catch (Exception ex) {
+            mainOperationButtons.getButton(0).setVisible(false);
+            mainOperationButtons.getButton(1).setVisible(false);
+            mainOperationButtons.getButton(2).setVisible(false);
+            mainOperationButtons.getButton(3).setVisible(false);
         }
     }
 
@@ -286,17 +391,29 @@ public class RikaishiNikuiLauncher {
         try {
             MinecraftVersionInformation information = downloadVersionList.getSelectedValue();
             JSONObject inf = information.toJSONObject();
+            inf.remove("last-launch");
+            inf.remove("formatted-by-id");
             downloadVersionDetailsPanel.setText("");
             for(String s : inf.keySet()) {
-                downloadVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
-                downloadVersionDetailsPanel.appendText(": ");
-                downloadVersionDetailsPanel.appendText(textFormat.format(inf.getString(s)), false);
-                downloadVersionDetailsPanel.appendText("\n");
+                try {
+                    new JSONObject(inf.getString(s));
+                } catch (Exception e) {
+                    downloadVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
+                    downloadVersionDetailsPanel.appendText(": ");
+                    downloadVersionDetailsPanel.appendText(textFormat.format(inf.getString(s)), false);
+                    downloadVersionDetailsPanel.appendText("\n");
+                }
             }
             downloadVersionDetailsPanel.updateText();
-        } catch (Exception ex) {
 
+            downloadOperationButtons.getButton(1).setVisible(information.getStatus().equals("status.download.ready"));
+        } catch (Exception ex) {
+            downloadOperationButtons.getButton(1).setVisible(false);
         }
+    }
+
+    public void defaultConfig() {
+        config.setIfNoExist("area", "minecraft");
     }
 
     public void defaultUiConfig() {
@@ -314,9 +431,9 @@ public class RikaishiNikuiLauncher {
     }
 
     public void applyUi() {
-        mainFrame.apply(configUi.getConfigJSONObject("frame-main"));
+        //        mainFrame.apply(configUi.getConfigJSONObject("frame-main"));
 
-        switch(buttonPanel.getActiveButton().getId()) {
+        switch(buttons.getActiveButton().getId()) {
             case 0 -> {
                 setMainVisible();
 
@@ -332,6 +449,9 @@ public class RikaishiNikuiLauncher {
 
                 searchLocalVersion.apply(configUi.getConfigJSONObject("search-local"));
                 searchLocalTip.apply(configUi.getConfigJSONObject("search-local-tip"));
+
+                mainOperationButtons.applyButtons(configUi.getConfigJSONObject("button-panel-main-operation").getJSONObject("buttons"));
+                mainOperationButtons.apply(configUi.getConfigJSONObject("button-panel-main-operation"));
             }
             case 1 -> {
                 setDownloadInformationList();
@@ -346,11 +466,14 @@ public class RikaishiNikuiLauncher {
 
                 searchDownloadVersion.apply(configUi.getConfigJSONObject("search-download"));
                 searchDownloadTip.apply(configUi.getConfigJSONObject("search-download-tip"));
+
+                downloadOperationButtons.applyButtons(configUi.getConfigJSONObject("button-panel-download-operation").getJSONObject("buttons"));
+                downloadOperationButtons.apply(configUi.getConfigJSONObject("button-panel-download-operation"));
             }
         }
 
-        buttonPanel.applyButtons(configUi.getConfigJSONObject("button-panel-main").getJSONObject("buttons"));
-        buttonPanel.apply(configUi.getConfigJSONObject("button-panel-main"));
+        buttons.applyButtons(configUi.getConfigJSONObject("button-panel-main").getJSONObject("buttons"));
+        buttons.apply(configUi.getConfigJSONObject("button-panel-main"));
     }
 
     public void setMainVisible(boolean visible) {
@@ -360,6 +483,7 @@ public class RikaishiNikuiLauncher {
         mainVersionDetailsPanel.setVisible(visible);
         searchLocalTip.setVisible(visible);
         searchLocalVersion.setVisible(visible);
+        mainOperationButtons.setVisible(visible);
     }
 
     public void setMainVisible() {
@@ -374,6 +498,7 @@ public class RikaishiNikuiLauncher {
         downloadVersionDetailsPanel.setVisible(visible);
         searchDownloadVersion.setVisible(visible);
         searchDownloadTip.setVisible(visible);
+        downloadOperationButtons.setVisible(visible);
     }
 
     public void setDownloadVisible() {
@@ -388,11 +513,13 @@ public class RikaishiNikuiLauncher {
         mainVersionPanel.apply(configUi.getConfigJSONObject("information-panel-main-version"));
         mainVersionList.apply(configUi.getConfigJSONObject("list-panel-versions"));
         mainVersionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-main-version-details"));
+        mainOperationButtons.apply(configUi.getConfigJSONObject("button-panel-main-operation"));
 
         downloadInformationPanel.apply(configUi.getConfigJSONObject("information-panel-download"));
         downloadVersionPanel.apply(configUi.getConfigJSONObject("information-panel-download-version"));
         downloadVersionList.apply(configUi.getConfigJSONObject("list-panel-versions-download"));
         downloadVersionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-download-version-details"));
+        downloadOperationButtons.apply(configUi.getConfigJSONObject("button-panel-download-operation"));
 
         searchLocalVersion.apply(configUi.getConfigJSONObject("search-local"));
         searchLocalTip.apply(configUi.getConfigJSONObject("search-local-tip"));
@@ -404,16 +531,18 @@ public class RikaishiNikuiLauncher {
     public void initUi() {
         mainFrame.setLayout(null);
         mainPanel.setLayout(null);
-        buttonPanel.setLayout(null);
+        buttons.setLayout(null);
         mainInformationPanel.setLayout(null);
         mainVersionPanel.setLayout(null);
         downloadInformationPanel.setLayout(null);
         downloadVersionPanel.setLayout(null);
         downloadVersionDetailsPanel.setLayout(null);
+        mainOperationButtons.setLayout(null);
+        downloadOperationButtons.setLayout(null);
 
         mainFrame.add(mainPanel);
         mainPanel.add(mainInformationPanel);
-        mainPanel.add(buttonPanel);
+        mainPanel.add(buttons);
         mainPanel.add(mainVersionDetailsPanel);
 
         mainPanel.add(downloadInformationPanel);
@@ -425,13 +554,31 @@ public class RikaishiNikuiLauncher {
         mainVersionPanel.add(mainVersionList);
         mainInformationPanel.add(mainVersionPanel);
 
+        mainInformationPanel.add(mainOperationButtons);
+
         mainInformationPanel.add(searchLocalVersion);
         mainInformationPanel.add(searchLocalTip);
 
         downloadInformationPanel.add(searchDownloadVersion);
         downloadInformationPanel.add(searchDownloadTip);
 
+        downloadInformationPanel.add(downloadOperationButtons);
+
         functionButtons();
+    }
+
+    public void defaultMainOperationButtons() {
+        mainOperationButtons = new RikaishiNikuiButtonPanel(350, 40, "main-operation");
+        mainOperationButtons.setXY(0, 660);
+        mainOperationButtons.setBackground(new RikaishiNikuiColor(43, 43, 43));
+        configUi.set("button-panel-main-operation", mainOperationButtons.toJSONObject());
+    }
+
+    public void defaultDownloadOperationButtons() {
+        downloadOperationButtons = new RikaishiNikuiButtonPanel(350, 40, "main-operation");
+        downloadOperationButtons.setXY(0, 660);
+        downloadOperationButtons.setBackground(new RikaishiNikuiColor(43, 43, 43));
+        configUi.set("button-panel-download-operation", downloadOperationButtons.toJSONObject());
     }
 
     public void defaultMainInformationPanel() {
@@ -445,7 +592,7 @@ public class RikaishiNikuiLauncher {
         mainVersionList.setListColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
         mainVersionList.setSelectionColor(new RikaishiNikuiColor(58, 58, 58), new RikaishiNikuiColor(214, 214, 214));
         configUi.set("list-panel-versions", mainVersionList.toJSONObject());
-        mainVersionPanel = new RikaishiNikuiPanel(350, 700, "main");
+        mainVersionPanel = new RikaishiNikuiPanel(350, 660, "main");
         mainVersionPanel.setXY(0, 0);
         mainVersionPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("information-panel-main-version", mainVersionPanel.toJSONObject());
@@ -477,7 +624,7 @@ public class RikaishiNikuiLauncher {
         downloadVersionList.setListColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
         downloadVersionList.setSelectionColor(new RikaishiNikuiColor(58, 58, 58), new RikaishiNikuiColor(214, 214, 214));
         configUi.set("list-panel-versions-download", downloadVersionList.toJSONObject());
-        downloadVersionPanel = new RikaishiNikuiPanel(350, 700, "main");
+        downloadVersionPanel = new RikaishiNikuiPanel(350, 660, "main");
         downloadVersionPanel.setXY(0, 0);
         downloadVersionPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("information-panel-download-version", downloadVersionPanel.toJSONObject());
@@ -498,38 +645,150 @@ public class RikaishiNikuiLauncher {
         configUi.set("search-download-tip", searchDownloadTip.toJSONObject());
     }
 
-    public void defaultMainPanelButtons() {
-        buttonPanel = new RikaishiNikuiButtonPanel(1000, 40, "main");
-        buttonPanel.setXY(0, 730);
-        buttonPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
+    public void defaultButtonsUi() {
+        defaultBarButtons();
+        defaultMainOperationButtons();
+        defaultDownloadOperationButtons();
         functionButtons();
-        configUi.set("button-panel-main", buttonPanel.toJSONObject());
+
+        configUi.set("button-panel-main", buttons.toJSONObject());
+        configUi.set("button-panel-main-operation", mainOperationButtons.toJSONObject());
+        configUi.set("button-panel-download-operation", downloadOperationButtons.toJSONObject());
+    }
+
+    public void defaultBarButtons() {
+        buttons = new RikaishiNikuiButtonPanel(1000, 40, "main");
+        buttons.setXY(0, 730);
+        buttons.setBackground(new RikaishiNikuiColor(43, 43, 43));
+        configUi.set("button-panel-main", buttons.toJSONObject());
     }
 
     public void functionButtons() {
         RikaishiNikuiButton mainButton = new RikaishiNikuiButton(100, 40, "main", "main.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), true).setId(0);
         mainButton.addActionListener(e -> {
-            buttonPanel.cancelButtonsActive();
-            buttonPanel.getButton(0).setActive(true);
+            buttons.cancelButtonsActive();
+            buttons.getButton(0).setActive(true);
         });
-        buttonPanel.applyButtons(mainButton);
-        RikaishiNikuiButton downloadButtons = new RikaishiNikuiButton(100, 40, "download", "download.vanilla.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(1);
-        downloadButtons.addActionListener(e -> {
-            buttonPanel.cancelButtonsActive();
-            buttonPanel.getButton(1).setActive(true);
+        buttons.applyButtons(mainButton);
+        RikaishiNikuiButton downloadButton = new RikaishiNikuiButton(100, 40, "download", "download.vanilla.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(1);
+        downloadButton.addActionListener(e -> {
+            buttons.cancelButtonsActive();
+            buttons.getButton(1).setActive(true);
         });
-        buttonPanel.applyButtons(downloadButtons);
-        buttonPanel.applyButtons(new RikaishiNikuiButton(100, 40, "function#2", "某功能#2", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2));
-        buttonPanel.applyButtons(new RikaishiNikuiButton(100, 40, "function#3", "某功能#3", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(3));
-        buttonPanel.applyButtons(new RikaishiNikuiButton(100, 40, "function#4", "某功能#4", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(4));
+        buttons.applyButtons(downloadButton);
+        buttons.applyButtons(new RikaishiNikuiButton(100, 40, "function#2", "某功能#2", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2));
+        buttons.applyButtons(new RikaishiNikuiButton(100, 40, "function#3", "某功能#3", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(3));
+        buttons.applyButtons(new RikaishiNikuiButton(100, 40, "function#4", "某功能#4", false).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(4));
+
+        RikaishiNikuiButton launch = new RikaishiNikuiButton(100, 40, "launch", "launch.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(0);
+        launch.addActionListener(e -> {
+            MinecraftVersionInformation information = mainVersionList.getSelectedValue();
+            try {
+                if(! information.getLockStatus().equals("lock.launching")) {
+                    information.setLockStatus("lock.launching");
+                    minecraftVersions.add(information);
+                    RikaishiNikuiMinecraftTask minecraftTask = new RikaishiNikuiMinecraftTask(new MinecraftLauncher(new MinecraftLaunchInformation(mainVersionList.getSelectedValue(), os, "java", new Account("zhuaidadaya", UUID.randomUUID().toString()))));
+                    information.setTaskId(minecraftTask.getId().toString());
+                    RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, UUID.randomUUID(), true);
+                    minecraftTask.setParentTask(downloadTask);
+                    taskManager.join(minecraftTask);
+                    testUUID = minecraftTask.getId();
+//                    taskManager.submitter(logFrame,testUUID);
+                }
+            } catch (Exception ex) {
+                information.setStatus("status.destroyed");
+                minecraftVersions.add(information);
+            }
+        });
+
+        mainOperationButtons.applyButtons(launch);
+
+        RikaishiNikuiButton cancel = new RikaishiNikuiButton(100, 40, "cancel", "cancel.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(1);
+        cancel.addActionListener(e -> {
+            MinecraftVersionInformation information = mainVersionList.getSelectedValue();
+            try {
+                if(taskManager.hasTask(UUID.fromString(information.getTaskId()))) {
+                    information.setLockStatus("lock.canceling");
+                    information.setStatus("status.canceling");
+                    minecraftVersions.add(information);
+                    try {
+                        taskManager.quit(UUID.fromString(information.getTaskId()));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    information.setLockStatus("lock.not");
+                    information.setStatus("status.ready");
+                    minecraftVersions.add(information);
+                    //                    if(information.getStatus().equals("status.interrupted")) {
+                    //                        minecraftVersions.remove(information);
+                    //                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        mainOperationButtons.applyButtons(cancel);
+
+        RikaishiNikuiButton setting = new RikaishiNikuiButton(100, 40, "setting", "setting.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2);
+        setting.addActionListener(e -> {
+
+        });
+
+        mainOperationButtons.applyButtons(setting);
+
+        RikaishiNikuiButton delete = new RikaishiNikuiButton(100, 40, "delete", "delete.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(3);
+        delete.addActionListener(e -> {
+            MinecraftVersionInformation information = mainVersionList.getSelectedValue();
+            try {
+                FileUtil.deleteFiles(information.getPath());
+            } catch (Exception ex) {
+
+            }
+            minecraftVersions.remove(information);
+            mainVersionDetailsPanel.setText("");
+        });
+
+        mainOperationButtons.applyButtons(delete);
+
+        RikaishiNikuiButton download = new RikaishiNikuiButton(100, 40, "download", "download.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(1);
+        download.addActionListener(e -> {
+            String id = UUID.randomUUID().toString();
+            String area = config.getConfigString("area");
+            if(area == null) {
+                area = "minecraft";
+                config.set("area", area);
+            }
+            String version = downloadVersionList.getSelectedValue().getVersion();
+            UUID taskId = UUID.randomUUID();
+            MinecraftVersionInformation information = new MinecraftVersionInformation(id, version + "-" + id, "status.downloading");
+            information.setVersion(version);
+            information.setTaskId(taskId.toString());
+            information.setArea(area);
+            RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, taskId, false);
+            taskManager.join(downloadTask);
+        });
+
+        downloadOperationButtons.applyButtons(download);
+
+        RikaishiNikuiButton refresh = new RikaishiNikuiButton(100, 40, "download#refresh", "refresh.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(0);
+        refresh.addActionListener(e -> {
+            RikaishiNikuiDownloadRefreshTask refreshTask = new RikaishiNikuiDownloadRefreshTask(REFRESH_TASK_ID, minecraftDownloader);
+            taskManager.join(refreshTask);
+        });
+
+        downloadOperationButtons.applyButtons(refresh);
     }
 
     public void appendErrorFrameText(Text text, boolean clear) {
         errorFrame.appendText(text, clear);
+        errorFrame.updateText();
     }
 
     public void appendLogFrameText(Text text, boolean clear) {
         logFrame.appendText(text, clear);
+        logFrame.updateText();
+        logFrame.setCaretPositionToFirst();
     }
 
     public void initCloseEvent() {

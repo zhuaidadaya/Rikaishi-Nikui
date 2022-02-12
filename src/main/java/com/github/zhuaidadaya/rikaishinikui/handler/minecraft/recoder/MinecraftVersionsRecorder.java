@@ -1,7 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import org.json.JSONObject;
 
 import java.util.Collection;
@@ -31,7 +30,13 @@ public class MinecraftVersionsRecorder {
         config.set("versions", toJSONObject());
     }
 
-    public Collection<String> getVersionNames() {
+    public void remove(MinecraftVersionInformation information) {
+        versions.remove(information.getId());
+        versionNames.remove(information.getId());
+        config.set("versions", toJSONObject());
+    }
+
+        public Collection<String> getVersionNames() {
         return versionNames.values();
     }
 
@@ -49,7 +54,16 @@ public class MinecraftVersionsRecorder {
         return result;
     }
 
-    public MinecraftVersionInformation getVersion(String id) {
+    public MinecraftVersionInformation getVersionAsName(String name) {
+        for(MinecraftVersionInformation information : versions.values()) {
+            if(information.getName().equals(name)) {
+                return information;
+            }
+        }
+        return null;
+    }
+
+    public MinecraftVersionInformation getVersionAsId(String id) {
         return versions.get(id);
     }
 

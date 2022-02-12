@@ -25,4 +25,15 @@ public class Variables {
     public static RikaishiNikuiMinecraftDownloader minecraftDownloader = new RikaishiNikuiMinecraftDownloader();
     public static MinecraftVersionsRecorder minecraftVersions = new MinecraftVersionsRecorder();
     public static RikaishiNikuiTaskManager taskManager = new RikaishiNikuiTaskManager();
+    public static String os;
+
+    static {
+        String osName = System.getProperty("os.name");
+        if(osName.contains("Windows"))
+            os = "windows";
+        else if(osName.contains("Linux"))
+            os = "linux";
+        else if(osName.contains("Macos"))
+            os = "macos";
+    }
 }

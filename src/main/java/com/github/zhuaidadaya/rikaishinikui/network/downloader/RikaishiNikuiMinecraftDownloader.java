@@ -1,30 +1,26 @@
 package com.github.zhuaidadaya.rikaishinikui.network.downloader;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launch.MinecraftLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.*;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
 import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import com.github.zhuaidadaya.utils.string.checker.StringCheckUtil;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.minecraftVersions;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiMinecraftDownloader {
     private final int taskThreads = 0;
     private final ResourceDownloader downloader = new ResourceDownloader();
+    private final String DEFAULT_MANIFEST = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
+    private final String DEFAULT_RESOURCE = "http://resources.download.minecraft.net";
     private int lastTaskThreads = 0;
     private int threads = - 1;
     private boolean running = true;
-    private final String DEFAULT_MANIFEST = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
-    private final String DEFAULT_RESOURCE = "http://resources.download.minecraft.net";
 
     public RikaishiNikuiMinecraftDownloader() {
 
@@ -61,11 +57,33 @@ public class RikaishiNikuiMinecraftDownloader {
         return new MinecraftVersionsParser(versionManifest);
     }
 
-    public boolean download(String area, String id, String name) {
-        try {
-            String localId = UUID.randomUUID().toString();
+    public boolean downloadVanilla(String area, String gameId, String name, String versionId, boolean isFix, String taskId) {
+        MinecraftVersionInformation information = new MinecraftVersionInformation(versionId, name, "downloading");
+        information.setTaskId(taskId);
+        information.setArea(area);
+        information.setVersion(gameId);
+        return downloadVanilla(information, isFix);
+    }
 
-            MinecraftVersionInformation information = new MinecraftVersionInformation(localId, name, area, "Vanilla", "status.downloading", id);
+    public boolean downloadVanilla(MinecraftVersionInformation information, boolean isFix) {
+        try {
+            running = true;
+
+            information.setType("minecraft.type.vanilla");
+
+            String versionId = information.getId();
+            if(! information.isIdFormatted()) {
+                versionId = information.getName();
+            }
+            String area = information.getArea();
+            String gameId = information.getVersion();
+            if(isFix) {
+                information.setStatus("status.checking");
+            } else {
+                information.setStatus("status.downloading");
+            }
+
+            information.setUrl(information.formatManifest());
 
             minecraftVersions.add(information);
 
@@ -81,92 +99,95 @@ public class RikaishiNikuiMinecraftDownloader {
 
             MinecraftVersionsParser versionsParser = getVersions(url, downloader);
 
-            information = new MinecraftVersionInformation(localId, name, area, "Vanilla", "status.downloading", id);
-            information.setUrl(versionsParser.getVersion(id).getUrl());
+            information.setUrl(versionsParser.getVersion(gameId).getUrl());
 
             minecraftVersions.add(information);
 
-            String manifestPath = String.format("%s/versions/%s/%s.json", area, localId, localId);
-            downloader.downloadFile(new NetworkFileInformation(versionsParser.getVersion(id).getUrl(), manifestPath), 0);
+            String manifestPath = String.format("%s/versions/%s/%s.json", area, versionId, versionId);
+            downloader.downloadFile(new NetworkFileInformation(versionsParser.getVersion(gameId).getUrl(), manifestPath), 0);
             JSONObject version = new JSONObject(downloader.downloadFileToStringBuilder(manifestPath).toString());
 
             MinecraftAssetIndexParser assetsIndexParser = new MinecraftAssetIndexParser(version, area);
 
             downloader.downloadFile(new NetworkFileInformation(assetsIndexParser.getUrl(), assetsIndexParser.getPath(), assetsIndexParser.getSha1()), - 1);
 
-            String os = System.getProperty("os.name");
-            if(os.contains("Windows"))
-                os = "windows";
-            else if(os.contains("Linux"))
-                os = "linux";
-            else if(os.contains("Macos"))
-                os = "macos";
-
             MinecraftLibrariesParser downloadParser = new MinecraftLibrariesParser(version, area, os);
 
             String finalOs = os;
             MinecraftClassifiersParser classifiersParser = new MinecraftClassifiersParser(version, area, finalOs);
+
+            MinecraftAssetsParser assetsParser = new MinecraftAssetsParser(resourceUrl, area, new JSONObject(downloader.downloadFileToStringBuilder(assetsIndexParser.getPath()).toString()));
+
+            MinecraftServiceJarParser serviceJarParser = new MinecraftServiceJarParser(version.getJSONObject("downloads"), area, versionId);
+
             Thread classifiersThread = new Thread(() -> {
                 try {
                     downloader.downloadFiles(classifiersParser.getClassifiersDownloads());
-                    done();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+
                 }
+                done();
             });
 
-            MinecraftServiceJarParser serviceJarParser = new MinecraftServiceJarParser(version.getJSONObject("downloads"), area, localId);
             Thread serviceJarThread = new Thread(() -> {
                 try {
                     downloader.downloadFile(new NetworkFileInformation(serviceJarParser.getClientUrl(), serviceJarParser.getClientPath(), serviceJarParser.getClientSha1()), threads);
                     downloader.downloadFile(new NetworkFileInformation(serviceJarParser.getServerUrl(), serviceJarParser.getServerPath(), serviceJarParser.getServerSha1()), threads);
-                    done();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                done();
             });
 
             Thread librariesThread = new Thread(() -> {
                 try {
                     downloader.downloadFiles(downloadParser.getLibrariesDownloads());
-                    done();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                done();
             });
 
-            MinecraftAssetsParser assetsParser = new MinecraftAssetsParser(resourceUrl, area, new JSONObject(downloader.downloadFileToStringBuilder(assetsIndexParser.getPath()).toString()));
             Thread resourcesThread = new Thread(() -> {
                 try {
                     assetsParser.getAssetsDownloads();
                     downloader.downloadFiles(assetsParser.getAssetsDownloads());
-                    done();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+                done();
             });
 
             lastTaskThreads = 4;
 
-            threadPool.execute(serviceJarThread);
-            threadPool.execute(librariesThread);
-            threadPool.execute(resourcesThread);
-            threadPool.execute(classifiersThread);
+            if(running) {
+                threadPool.execute(serviceJarThread);
+                threadPool.execute(librariesThread);
+                threadPool.execute(resourcesThread);
+                threadPool.execute(classifiersThread);
+            }
 
             threadPool.shutdown();
 
-            while(lastTaskThreads != 0 & running) {
+            while(lastTaskThreads != 0) {
+                if(! running) {
+                    information.setStatus("status.interrupting");
+                    minecraftVersions.add(information);
+                }
                 Thread.sleep(25);
             }
 
             if(! running) {
+                information.setStatus("status.interrupted");
+                information.setLockStatus("lock.interrupted");
+                minecraftVersions.add(information);
                 return false;
             }
 
             information.setStatus("status.ready");
             minecraftVersions.add(information);
         } catch (Exception e) {
-            e.printStackTrace();
+            return false;
         }
 
         return true;
@@ -180,15 +201,6 @@ public class RikaishiNikuiMinecraftDownloader {
     public void done() {
         synchronized(this) {
             lastTaskThreads--;
-        }
-    }
-
-    public void download(String id, String name) {
-        try {
-            download(Objects.requireNonNull(config.getConfigString("area")), id, name);
-        } catch (Exception ex) {
-            config.set("area", "minecraft");
-            download("minecraft", id, name);
         }
     }
 }

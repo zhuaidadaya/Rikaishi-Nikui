@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.color;
 
-import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import org.json.JSONObject;
 

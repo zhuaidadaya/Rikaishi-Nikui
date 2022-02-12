@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.ui;
+package com.github.zhuaidadaya.rikaishinikui.ui.component;
 
 import org.json.JSONObject;
 

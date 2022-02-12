@@ -1,6 +1,5 @@
 package com.github.zhuaidadaya.rikaishinikui.network.downloader;
 
-import com.github.zhuaidadaya.utils.file.FileUtil;
 import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
 import com.github.zhuaidadaya.utils.file.checker.FileCheckUtil;
 import com.github.zhuaidadaya.utils.resource.Resources;
@@ -31,14 +30,15 @@ public class FileDownloader {
         this.lastFiles = files.size();
 
         for(NetworkFileInformation information : files) {
-            if(! running) {
-                break;
-            }
             downloadingFiles++;
+            if(! running) {
+                doneFile();
+                continue;
+            }
             if(! FileCheckUtil.sha1(information.getPath()).equals(information.getSha1())) {
-                while(downloadingFiles > 128) {
+                while(downloadingFiles > 512) {
                     try {
-                        Thread.sleep(2);
+                        Thread.sleep(1);
                     } catch (InterruptedException e) {
 
                     }
@@ -47,14 +47,18 @@ public class FileDownloader {
                     try {
                         int tryCount = 0;
                         while(true) {
+                            if(!running) {
+                                doneFile();
+                                break;
+                            }
                             tryCount++;
                             try {
                                 String url = information.getUrl();
                                 String path = information.getPath();
-                                if(information.getSize() > 1024 * 1024 * 3)
-                                    downloadWithThreadPool(url, path, - 1);
+                                if(information.getSize() > 1024 * 16)
+                                    downloadWithThreadPool(url, path, -1);
                                 else
-                                    downloadWithBUf(url, path);
+                                    downloadWithBuf(url, path);
                                 doneFile();
                                 break;
                             } catch (Exception e) {
@@ -77,7 +81,7 @@ public class FileDownloader {
         }
 
         threadPool.shutdown();
-        while(lastFiles != 0 & running) {
+        while(lastFiles != 0) {
             try {
                 Thread.sleep(25);
             } catch (InterruptedException e) {
@@ -86,7 +90,7 @@ public class FileDownloader {
         }
     }
 
-    public void downloadWithBUf(String url, String filePath) throws IOException {
+    public void downloadWithBuf(String url, String filePath) throws IOException {
         HttpURLConnection connection = null;
         try {
             connection = NetworkFileUtil.getHttp(url);
@@ -118,12 +122,9 @@ public class FileDownloader {
                 break;
             }
         }
+
         br.close();
         out.close();
-
-        if(! running) {
-            file.delete();
-        }
     }
 
     public void downloadWithThreadPool(String url, String filePath, int threads) throws IOException {
@@ -132,7 +133,11 @@ public class FileDownloader {
         long length = getContentLength(url);
 
         if(threads == - 1) {
-            threads = (int) (length / 1024 / 1024 / 2.5);
+            if(length / 1024 / 1024 > 3) {
+                threads = (int) (length / 1024 / 1024 / 3);
+            } else {
+                threads = 3;
+            }
         }
 
         threads = Math.max(1, threads);
@@ -141,9 +146,9 @@ public class FileDownloader {
         this.lastThreads = threads;
 
         for(int i = 0; i < threads; i++) {
-            if(! running) {
-                fail();
-                break;
+            if(!running) {
+                done();
+                continue;
             }
             long start = i * length / threads;
             long end = (i + 1) * length / threads - 1;

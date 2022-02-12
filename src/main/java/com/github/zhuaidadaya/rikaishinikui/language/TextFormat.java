@@ -1,11 +1,12 @@
 package com.github.zhuaidadaya.rikaishinikui.language;
 
-import com.github.zhuaidadaya.utils.reader.FileReads;
+import com.github.zhuaidadaya.utils.file.FileUtil;
 import com.github.zhuaidadaya.utils.resource.Resources;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class TextFormat {
             String resource = languageResource.get(lang);
 
             try {
-                JSONObject json = new JSONObject(FileReads.read(new BufferedReader(new InputStreamReader(Resources.getResource(resource, getClass())))));
+                JSONObject json = new JSONObject(FileUtil.read(new BufferedReader(new InputStreamReader(Resources.getResource(resource, getClass()), StandardCharsets.UTF_8))));
                 format.put(lang, json);
             } catch (Exception e) {
 

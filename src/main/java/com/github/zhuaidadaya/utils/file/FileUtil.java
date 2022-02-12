@@ -1,9 +1,8 @@
 package com.github.zhuaidadaya.utils.file;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.github.zhuaidadaya.utils.resource.Resources;
+
+import java.io.*;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -50,8 +49,7 @@ public class FileUtil {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("failed to unzip: " + zip,e);
+            throw new RuntimeException("failed to unzip: " + zip, e);
         } finally {
             if(zipFile != null) {
                 try {
@@ -61,7 +59,44 @@ public class FileUtil {
                 }
             }
         }
-
     }
 
+    public static String read(BufferedReader reader) {
+        String cache;
+        StringBuilder builder = new StringBuilder();
+        try {
+            while((cache = reader.readLine()) != null)
+                builder.append(cache).append("\n");
+        } catch (Exception e) {
+            return "";
+        }
+        return builder.toString();
+    }
+
+    public static StringBuilder readAsStringBuilder(BufferedReader reader) {
+        String cache;
+        StringBuilder builder = new StringBuilder();
+        try {
+            while((cache = reader.readLine()) != null)
+                builder.append(cache).append("\n");
+        } catch (Exception e) {
+
+        }
+        return builder;
+    }
+
+    public static void write(File file, StringBuilder log) {
+        write(file, log.toString());
+    }
+
+    public static void write(File file, String log) {
+        try {
+            Resources.createParent(file.getPath());
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(log);
+            writer.close();
+        } catch (Exception e) {
+
+        }
+    }
 }

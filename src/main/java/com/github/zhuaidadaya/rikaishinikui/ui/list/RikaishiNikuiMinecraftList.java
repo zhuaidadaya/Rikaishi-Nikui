@@ -1,7 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
-import com.github.zhuaidadaya.rikaishinikui.ui.RikaishiNikuiComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;
 
@@ -96,6 +96,10 @@ public class RikaishiNikuiMinecraftList extends JList<MinecraftVersionInformatio
         if(getWidth() != width || getHeight() != height) {
             setBounds(getX(), getY(), width, height);
         }
+    }
+
+    public int listSize() {
+        return data == null ? 0 : data.size();
     }
 
     @Override
