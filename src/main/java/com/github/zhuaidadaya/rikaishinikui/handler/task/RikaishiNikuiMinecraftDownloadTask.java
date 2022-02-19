@@ -66,6 +66,22 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
         done();
     }
 
+    public void stop() {
+        stop = true;
+        RikaishiNikuiTask parent = getParentTask();
+        if(parent != null) {
+            parent.stop();
+        }
+        logger.info("stopping " + getTaskTypeName() + " " + getId());
+        running = false;
+        done = true;
+        try {
+            downloader.stop();
+        } catch (Exception e) {
+
+        }
+    }
+
     @Override
     public boolean isRunning() {
         return running;

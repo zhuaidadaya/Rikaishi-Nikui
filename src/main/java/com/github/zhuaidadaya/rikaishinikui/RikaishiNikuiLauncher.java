@@ -17,15 +17,17 @@ import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiTextFrame;
+import com.github.zhuaidadaya.rikaishinikui.ui.list.RikaishiNikuiJavaList;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.RikaishiNikuiMinecraftList;
+import com.github.zhuaidadaya.rikaishinikui.ui.list.RikaishiNikuiScrollJavaList;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.RikaishiNikuiScrollMinecraftList;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
 import com.github.zhuaidadaya.utils.config.EncryptionType;
 import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
 import com.github.zhuaidadaya.utils.file.FileUtil;
+import com.github.zhuaidadaya.utils.file.IllegalFileName;
 import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
-import org.apache.logging.log4j.core.appender.WriterAppender;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -44,7 +46,7 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiTextFrame errorFrame;
     public RikaishiNikuiTextFrame logFrame;
 
-    public RikaishiNikuiButtonPanel buttons;
+    public RikaishiNikuiHorizontalButtonPanel buttons;
 
     public RikaishiNikuiPanel mainPanel;
 
@@ -55,7 +57,7 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiTipPanel searchLocalTip;
     public RikaishiNikuiEditingTextPanel searchLocalVersion;
 
-    public RikaishiNikuiButtonPanel mainOperationButtons;
+    public RikaishiNikuiHorizontalButtonPanel mainOperationButtons;
 
     public RikaishiNikuiPanel downloadInformationPanel;
     public RikaishiNikuiPanel downloadVersionPanel;
@@ -63,8 +65,17 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiTextPanel downloadVersionDetailsPanel;
     public RikaishiNikuiTipPanel searchDownloadTip;
     public RikaishiNikuiEditingTextPanel searchDownloadVersion;
+    public RikaishiNikuiTipPanel downloadSaveAsTip;
+    public RikaishiNikuiEditingTextPanel downloadSaveAs;
 
-    public RikaishiNikuiButtonPanel downloadOperationButtons;
+    public RikaishiNikuiPanel javaInformationPanel;
+    public RikaishiNikuiPanel javaVersionPanel;
+    public RikaishiNikuiScrollJavaList javaVersionList;
+    public RikaishiNikuiTextPanel javaVersionDetailsPanel;
+    public RikaishiNikuiTipPanel searchJavaTip;
+    public RikaishiNikuiEditingTextPanel searchJavaVersion;
+
+    public RikaishiNikuiHorizontalButtonPanel downloadOperationButtons;
 
     public MinecraftVersionsParser downloadVersions;
 
@@ -97,33 +108,43 @@ public class RikaishiNikuiLauncher {
             mainFrame.setAlwaysOnTop(false);
 
             mainPanel = new RikaishiNikuiPanel("main");
-            buttons = new RikaishiNikuiButtonPanel("main");
+            buttons = new RikaishiNikuiHorizontalButtonPanel("main");
             mainInformationPanel = new RikaishiNikuiPanel("main");
 
             mainVersionPanel = new RikaishiNikuiPanel("main");
             mainVersionList = new RikaishiNikuiScrollMinecraftList(new RikaishiNikuiMinecraftList("main"));
             mainVersionDetailsPanel = new RikaishiNikuiTextPanel("main");
-            searchLocalVersion = new RikaishiNikuiEditingTextPanel();
+            searchLocalVersion = new RikaishiNikuiEditingTextPanel("main");
             searchLocalTip = new RikaishiNikuiTipPanel();
-            mainOperationButtons = new RikaishiNikuiButtonPanel();
+            mainOperationButtons = new RikaishiNikuiHorizontalButtonPanel("main");
 
             downloadInformationPanel = new RikaishiNikuiPanel("download");
             downloadVersionPanel = new RikaishiNikuiPanel("download");
             downloadVersionList = new RikaishiNikuiScrollMinecraftList(new RikaishiNikuiMinecraftList("download"));
             downloadVersionDetailsPanel = new RikaishiNikuiTextPanel("download");
-            searchDownloadVersion = new RikaishiNikuiEditingTextPanel();
-            searchDownloadTip = new RikaishiNikuiTipPanel();
-            downloadOperationButtons = new RikaishiNikuiButtonPanel();
+            searchDownloadVersion = new RikaishiNikuiEditingTextPanel("download");
+            searchDownloadTip = new RikaishiNikuiTipPanel("download");
+            downloadOperationButtons = new RikaishiNikuiHorizontalButtonPanel("download");
+            downloadSaveAs = new RikaishiNikuiEditingTextPanel("download");
+            downloadSaveAsTip = new RikaishiNikuiTipPanel();
+
+            javaInformationPanel = new RikaishiNikuiPanel("java");
+            javaVersionDetailsPanel = new RikaishiNikuiTextPanel("java");
+            javaVersionList = new RikaishiNikuiScrollJavaList(new RikaishiNikuiJavaList("java"));
+            javaVersionPanel = new RikaishiNikuiHorizontalButtonPanel("java");
+            searchJavaVersion = new RikaishiNikuiEditingTextPanel("java");
+            searchJavaTip = new RikaishiNikuiTipPanel();
 
             try {
                 initUi();
 
                 testRending();
             } catch (Exception ex) {
-                defaultMainInformationPanel();
                 defaultButtonsUi();
 
                 defaultDownloadInformationPanel();
+                defaultMainInformationPanel();
+                defaultJavaInformationPanel();
 
                 defaultUiConfig();
 
@@ -145,22 +166,27 @@ public class RikaishiNikuiLauncher {
 
             config.set("minecraft-downloader", minecraftDownloader.toJSONObject());
 
+            String cache = "rikaishi_nikui/logs/cached/";
+            try {
+                FileUtil.deleteFiles(cache);
+            } catch (Exception e) {
+
+            }
+
             new Thread(() -> {
                 Thread.currentThread().setName("main tick thread");
 
                 while(running) {
                     long tickStart = System.currentTimeMillis();
 
-                    synchronized(this) {
                         try {
-                            if(mainFrame.isFocused()) {
+//                            if(mainFrame.isFocused()) {
                                 tick();
-                            }
+//                            }
                         } catch (Exception e) {
                             parseError(e, "error in tick thread, stop tick task");
                             break;
                         }
-                    }
 
                     long tickTime = System.currentTimeMillis() - tickStart;
                     if(tickTime < tickInterval) {
@@ -173,13 +199,6 @@ public class RikaishiNikuiLauncher {
                 }
                 shutdown = true;
             }).start();
-
-            String cache = "logs/cached/";
-            try {
-                FileUtil.deleteFiles(cache);
-            } catch (Exception e) {
-
-            }
 
             mainFrame.setVisible(true);
 
@@ -197,7 +216,11 @@ public class RikaishiNikuiLauncher {
             //            launcher.setVmOptions(vmOption);
             //            launcher.launch();
 
-            downloadVersions = minecraftDownloader.getVersions();
+            try {
+                downloadVersions = minecraftDownloader.getVersions();
+            } catch (Exception e) {
+
+            }
         } catch (Exception e) {
             parseError(e, "error in rikaishi nikui launcher initializing");
         }
@@ -228,7 +251,7 @@ public class RikaishiNikuiLauncher {
         config = new ObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui", "rikaishi_nikui.mhf").setNote(textFormat.getText("config.note"));
     }
 
-    public void tick() throws Exception {
+    public synchronized void tick() throws Exception {
         configUi.readConfig(false);
         config.readConfig(false);
         rending();
@@ -331,7 +354,21 @@ public class RikaishiNikuiLauncher {
 
     public void setLocalInformationText() {
         try {
+            String area = config.getConfigString("area");
             MinecraftVersionInformation information = mainVersionList.getSelectedValue();
+            mainVersionDetailsPanel.setText("");
+            if(information == null) {
+                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found", area));
+                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.download"));
+                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.import"));
+                mainVersionDetailsPanel.updateText();
+                mainOperationButtons.setButtonVisible(0,false);
+                mainOperationButtons.setButtonVisible(1,false);
+                mainOperationButtons.setButtonVisible(2,false);
+                mainOperationButtons.setButtonVisible(3,false);
+                mainOperationButtons.setButtonVisible(4,true);
+                throw new Exception();
+            }
             if(new File(information.formatManifest()).isFile()) {
                 if(information.getStatus().equals("status.undefined") & ! information.getStatus().equals("status.destroyed")) {
                     information.setStatus("status.ready");
@@ -344,7 +381,8 @@ public class RikaishiNikuiLauncher {
 
                 }
             } else {
-                information.setStatus("status.undefined");
+                if(! information.getStatus().equals("status.checking") & ! information.getStatus().equals("status.parsing"))
+                    information.setStatus("status.undefined");
             }
 
             if(information.getLockStatus().equals("lock.launching")) {
@@ -360,7 +398,6 @@ public class RikaishiNikuiLauncher {
             }
 
             JSONObject inf = information.toJSONObject();
-            mainVersionDetailsPanel.setText("");
             for(String s : inf.keySet()) {
                 try {
                     new JSONObject(inf.getString(s));
@@ -379,16 +416,18 @@ public class RikaishiNikuiLauncher {
             mainOperationButtons.getButton(1).setVisible(information.getLockStatus().equals("lock.launching") || information.getStatus().equals("status.downloading"));
             mainOperationButtons.getButton(2).setVisible(true);
             mainOperationButtons.getButton(3).setVisible(information.getStatus().equals("status.interrupted") || information.getStatus().equals("status.undefined"));
+            mainOperationButtons.getButton(4).setVisible(false);
         } catch (Exception ex) {
-            mainOperationButtons.getButton(0).setVisible(false);
-            mainOperationButtons.getButton(1).setVisible(false);
-            mainOperationButtons.getButton(2).setVisible(false);
-            mainOperationButtons.getButton(3).setVisible(false);
+            mainOperationButtons.setButtonVisible(0,false);
+            mainOperationButtons.setButtonVisible(1,false);
+            mainOperationButtons.setButtonVisible(2,false);
+            mainOperationButtons.setButtonVisible(3,false);
         }
     }
 
     public void setDownloadInformationText() {
         try {
+            String area = config.getConfigString("area");
             MinecraftVersionInformation information = downloadVersionList.getSelectedValue();
             JSONObject inf = information.toJSONObject();
             inf.remove("last-launch");
@@ -397,11 +436,35 @@ public class RikaishiNikuiLauncher {
             inf.remove("last-task-status");
             inf.remove("task-feedback");
             inf.remove("lock-status");
-            inf.remove("id");
+            boolean canDownload = true;
+            if(downloadSaveAs.getText().equals("")) {
+                inf.put("save-as", "save.auto");
+            } else {
+                String name = downloadSaveAs.getText();
+                MinecraftVersionInformation detect = new MinecraftVersionInformation(name, name);
+                detect.setArea(area);
+                IllegalFileName illegal = FileUtil.legally(name);
+                if(! illegal.isIllegal()) {
+                    if(new File(detect.formatPath()).exists()) {
+                        inf.put("save-as", textFormat.format("save.name.dump", name).toJSONObject().toString());
+                        canDownload = false;
+                    } else {
+                        inf.put("save-as", textFormat.format("save.name", name).toJSONObject().toString());
+                    }
+                } else {
+                    inf.put("save-as", textFormat.format("save.illegal", name, illegal.getIllegals()).toJSONObject().toString());
+                    canDownload = false;
+                }
+            }
             downloadVersionDetailsPanel.setText("");
             for(String s : inf.keySet()) {
                 try {
-                    new JSONObject(inf.getString(s));
+                    JSONObject json = new JSONObject(inf.getString(s));
+                    Text text = new Text(json);
+                    downloadVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
+                    downloadVersionDetailsPanel.appendText(": ");
+                    downloadVersionDetailsPanel.appendText(text, false);
+                    downloadVersionDetailsPanel.appendText("\n");
                 } catch (Exception e) {
                     downloadVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
                     downloadVersionDetailsPanel.appendText(": ");
@@ -411,14 +474,14 @@ public class RikaishiNikuiLauncher {
             }
             downloadVersionDetailsPanel.updateText();
 
-            downloadOperationButtons.getButton(1).setVisible(information.getStatus().equals("status.download.ready"));
+            downloadOperationButtons.getButton(1).setVisible(information.getStatus().equals("status.download.ready") & canDownload);
         } catch (Exception ex) {
             downloadOperationButtons.getButton(1).setVisible(false);
         }
     }
 
     public void defaultConfig() {
-        config.set("area", "rikaishi_nikui/minecraft");
+        config.setIfNoExist("area", "rikaishi_nikui/minecraft");
     }
 
     public void defaultUiConfig() {
@@ -474,6 +537,22 @@ public class RikaishiNikuiLauncher {
 
                 downloadOperationButtons.applyButtons(configUi.getConfigJSONObject("button-panel-download-operation").getJSONObject("buttons"));
                 downloadOperationButtons.apply(configUi.getConfigJSONObject("button-panel-download-operation"));
+
+                downloadSaveAs.apply(configUi.getConfigJSONObject("download-save-as-editing"));
+                downloadSaveAsTip.apply(configUi.getConfigJSONObject("download-save-as-editing-tip"));
+            }
+            case 2 -> {
+                setJavaVisible();
+
+                javaInformationPanel.apply(configUi.getConfigJSONObject("information-panel-java"));
+
+                javaVersionList.apply(configUi.getConfigJSONObject("list-panel-versions-java"));
+                javaVersionPanel.apply(configUi.getConfigJSONObject("information-panel-java-version"));
+
+                javaVersionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-java-version-details"));
+
+                searchJavaVersion.apply(configUi.getConfigJSONObject("search-java"));
+                searchJavaTip.apply(configUi.getConfigJSONObject("search-java-tip"));
             }
         }
 
@@ -494,6 +573,7 @@ public class RikaishiNikuiLauncher {
     public void setMainVisible() {
         setMainVisible(true);
         setDownloadVisible(false);
+        setJavaVisible(false);
     }
 
     public void setDownloadVisible(boolean visible) {
@@ -504,10 +584,29 @@ public class RikaishiNikuiLauncher {
         searchDownloadVersion.setVisible(visible);
         searchDownloadTip.setVisible(visible);
         downloadOperationButtons.setVisible(visible);
+        downloadSaveAs.setVisible(visible);
+        downloadSaveAsTip.setVisible(visible);
     }
 
     public void setDownloadVisible() {
         setDownloadVisible(true);
+        setMainVisible(false);
+        setJavaVisible(false);
+    }
+
+    public void setJavaVisible(boolean visible) {
+        javaInformationPanel.setVisible(visible);
+        javaVersionPanel.setVisible(visible);
+        javaVersionList.setVisible(visible);
+        javaVersionDetailsPanel.setVisible(visible);
+        searchJavaTip.setVisible(visible);
+        searchJavaVersion.setVisible(visible);
+        //        javaOperationButtons.setVisible(visible);
+    }
+
+    public void setJavaVisible() {
+        setJavaVisible(true);
+        setDownloadVisible(false);
         setMainVisible(false);
     }
 
@@ -531,6 +630,19 @@ public class RikaishiNikuiLauncher {
 
         searchDownloadVersion.apply(configUi.getConfigJSONObject("search-download"));
         searchDownloadTip.apply(configUi.getConfigJSONObject("search-download-tip"));
+
+        downloadSaveAs.apply(configUi.getConfigJSONObject("download-save-as-editing"));
+        downloadSaveAsTip.apply(configUi.getConfigJSONObject("download-save-as-editing-tip"));
+
+        javaInformationPanel.apply(configUi.getConfigJSONObject("information-panel-java"));
+
+        javaVersionList.apply(configUi.getConfigJSONObject("list-panel-versions-java"));
+        javaVersionPanel.apply(configUi.getConfigJSONObject("information-panel-java-version"));
+
+        javaVersionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-java-version-details"));
+
+        searchJavaVersion.apply(configUi.getConfigJSONObject("search-java"));
+        searchJavaTip.apply(configUi.getConfigJSONObject("search-java-tip"));
     }
 
     public void initUi() {
@@ -544,17 +656,28 @@ public class RikaishiNikuiLauncher {
         downloadVersionDetailsPanel.setLayout(null);
         mainOperationButtons.setLayout(null);
         downloadOperationButtons.setLayout(null);
+        javaInformationPanel.setLayout(null);
+        javaVersionPanel.setLayout(null);
+        javaVersionList.setLayout(null);
+        javaVersionDetailsPanel.setLayout(null);
 
         mainFrame.add(mainPanel);
-        mainPanel.add(mainInformationPanel);
         mainPanel.add(buttons);
-        mainPanel.add(mainVersionDetailsPanel);
+
+        mainPanel.add(mainInformationPanel);
+
+        mainInformationPanel.add(mainVersionDetailsPanel);
 
         mainPanel.add(downloadInformationPanel);
+
+        mainPanel.add(javaInformationPanel);
 
         downloadVersionPanel.add(downloadVersionList);
         downloadInformationPanel.add(downloadVersionPanel);
         mainPanel.add(downloadVersionDetailsPanel);
+
+        javaVersionPanel.add(javaVersionList);
+        javaInformationPanel.add(javaVersionPanel);
 
         mainVersionPanel.add(mainVersionList);
         mainInformationPanel.add(mainVersionPanel);
@@ -566,6 +689,11 @@ public class RikaishiNikuiLauncher {
 
         downloadInformationPanel.add(searchDownloadVersion);
         downloadInformationPanel.add(searchDownloadTip);
+        downloadInformationPanel.add(downloadSaveAs);
+        downloadInformationPanel.add(downloadSaveAsTip);
+
+        javaInformationPanel.add(searchJavaVersion);
+        javaInformationPanel.add(searchJavaTip);
 
         downloadInformationPanel.add(downloadOperationButtons);
 
@@ -573,15 +701,15 @@ public class RikaishiNikuiLauncher {
     }
 
     public void defaultMainOperationButtons() {
-        mainOperationButtons = new RikaishiNikuiButtonPanel(350, 40, "main-operation");
+        mainOperationButtons = new RikaishiNikuiHorizontalButtonPanel(350, 40, "main-operation");
         mainOperationButtons.setXY(0, 660);
         mainOperationButtons.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("button-panel-main-operation", mainOperationButtons.toJSONObject());
     }
 
     public void defaultDownloadOperationButtons() {
-        downloadOperationButtons = new RikaishiNikuiButtonPanel(350, 40, "main-operation");
-        downloadOperationButtons.setXY(0, 660);
+        downloadOperationButtons = new RikaishiNikuiHorizontalButtonPanel(350, 40, "main-operation");
+        downloadOperationButtons.setXY(0, 630);
         downloadOperationButtons.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("button-panel-download-operation", downloadOperationButtons.toJSONObject());
     }
@@ -605,7 +733,7 @@ public class RikaishiNikuiLauncher {
         mainVersionDetailsPanel.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
         mainVersionDetailsPanel.setXY(350, 0);
         configUi.set("information-panel-main-version-details", mainVersionDetailsPanel.toJSONObject());
-        searchLocalVersion = new RikaishiNikuiEditingTextPanel();
+        searchLocalVersion = new RikaishiNikuiEditingTextPanel("main");
         searchLocalVersion.setColor(new RikaishiNikuiColor(49, 51, 53), new RikaishiNikuiColor(214, 214, 214), new RikaishiNikuiColor(200, 200, 200));
         searchLocalVersion.setXY(100, 700);
         searchLocalVersion.setSize(250, 25);
@@ -623,31 +751,86 @@ public class RikaishiNikuiLauncher {
         downloadInformationPanel.setXY(0, 0);
         downloadInformationPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("information-panel-download", downloadInformationPanel.toJSONObject());
+
         downloadVersionList = new RikaishiNikuiScrollMinecraftList(new RikaishiNikuiMinecraftList(1000, 1000, "main"));
         downloadVersionList.disableBorder();
         downloadVersionList.setXY(0, 0);
         downloadVersionList.setListColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
         downloadVersionList.setSelectionColor(new RikaishiNikuiColor(58, 58, 58), new RikaishiNikuiColor(214, 214, 214));
         configUi.set("list-panel-versions-download", downloadVersionList.toJSONObject());
-        downloadVersionPanel = new RikaishiNikuiPanel(350, 660, "main");
+
+        downloadVersionPanel = new RikaishiNikuiPanel(350, 630, "main");
         downloadVersionPanel.setXY(0, 0);
         downloadVersionPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("information-panel-download-version", downloadVersionPanel.toJSONObject());
+
         downloadVersionDetailsPanel = new RikaishiNikuiTextPanel(650, 720, "main");
         downloadVersionDetailsPanel.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
         downloadVersionDetailsPanel.setXY(350, 0);
         configUi.set("information-panel-download-version-details", downloadVersionDetailsPanel.toJSONObject());
-        searchDownloadVersion = new RikaishiNikuiEditingTextPanel();
+
+        searchDownloadVersion = new RikaishiNikuiEditingTextPanel("download");
         searchDownloadVersion.setColor(new RikaishiNikuiColor(49, 51, 53), new RikaishiNikuiColor(214, 214, 214), new RikaishiNikuiColor(200, 200, 200));
         searchDownloadVersion.setXY(100, 700);
         searchDownloadVersion.setSize(250, 25);
         configUi.set("search-download", searchDownloadVersion.toJSONObject());
+
         searchDownloadTip = new RikaishiNikuiTipPanel();
         searchDownloadTip.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
         searchDownloadTip.setXY(0, 700);
         searchDownloadTip.setSize(100, 25);
         searchDownloadTip.setText("tip.search");
         configUi.set("search-download-tip", searchDownloadTip.toJSONObject());
+
+        downloadSaveAs = new RikaishiNikuiEditingTextPanel("download");
+        downloadSaveAs.setColor(new RikaishiNikuiColor(49, 51, 53), new RikaishiNikuiColor(214, 214, 214), new RikaishiNikuiColor(200, 200, 200));
+        downloadSaveAs.setXY(100, 670);
+        downloadSaveAs.setSize(250, 25);
+        configUi.set("download-save-as-editing", downloadSaveAs.toJSONObject());
+
+        downloadSaveAsTip = new RikaishiNikuiTipPanel();
+        downloadSaveAsTip.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
+        downloadSaveAsTip.setXY(0, 670);
+        downloadSaveAsTip.setSize(100, 25);
+        downloadSaveAsTip.setText("tip.save.as");
+        configUi.set("download-save-as-editing-tip", downloadSaveAsTip.toJSONObject());
+    }
+
+    public void defaultJavaInformationPanel() {
+        javaInformationPanel = new RikaishiNikuiPanel(1000, 730, "main");
+        javaInformationPanel.setXY(0, 0);
+        javaInformationPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
+        configUi.set("information-panel-java", javaInformationPanel.toJSONObject());
+
+        javaVersionList = new RikaishiNikuiScrollJavaList(new RikaishiNikuiJavaList(1000, 1000, "main"));
+        javaVersionList.disableBorder();
+        javaVersionList.setXY(0, 0);
+        javaVersionList.setListColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
+        javaVersionList.setSelectionColor(new RikaishiNikuiColor(58, 58, 58), new RikaishiNikuiColor(214, 214, 214));
+        configUi.set("list-panel-versions-java", javaVersionList.toJSONObject());
+
+        javaVersionPanel = new RikaishiNikuiPanel(350, 630, "main");
+        javaVersionPanel.setXY(0, 0);
+        javaVersionPanel.setBackground(new RikaishiNikuiColor(43, 43, 43));
+        configUi.set("information-panel-java-version", javaVersionPanel.toJSONObject());
+
+        javaVersionDetailsPanel = new RikaishiNikuiTextPanel(650, 720, "main");
+        javaVersionDetailsPanel.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
+        javaVersionDetailsPanel.setXY(350, 0);
+        configUi.set("information-panel-java-version-details", javaVersionDetailsPanel.toJSONObject());
+
+        searchJavaVersion = new RikaishiNikuiEditingTextPanel("java");
+        searchJavaVersion.setColor(new RikaishiNikuiColor(49, 51, 53), new RikaishiNikuiColor(214, 214, 214), new RikaishiNikuiColor(200, 200, 200));
+        searchJavaVersion.setXY(100, 700);
+        searchJavaVersion.setSize(250, 25);
+        configUi.set("search-java", searchJavaVersion.toJSONObject());
+
+        searchJavaTip = new RikaishiNikuiTipPanel();
+        searchJavaTip.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
+        searchJavaTip.setXY(0, 700);
+        searchJavaTip.setSize(100, 25);
+        searchJavaTip.setText("tip.search.java");
+        configUi.set("search-java-tip", searchJavaTip.toJSONObject());
     }
 
     public void defaultButtonsUi() {
@@ -662,7 +845,7 @@ public class RikaishiNikuiLauncher {
     }
 
     public void defaultBarButtons() {
-        buttons = new RikaishiNikuiButtonPanel(1000, 40, "main");
+        buttons = new RikaishiNikuiHorizontalButtonPanel(1000, 40, "main");
         buttons.setXY(0, 730);
         buttons.setBackground(new RikaishiNikuiColor(43, 43, 43));
         configUi.set("button-panel-main", buttons.toJSONObject());
@@ -681,7 +864,12 @@ public class RikaishiNikuiLauncher {
             buttons.getButton(1).setActive(true);
         });
         buttons.applyButtons(downloadButton);
-        buttons.applyButtons(new RikaishiNikuiButton(100, 40, "vm", "vm.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2));
+        RikaishiNikuiButton javaButton = new RikaishiNikuiButton(100, 40, "vm", "vm.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2);
+        javaButton.addActionListener(e -> {
+            buttons.cancelButtonsActive();
+            buttons.getButton(2).setActive(true);
+        });
+        buttons.applyButtons(javaButton);
         buttons.applyButtons(new RikaishiNikuiButton(100, 40, "vm-options", "vm-options.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(3));
         buttons.applyButtons(new RikaishiNikuiButton(100, 40, "task", "task.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(4));
 
@@ -720,14 +908,10 @@ public class RikaishiNikuiLauncher {
                     try {
                         taskManager.quit(UUID.fromString(information.getTaskId()));
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        information.setLockStatus("lock.not");
+                        information.setStatus("status.undefined");
+                        minecraftVersions.add(information);
                     }
-                    information.setLockStatus("lock.not");
-                    information.setStatus("status.ready");
-                    minecraftVersions.add(information);
-                    //                    if(information.getStatus().equals("status.interrupted")) {
-                    //                        minecraftVersions.remove(information);
-                    //                    }
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -757,8 +941,18 @@ public class RikaishiNikuiLauncher {
 
         mainOperationButtons.applyButtons(delete);
 
+        RikaishiNikuiButton importMinecraft = new RikaishiNikuiButton(100, 40, "import", "import.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(4);
+        importMinecraft.addActionListener(e -> {
+
+        });
+
+        mainOperationButtons.applyButtons(importMinecraft);
+
         RikaishiNikuiButton download = new RikaishiNikuiButton(100, 40, "download", "download.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(1);
         download.addActionListener(e -> {
+            String name = downloadSaveAs.getText();
+            downloadSaveAs.setText("");
+            downloadSaveAs.updateText();
             String id = UUID.randomUUID().toString();
             String area = config.getConfigString("area");
             if(area == null) {
@@ -767,10 +961,15 @@ public class RikaishiNikuiLauncher {
             }
             String version = downloadVersionList.getSelectedValue().getVersion();
             UUID taskId = UUID.randomUUID();
-            MinecraftVersionInformation information = new MinecraftVersionInformation(id, version + "-" + id, "status.downloading");
+            MinecraftVersionInformation information;
+            if(name.equals(""))
+                information = new MinecraftVersionInformation(id, version + "-" + id, "status.downloading");
+            else
+                information = new MinecraftVersionInformation(id, name, "status.downloading");
             information.setVersion(version);
             information.setTaskId(taskId.toString());
             information.setArea(area);
+            information.setIdFormatted(false);
             RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, taskId, false);
             taskManager.join(downloadTask);
         });

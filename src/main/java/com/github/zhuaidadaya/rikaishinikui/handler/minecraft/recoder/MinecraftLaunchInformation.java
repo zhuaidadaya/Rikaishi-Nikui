@@ -5,19 +5,25 @@ import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 
 public class MinecraftLaunchInformation {
     private MinecraftVersionInformation versionInformation;
     private String os;
     private String java = "java";
     private Account account = new Account();
-    private Collection<String> vmOptions = Collections.emptySet();
+    private Collection<String> vmOptions;
 
     public MinecraftLaunchInformation(MinecraftVersionInformation information, String os, String java, Account account) {
         versionInformation = information;
         this.os = os;
         this.java = java;
         this.account = account;
+        vmOptions = new LinkedHashSet<>();
+        vmOptions.add("-server");
+        // log4j2 - jndi inject
+        vmOptions.add("-Dlog4j2.formatMsgNoLookups=true");
+        vmOptions.add("-Dcom.sun.jndi.ldap.object.trustURLCodebase=false");
     }
 
     public String getOs() {

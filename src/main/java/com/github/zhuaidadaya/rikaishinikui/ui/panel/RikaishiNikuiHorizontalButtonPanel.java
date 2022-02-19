@@ -4,29 +4,41 @@ import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import org.json.JSONObject;
 
-public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements RikaishiNikuiComponent {
+import java.util.Collections;
+import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.LockSupport;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.launcher;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
+
+public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel implements RikaishiNikuiComponent {
     private final Int2ObjectRBTreeMap<RikaishiNikuiButton> buttonsQueue = new Int2ObjectRBTreeMap<>();
+    private final Object o = new Object();
     private int buttonsWidth = 0;
     private int width = 0;
     private int height = 0;
     private int x = 0;
     private int y = 0;
 
-    public RikaishiNikuiButtonPanel() {
-
+    public RikaishiNikuiHorizontalButtonPanel() {
+        setName("RikaishiNikuiComponent#" + this);
     }
 
-    public RikaishiNikuiButtonPanel(String name) {
+    public RikaishiNikuiHorizontalButtonPanel(String name) {
         setName(name);
     }
 
-    public RikaishiNikuiButtonPanel(int width, int height) {
+    public RikaishiNikuiHorizontalButtonPanel(int width, int height) {
         setSize(width, height);
+        setName("RikaishiNikuiComponent#" + this);
     }
 
-    public RikaishiNikuiButtonPanel(int width, int height, String name) {
+    public RikaishiNikuiHorizontalButtonPanel(int width, int height, String name) {
         setSize(width, height);
         setName(name);
     }
@@ -69,22 +81,33 @@ public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements Rika
         this.y = y;
     }
 
+    public void setButtonVisible(int id, boolean visible) {
+        RikaishiNikuiButton button = buttonsQueue.get(id);
+        button.setVisible(visible);
+        buttonsQueue.put(id, button);
+    }
+
     public void applyButtons(RikaishiNikuiButton... buttons) {
         for(RikaishiNikuiButton button : buttons) {
-            button.setSize(button.getWidth(), height);
-            button.setBounds(0, 0, button.getWidth(), height);
-            buttonsQueue.put(button.getId(), button);
+            if(button.isVisible()) {
+                button.setSize(button.getWidth(), height);
+                button.setBounds(0, 0, button.getWidth(), height);
+                buttonsQueue.put(button.getId(), button);
+            }
         }
     }
 
     public void applyButtons(JSONObject json) {
         for(String name : json.keySet()) {
             JSONObject buttonJson = json.getJSONObject(name);
-            applyButton(buttonsQueue.get(buttonJson.getInt("id")),buttonJson);
+            RikaishiNikuiButton button = buttonsQueue.get(buttonJson.getInt("id"));
+            if(button.isVisible()) {
+                applyButton(button, buttonJson);
+            }
         }
     }
 
-    public void applyButton(RikaishiNikuiButton button,JSONObject json) {
+    public void applyButton(RikaishiNikuiButton button, JSONObject json) {
         button.apply(json);
     }
 
@@ -93,11 +116,12 @@ public class RikaishiNikuiButtonPanel extends RikaishiNikuiPanel implements Rika
         for(RikaishiNikuiButton button : buttonsQueue.values()) {
             if(button.isVisible()) {
                 button.apply(json.getJSONObject(button.getName()));
-                button.setSize(button.getWidth(), height);
                 button.setBounds(buttonsWidth, 0, button.getWidth(), height);
                 button.formatText();
                 buttonsWidth += button.getWidth();
                 add(button);
+            } else {
+                remove(button);
             }
         }
     }

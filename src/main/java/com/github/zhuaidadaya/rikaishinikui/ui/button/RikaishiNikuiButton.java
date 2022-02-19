@@ -21,6 +21,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
     private RikaishiNikuiColor activeBackground = RikaishiNikuiColor.parse(getBackground());
     private RikaishiNikuiColor activeForeground = RikaishiNikuiColor.parse(getForeground());
     private int id = 0;
+    private boolean visible = true;
     private ActionListener listener;
 
     public RikaishiNikuiButton() {
@@ -29,6 +30,14 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
 
     public RikaishiNikuiButton(JSONObject json) {
         apply(json);
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 
     public RikaishiNikuiButton(int width) {
@@ -90,9 +99,11 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
     public void apply(JSONObject json) {
         setSize(json.getInt("width"), json.getInt("height"));
 
+        setVisible(json.getBoolean("visible"));
+        super.setVisible(visible);
         this.text = json.getString("text");
         this.formatted = json.getBoolean("formatted");
-//        this.active = json.getBoolean("active");
+        //        this.active = json.getBoolean("active");
         this.borderPainted = json.getBoolean("border-painted");
 
         if(active) {
@@ -203,6 +214,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         json.put("border-painted", borderPainted);
         json.put("name", getName());
         json.put("id", id);
+        json.put("visible", visible);
 
         return json;
     }

@@ -9,7 +9,7 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public abstract class RikaishiNikuiTask {
     protected final UUID id;
-    protected final PaginateCachedLog logs = new PaginateCachedLog(getId(),-1,"rikaishi_nikui");
+    protected PaginateCachedLog logs;
     protected RikaishiNikuiTaskStatus status = RikaishiNikuiTaskStatus.INACTIVE;
     protected boolean running = false;
     protected boolean done = false;
@@ -21,6 +21,7 @@ public abstract class RikaishiNikuiTask {
     public RikaishiNikuiTask(UUID id,String taskTypeName) {
         this.id = id;
         this.taskTypeName = taskTypeName;
+        logs = new PaginateCachedLog(getId(),-1,"rikaishi_nikui");
     }
 
     public RikaishiNikuiTask(UUID id) {

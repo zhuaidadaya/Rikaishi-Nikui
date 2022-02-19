@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
 
@@ -69,7 +70,7 @@ public class MinecraftVersionsParser {
         Collection<MinecraftVersionInformation> versionsInformation = new LinkedHashSet<>();
         for(MinecraftVersionParser parser : versionsMap.values()) {
             if(parser.getId().contains(search)) {
-                MinecraftVersionInformation information = new MinecraftVersionInformation(parser.getId(), parser.getId());
+                MinecraftVersionInformation information = new MinecraftVersionInformation(UUID.nameUUIDFromBytes(parser.getId().getBytes()).toString(), parser.getId());
                 information.setUrl(parser.getUrl());
                 information.setType("Vanilla");
                 information.setVersion(parser.getId());

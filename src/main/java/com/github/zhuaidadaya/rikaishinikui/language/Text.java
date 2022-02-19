@@ -37,8 +37,15 @@ public class Text {
         }
     }
 
+    public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
+        json.put("text", text);
+        json.put("color", color.toJSONObject());
+        return json;
+    }
+
     public void format(Object o) {
-        text = text.formatted(o);
+        text = text.replaceFirst("%s",o.toString());
     }
 
     public String getText() {
@@ -68,8 +75,8 @@ public class Text {
         return color.getAwtColor();
     }
 
-    public Text replace(String target,String replacement) {
-        text = text.replace(target,replacement);
+    public Text replace(String target, String replacement) {
+        text = text.replace(target, replacement);
         return this;
     }
 }

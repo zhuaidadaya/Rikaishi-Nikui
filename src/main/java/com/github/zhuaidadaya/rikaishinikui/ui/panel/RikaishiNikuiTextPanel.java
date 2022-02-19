@@ -9,13 +9,14 @@ import org.json.JSONObject;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.util.UUID;
 
 public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
     private String text;
     private Document doc = new DefaultStyledDocument();
 
     public RikaishiNikuiTextPanel() {
-
+        setName("RikaishiNikuiComponent#" + this);
     }
 
     public RikaishiNikuiTextPanel(String name) {
@@ -24,6 +25,7 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
 
     public RikaishiNikuiTextPanel(int width, int height) {
         setSize(width, height);
+        setName("RikaishiNikuiComponent#" + this);
     }
 
     public RikaishiNikuiTextPanel(int width, int height, String name) {
@@ -54,13 +56,13 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
     }
 
     public void apply(JSONObject json) {
-        setEditable(false);
-        setXY(json.getInt("x"), json.getInt("y"));
-        setSize(json.getInt("width"), json.getInt("height"));
-        setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
-        setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
-        repaint();
-    }
+            setEditable(false);
+            setXY(json.getInt("x"), json.getInt("y"));
+            setSize(json.getInt("width"), json.getInt("height"));
+            setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
+            setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
+            repaint();
+        }
 
     public void setText(Text text) {
         this.text = text.getText();

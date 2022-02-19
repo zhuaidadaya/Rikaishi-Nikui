@@ -20,6 +20,10 @@ public class FileUtil {
         file.delete();
     }
 
+    public static IllegalFileName legally(String name) {
+        return new IllegalFileName(name);
+    }
+
     public static void unzip(String zip, String path) throws RuntimeException {
         ZipFile zipFile = null;
         try {

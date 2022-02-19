@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.language;
 
@@ -49,8 +50,9 @@ public class TextFormat {
 
             for(Object o : args) {
                 try {
-                    formatReturn.format(o.toString());
+                    formatReturn.format(Matcher.quoteReplacement(o.toString()));
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     return formatReturn;
                 }
             }

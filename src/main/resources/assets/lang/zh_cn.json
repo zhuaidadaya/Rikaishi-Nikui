@@ -39,6 +39,9 @@
     "delete.button": {
         "text": "删除"
     },
+    "import.button": {
+        "text": "导入"
+    },
     "task.button": {
         "text": "任务"
     },
@@ -352,6 +355,73 @@
             "r": 106,
             "g": 135,
             "b": 89
+        }
+    },
+    "tip.versions.not.found": {
+        "text": "未在\"%s\"应用域中找到minecraft游戏内容\n",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "tip.versions.not.found.download": {
+        "text": "通过底部的\"Vanilla\"下载minecraft vanilla\n",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "tip.versions.not.found.import": {
+        "text": "或者通过\"导入\"将minecraft导入到rikaishi nikui中\n",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "tip.save.as": {
+        "text": "保存名称:"
+    },
+    "minecraft.information.save-as": {
+        "text": "格式化名称",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "save.name": {
+        "text": "以\"%s\"保存此版本",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "save.name.dump": {
+        "text": "\"%s\"名称与其他版本重复",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "save.illegal": {
+        "text": "\"%s\"名称存在非法字符: %s",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "save.auto": {
+        "text": "自动生成",
+        "color": {
+            "r": 217,
+            "g": 163,
+            "b": 67
         }
     }
 }

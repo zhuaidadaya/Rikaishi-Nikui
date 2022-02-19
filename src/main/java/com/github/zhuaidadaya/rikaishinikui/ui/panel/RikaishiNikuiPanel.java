@@ -5,9 +5,11 @@ import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import java.util.UUID;
 
 public class RikaishiNikuiPanel extends JPanel implements RikaishiNikuiComponent {
     public RikaishiNikuiPanel() {
+        setName("RikaishiNikuiComponent#" + this);
     }
 
     public RikaishiNikuiPanel(JSONObject json) {
@@ -20,6 +22,7 @@ public class RikaishiNikuiPanel extends JPanel implements RikaishiNikuiComponent
 
     public RikaishiNikuiPanel(int width, int height) {
         setSize(width, height);
+        setName("RikaishiNikuiComponent#" + this);
     }
 
     public RikaishiNikuiPanel(int width, int height, String name) {
@@ -28,9 +31,9 @@ public class RikaishiNikuiPanel extends JPanel implements RikaishiNikuiComponent
     }
 
     public void apply(JSONObject json) {
-        setXY(json.getInt("x"), json.getInt("y"));
-        setSize(json.getInt("width"), json.getInt("height"));
-        setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
+            setXY(json.getInt("x"), json.getInt("y"));
+            setSize(json.getInt("width"), json.getInt("height"));
+            setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
     }
 
     public void setHeight(int height) {

@@ -179,14 +179,14 @@ public class RikaishiNikuiMinecraftDownloader {
             minecraftVersions.add(information);
 
             while(lastTaskThreads != 0) {
-                if(! running) {
+                if(! running & ! isFix) {
                     information.setStatus("status.interrupting");
                     minecraftVersions.add(information);
                 }
                 Thread.sleep(25);
             }
 
-            if(! running) {
+            if(! running & ! isFix) {
                 information.setStatus("status.interrupted");
                 information.setLockStatus("lock.interrupted");
                 minecraftVersions.add(information);
