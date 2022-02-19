@@ -39,6 +39,15 @@
     "delete.button": {
         "text": "删除"
     },
+    "task.button": {
+        "text": "任务"
+    },
+    "vm-options.button": {
+        "text": "VM选项"
+    },
+    "vm.button": {
+        "text": "Java"
+    },
     "lock.launching": {
         "text": "启动中",
         "color": {
@@ -66,9 +75,9 @@
     "lock.interrupted": {
         "text": "已中断",
         "color": {
-            "r": 152,
-            "g": 12,
-            "b": 10
+            "r": 198,
+            "g": 55,
+            "b": 65
         }
     },
     "download.vanilla.button": {
@@ -81,25 +90,41 @@
     "unknown": {
         "text": "未知",
         "color": {
-            "r": 152,
-            "g": 12,
-            "b": 10
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "status.parsing": {
+        "text": "解析中",
+        "color": {
+            "r": 217,
+            "g": 163,
+            "b": 67
+        }
+    },
+    "status.getting": {
+        "text": "获取中",
+        "color": {
+            "r": 217,
+            "g": 163,
+            "b": 67
         }
     },
     "status.undefined": {
         "text": "不可用",
         "color": {
-            "r": 152,
-            "g": 12,
-            "b": 10
+            "r": 198,
+            "g": 55,
+            "b": 65
         }
     },
     "status.destroyed": {
         "text": "已损坏",
         "color": {
-            "r": 152,
-            "g": 12,
-            "b": 10
+            "r": 198,
+            "g": 55,
+            "b": 65
         }
     },
     "status.checking": {
@@ -129,9 +154,9 @@
     "status.interrupted": {
         "text": "已中断",
         "color": {
-            "r": 152,
-            "g": 12,
-            "b": 10
+            "r": 198,
+            "g": 55,
+            "b": 65
         }
     },
     "status.interrupting": {
@@ -254,11 +279,75 @@
             "b": 89
         }
     },
+    "minecraft.information.last-task-status": {
+        "text": "上一任务状态",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.task-feedback": {
+        "text": "任务反馈",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
     "tip.search": {
         "text": "查找版本:"
     },
     "minecraft.type.vanilla": {
         "text": "原版Minecraft",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "task.status.inactive": {
+        "text": "不活跃",
+        "color": {
+            "r": 140,
+            "g": 122,
+            "b": 165
+        }
+    },
+    "task.status.running": {
+        "text": "运行中",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "task.status.failed": {
+        "text": "已失败",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "task.status.done": {
+        "text": "已结束",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "task.feedback.java.version.error": {
+        "text": "java版本错误",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "none": {
+        "text": "无",
         "color": {
             "r": 106,
             "g": 135,

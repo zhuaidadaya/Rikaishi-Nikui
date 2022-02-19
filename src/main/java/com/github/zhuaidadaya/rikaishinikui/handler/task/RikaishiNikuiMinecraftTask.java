@@ -9,68 +9,57 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
     private final MinecraftLauncher launcher;
-    private boolean running = false;
-    private boolean done = false;
-    private boolean stop = false;
 
     public RikaishiNikuiMinecraftTask(MinecraftLauncher launcher) {
-        super(UUID.randomUUID());
+        super(UUID.randomUUID(),"MinecraftTask(TS)");
         this.launcher = launcher;
-    }
-
-    @Override
-    public void preJoin() {
-        RikaishiNikuiTask parent = super.getParentTask();
-        running = true;
-        logger.info("RikaishiNikuiMinecraftTask " + getId() + " pre join");
-        if(parent != null) {
-            parent.preJoin();
-            parent.join();
-        }
-        if(! stop) {
-            done = false;
-            logger.info("RikaishiNikuiMinecraftTask " + getId() + " pre join done");
-        } else {
-            running = false;
-        }
     }
 
     @Override
     protected void join() {
         if(running) {
-            logger.info("RikaishiNikuiMinecraftTask " + getId() + " join to manager");
+            logger.info(getTaskTypeName() + " " + getId() + " join to manager");
             synchronized(this) {
                 launcher.launch(getId().toString());
             }
         }
         done = true;
         running = false;
-        done();
+        if(launcher.isFailed()) {
+            fail();
+        } else {
+            done();
+        }
     }
 
-    @Override
     protected void stop() {
         stop = true;
         RikaishiNikuiTask parent = super.getParentTask();
         if(parent != null) {
             parent.stop();
         }
-        logger.info("stopping RikaishiNikuiMinecraftTask " + getId());
-        running = false;
+        logger.info("stopping " + getTaskTypeName() + " " + getId());
         try {
             launcher.stop();
         } catch (Exception e) {
 
         }
+        running = false;
         done = true;
     }
 
     @Override
-    protected void done() {
+    protected void fail() {
+        status = RikaishiNikuiTaskStatus.FAILED;
         if(! running) {
-            logger.info("RikaishiNikuiMinecraftTask " + getId() + " done");
+            logger.info(getTaskTypeName() + " " + getId() + " failed");
         } else {
             stop();
+        }
+        try {
+            launcher.stop();
+        } catch (Exception e) {
+
         }
     }
 

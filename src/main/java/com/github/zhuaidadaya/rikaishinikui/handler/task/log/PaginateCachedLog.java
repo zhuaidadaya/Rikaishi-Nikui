@@ -13,6 +13,7 @@ public class PaginateCachedLog {
     private Int2ObjectRBTreeMap<String> pages = new Int2ObjectRBTreeMap<>();
     private int pageSize = 1024 * 256;
     private StringBuilder log = new StringBuilder();
+    private String base;
 
     public PaginateCachedLog(UUID id) {
         this.cachedId = id;
@@ -20,7 +21,21 @@ public class PaginateCachedLog {
 
     public PaginateCachedLog(UUID id, int pageSize) {
         this.cachedId = id;
-        this.pageSize = pageSize;
+        this.pageSize = pageSize > 0 ? pageSize : this.pageSize;
+    }
+
+    public PaginateCachedLog(UUID id, int pageSize,String base) {
+        this.cachedId = id;
+        this.pageSize = pageSize > 0 ? pageSize : this.pageSize;
+        this.base = base;
+    }
+
+    public void setBase(String base) {
+        this.base = base;
+    }
+
+    public String getBase() {
+        return base;
     }
 
     public void append(String log) {
@@ -31,7 +46,7 @@ public class PaginateCachedLog {
     }
 
     public void cache() {
-        String cache = "logs/cached/" + cachedId.toString() + "/cached-" + (pages.size() + 1) + ".log";
+        String cache = base + "/logs/cached/" + cachedId.toString() + "/cached-" + (pages.size() + 1) + ".log";
         FileUtil.write(new File(cache), log);
         pages.put(pages.size() + 1, cache);
         log = new StringBuilder();

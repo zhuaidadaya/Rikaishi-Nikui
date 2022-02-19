@@ -13,5 +13,6 @@ public class RikaishiNikuiSubmitter {
     public void submit(String log) {
         component.setText(new Text(log));
         component.updateText();
+        component.setCaretPosition(log.length());
     }
 }

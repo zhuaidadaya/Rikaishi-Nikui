@@ -1,9 +1,12 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.UUID;
+
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.taskManager;
 
 public class MinecraftVersionInformation {
     private String name = "unknown";
@@ -18,6 +21,24 @@ public class MinecraftVersionInformation {
     private String lockStatus = "lock.not";
     private boolean idFormatted = true;
     private String taskId = "unknown";
+    private RikaishiNikuiTaskStatus lastTaskStatus = RikaishiNikuiTaskStatus.INACTIVE;
+    private String taskFeedback = "none";
+
+    public String getTaskFeedback() {
+        return taskFeedback;
+    }
+
+    public void setTaskFeedback(String taskFeedback) {
+        this.taskFeedback = taskFeedback;
+    }
+
+    public RikaishiNikuiTaskStatus getLastTaskStatus() {
+        return lastTaskStatus;
+    }
+
+    public void setLastTaskStatus(RikaishiNikuiTaskStatus lastTaskStatus) {
+        this.lastTaskStatus = lastTaskStatus;
+    }
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
         this.id = id;
@@ -127,6 +148,8 @@ public class MinecraftVersionInformation {
         this.idFormatted = json.getBoolean("formatted-by-id");
         this.lockStatus = json.getString("lock-status");
         this.taskId = json.getString("task-id");
+        this.lastTaskStatus = RikaishiNikuiTaskStatus.of(json.getString("last-task-status"));
+        this.taskFeedback = json.getString("task-feedback");
     }
 
     public String getLastLaunch() {
@@ -151,6 +174,12 @@ public class MinecraftVersionInformation {
         json.put("formatted-by-id", idFormatted);
         json.put("lock-status", lockStatus);
         json.put("task-id", taskId);
+        try {
+            json.put("last-task-status", taskManager.getStatus(UUID.fromString(taskId)).toString());
+        } catch (Exception e) {
+            json.put("last-task-status", "task.status.inactive");
+        }
+        json.put("task-feedback", taskFeedback);
 
         return json;
     }

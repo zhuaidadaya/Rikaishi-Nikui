@@ -87,4 +87,18 @@ public class RikaishiNikuiTaskManager {
             task.setSubmitter(null);
         }
     }
+
+    public void quitAll() {
+        for(RikaishiNikuiTask task : tasks.values()) {
+            task.done();
+        }
+    }
+
+    public RikaishiNikuiTaskStatus getStatus(RikaishiNikuiTask task) {
+        return getStatus(task.getId());
+    }
+
+    public RikaishiNikuiTaskStatus getStatus(UUID task) {
+        return tasks.get(task).getStatus();
+    }
 }

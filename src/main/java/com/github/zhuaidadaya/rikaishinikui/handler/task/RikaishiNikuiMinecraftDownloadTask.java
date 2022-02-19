@@ -15,20 +15,17 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     private String name;
     private String versionId;
     private String area;
-    private boolean running = false;
     private boolean isFix = false;
-    private boolean done = false;
-    private boolean stop = false;
     private MinecraftVersionInformation information;
 
     public RikaishiNikuiMinecraftDownloadTask(MinecraftVersionInformation information, UUID id, boolean isFix) {
-        super(id);
+        super(id,"DownloadTask(TS)");
         this.information = information;
         this.isFix = isFix;
     }
 
     public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area, boolean isFix) {
-        super(id);
+        super(id,"DownloadTask(TS)");
         this.gameId = gameId;
         this.name = name;
         this.versionId = versionId;
@@ -37,7 +34,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     }
 
     public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area) {
-        super(id);
+        super(id,"DownloadTask(TS)");
         this.gameId = gameId;
         this.name = name;
         this.versionId = versionId;
@@ -45,26 +42,9 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     }
 
     @Override
-    public void preJoin() {
-        RikaishiNikuiTask parent = super.getParentTask();
-        running = true;
-        logger.info("RikaishiNikuiMinecraftDownloadTask " + getId() + " pre join");
-        if(parent != null) {
-            parent.preJoin();
-            parent.join();
-        }
-        if(! stop) {
-            done = false;
-            logger.info("RikaishiNikuiMinecraftDownloadTask " + getId() + " pre join done");
-        } else {
-            running = false;
-        }
-    }
-
-    @Override
     protected void join() {
         if(running) {
-            logger.info("RikaishiNikuiMinecraftDownloadTask " + getId() + " join to manager");
+            logger.info(getTaskTypeName() + " " + getId() + " join to manager");
             synchronized(this) {
                 try {
                     downloader.apply(config.getConfigJSONObject("minecraft-downloader"));
@@ -84,28 +64,6 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
         done = true;
         running = false;
         done();
-    }
-
-    @Override
-    protected void stop() {
-        stop = true;
-        RikaishiNikuiTask parent = super.getParentTask();
-        if(parent != null) {
-            parent.stop();
-        }
-        logger.info("stopping RikaishiNikuiMinecraftDownloadTask " + getId());
-        running = false;
-        downloader.stop();
-        done = true;
-    }
-
-    @Override
-    protected void done() {
-        if(! running) {
-            logger.info("RikaishiNikuiMinecraftDownloadTask " + getId() + " done");
-        } else {
-            stop();
-        }
     }
 
     @Override

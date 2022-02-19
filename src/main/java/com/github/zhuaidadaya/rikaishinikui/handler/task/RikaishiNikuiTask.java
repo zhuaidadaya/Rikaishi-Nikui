@@ -5,11 +5,23 @@ import com.github.zhuaidadaya.rikaishinikui.ui.log.submitter.RikaishiNikuiSubmit
 
 import java.util.UUID;
 
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
+
 public abstract class RikaishiNikuiTask {
-    private final UUID id;
+    protected final UUID id;
+    protected final PaginateCachedLog logs = new PaginateCachedLog(getId(),-1,"rikaishi_nikui");
+    protected RikaishiNikuiTaskStatus status = RikaishiNikuiTaskStatus.INACTIVE;
+    protected boolean running = false;
+    protected boolean done = false;
+    protected boolean stop = false;
     protected RikaishiNikuiSubmitter submitter;
-    protected final PaginateCachedLog logs = new PaginateCachedLog(getId());
-    private RikaishiNikuiTask parent;
+    protected RikaishiNikuiTask parent;
+    private String taskTypeName = "RikaishiNikuiTask(Ab)";
+
+    public RikaishiNikuiTask(UUID id,String taskTypeName) {
+        this.id = id;
+        this.taskTypeName = taskTypeName;
+    }
 
     public RikaishiNikuiTask(UUID id) {
         this.id = id;
@@ -43,13 +55,52 @@ public abstract class RikaishiNikuiTask {
 
     public abstract boolean isRunning();
 
-    protected abstract void preJoin();
+    protected void preJoin() {
+        RikaishiNikuiTask parent = getParentTask();
+        running = true;
+        status = RikaishiNikuiTaskStatus.RUNNING;
+        logger.info(taskTypeName + " " + getId() + " pre join");
+        if(parent != null) {
+            parent.preJoin();
+            parent.join();
+        }
+        if(! stop) {
+            done = false;
+        } else {
+            running = false;
+        }
+    }
 
     protected abstract void join();
 
-    protected abstract void stop();
+    protected void stop() {
+        stop = true;
+        RikaishiNikuiTask parent = getParentTask();
+        if(parent != null) {
+            parent.stop();
+        }
+        logger.info("stopping " + taskTypeName + " " + getId());
+        running = false;
+        done = true;
+    }
 
-    protected abstract void done();
+    protected void done() {
+        status = RikaishiNikuiTaskStatus.DONE;
+        if(! running) {
+            logger.info(taskTypeName + " " + getId() + " done");
+        } else {
+            stop();
+        }
+    }
+
+    protected void fail() {
+        status = RikaishiNikuiTaskStatus.FAILED;
+        if(! running) {
+            logger.info(taskTypeName + " " + getId() + " failed");
+        } else {
+            stop();
+        }
+    }
 
     protected abstract void log(String log);
 
@@ -59,17 +110,25 @@ public abstract class RikaishiNikuiTask {
 
     protected abstract StringBuilder getLog(int page);
 
-    protected void setSubmitter(RikaishiNikuiSubmitter submitter) {
-        this.submitter = submitter;
-    }
-
     protected RikaishiNikuiSubmitter getSubmitter() {
         return this.submitter;
+    }
+
+    protected void setSubmitter(RikaishiNikuiSubmitter submitter) {
+        this.submitter = submitter;
     }
 
     protected void submit(StringBuilder log) {
         if(submitter != null) {
             submitter.submit(log.toString());
         }
+    }
+
+    protected RikaishiNikuiTaskStatus getStatus() {
+        return status;
+    }
+
+    protected String getTaskTypeName() {
+        return taskTypeName;
     }
 }

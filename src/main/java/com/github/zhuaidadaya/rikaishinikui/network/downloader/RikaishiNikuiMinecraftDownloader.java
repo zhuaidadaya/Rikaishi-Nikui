@@ -6,8 +6,6 @@ import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import com.github.zhuaidadaya.utils.string.checker.StringCheckUtil;
 import org.json.JSONObject;
 
-import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -83,25 +81,27 @@ public class RikaishiNikuiMinecraftDownloader {
                 information.setStatus("status.downloading");
             }
 
-            information.setUrl(information.formatManifest());
+            information.setUrl("status.getting");
 
             minecraftVersions.add(information);
 
             ExecutorService threadPool = Executors.newCachedThreadPool();
 
             String url;
-            url = StringCheckUtil.getOrDefault(config.getConfigString("minecraft-versions-manifest-url"), DEFAULT_MANIFEST);
+            url = StringCheckUtil.getNotNull(config.getConfigString("minecraft-versions-manifest-url"), DEFAULT_MANIFEST);
             config.set("minecraft-versions-manifest-url", url);
 
             String resourceUrl;
-            resourceUrl = StringCheckUtil.getOrDefault(config.getConfigString("minecraft-versions-resource-url"), DEFAULT_RESOURCE);
+            resourceUrl = StringCheckUtil.getNotNull(config.getConfigString("minecraft-versions-resource-url"), DEFAULT_RESOURCE);
             config.set("minecraft-versions-resource-url", resourceUrl);
 
-            MinecraftVersionsParser versionsParser = getVersions(url, downloader);
+            information.setStatus("status.parsing");
 
-            information.setUrl(versionsParser.getVersion(gameId).getUrl());
+            information.setUrl(information.formatManifest());
 
             minecraftVersions.add(information);
+
+            MinecraftVersionsParser versionsParser = getVersions(url, downloader);
 
             String manifestPath = String.format("%s/versions/%s/%s.json", area, versionId, versionId);
             downloader.downloadFile(new NetworkFileInformation(versionsParser.getVersion(gameId).getUrl(), manifestPath), 0);
@@ -168,6 +168,15 @@ public class RikaishiNikuiMinecraftDownloader {
             }
 
             threadPool.shutdown();
+
+            if(isFix)
+                information.setStatus("status.checking");
+            else
+                information.setStatus("status.downloading");
+
+            information.setUrl(information.formatManifest());
+
+            minecraftVersions.add(information);
 
             while(lastTaskThreads != 0) {
                 if(! running) {
