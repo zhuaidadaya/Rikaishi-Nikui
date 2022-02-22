@@ -35,10 +35,14 @@ public class MinecraftLibrariesParser {
             try {
                 json.getJSONObject("classifiers");
             } catch (Exception e) {
-                MinecraftLibraryParser libraryParser = new MinecraftLibraryParser(json, os);
+                try {
+                    MinecraftLibraryParser libraryParser = new MinecraftLibraryParser(json, os);
 
-                if(libraryParser.getLibrary() != null) {
-                    libs.put(libraryParser.getUrl(), libraryParser);
+                    if(libraryParser.getLibrary() != null) {
+                        libs.put(libraryParser.getUrl(), libraryParser);
+                    }
+                } catch (Exception e2) {
+
                 }
             }
         }

@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
 
 public class MinecraftVersionsParser {
     private final JSONArray versions;
@@ -67,14 +68,17 @@ public class MinecraftVersionsParser {
     }
 
     public Collection<MinecraftVersionInformation> getVersionsInformation(String search) {
+        String filter = search.toLowerCase();
         Collection<MinecraftVersionInformation> versionsInformation = new LinkedHashSet<>();
         for(MinecraftVersionParser parser : versionsMap.values()) {
-            if(parser.getId().contains(search)) {
+            if(parser.getId().toLowerCase().contains(filter) || parser.getReleaseTime().toLowerCase().contains(filter) || parser.getType().toLowerCase().contains(filter) || textFormat.getText(parser.getType()).toLowerCase().contains(filter)) {
                 MinecraftVersionInformation information = new MinecraftVersionInformation(UUID.nameUUIDFromBytes(parser.getId().getBytes()).toString(), parser.getId());
                 information.setUrl(parser.getUrl());
                 information.setType("Vanilla");
                 information.setVersion(parser.getId());
                 information.setStatus("status.download.ready");
+                information.setReleaseTime(parser.getReleaseTime());
+                information.setReleaseType(parser.getType());
                 versionsInformation.add(information);
             }
         }

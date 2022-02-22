@@ -15,7 +15,11 @@ public class MinecraftServiceJarParser {
     public MinecraftServiceJarParser(JSONObject json, String area,String name) {
         download = json;
         clientArtifactParser = new MinecraftArtifactParser(json.getJSONObject("client"));
-        serverArtifactParser = new MinecraftArtifactParser(json.getJSONObject("server"));
+        try {
+            serverArtifactParser = new MinecraftArtifactParser(json.getJSONObject("server"));
+        } catch (Exception e) {
+            serverArtifactParser = null;
+        }
         this.area = area;
         this.name = name;
     }

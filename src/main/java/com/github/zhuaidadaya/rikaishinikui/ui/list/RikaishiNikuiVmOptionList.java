@@ -1,6 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import org.json.JSONObject;
@@ -9,53 +10,53 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.Vector;
 
-public class RikaishiNikuiJavaList extends JList<JavaVersionInformation> implements RikaishiNikuiComponent {
+public class RikaishiNikuiVmOptionList extends JList<VmOption> implements RikaishiNikuiComponent {
     private int width = 0;
     private int height = 0;
     private boolean followParent = true;
     private Collection<?> data;
 
-    public RikaishiNikuiJavaList() {
+    public RikaishiNikuiVmOptionList() {
 
     }
 
-    public RikaishiNikuiJavaList(String name) {
+    public RikaishiNikuiVmOptionList(String name) {
         setName(name);
     }
 
 
-    public RikaishiNikuiJavaList(int width, int height, String name) {
+    public RikaishiNikuiVmOptionList(int width, int height, String name) {
         setSize(width, height);
         setName(name);
     }
 
-    public RikaishiNikuiJavaList setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiVmOptionList setBackground(RikaishiNikuiColor color) {
         setBackground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiJavaList setForeground(RikaishiNikuiColor color) {
+    public RikaishiNikuiVmOptionList setForeground(RikaishiNikuiColor color) {
         setForeground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiJavaList setSelectionBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiVmOptionList setSelectionBackground(RikaishiNikuiColor color) {
         setSelectionBackground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiJavaList setSelectionForeground(RikaishiNikuiColor color) {
+    public RikaishiNikuiVmOptionList setSelectionForeground(RikaishiNikuiColor color) {
         setSelectionForeground(color.getAwtColor());
         return this;
     }
 
-    public RikaishiNikuiJavaList setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiVmOptionList setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
         return this;
     }
 
-    public RikaishiNikuiJavaList setSelectionColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiVmOptionList setSelectionColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setSelectionBackground(background);
         setSelectionForeground(foreground);
         return this;
@@ -107,10 +108,10 @@ public class RikaishiNikuiJavaList extends JList<JavaVersionInformation> impleme
         setXY(json.getInt("x"), json.getInt("y"));
     }
 
-    public void setListData(Collection<JavaVersionInformation> data) {
+    public void setListData(Collection<VmOption> data) {
         this.data = data;
         int selected = getSelectedIndex();
-        Vector<? extends JavaVersionInformation> vector = new Vector<>(data);
+        Vector<? extends VmOption> vector = new Vector<>(data);
         this.setListData(vector);
         setSelectedIndex(selected);
     }

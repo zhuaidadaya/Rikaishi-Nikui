@@ -1,14 +1,18 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.UUID;
+import java.util.*;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.taskManager;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
 
 public class MinecraftVersionInformation {
+    private final LinkedHashMap<String, String> vmOptionsName = new LinkedHashMap<>();
     private String name = "unknown";
     private String id = UUID.randomUUID().toString();
     private String status = "unknown";
@@ -23,22 +27,9 @@ public class MinecraftVersionInformation {
     private String taskId = "unknown";
     private RikaishiNikuiTaskStatus lastTaskStatus = RikaishiNikuiTaskStatus.INACTIVE;
     private String taskFeedback = "none";
-
-    public String getTaskFeedback() {
-        return taskFeedback;
-    }
-
-    public void setTaskFeedback(String taskFeedback) {
-        this.taskFeedback = taskFeedback;
-    }
-
-    public RikaishiNikuiTaskStatus getLastTaskStatus() {
-        return lastTaskStatus;
-    }
-
-    public void setLastTaskStatus(RikaishiNikuiTaskStatus lastTaskStatus) {
-        this.lastTaskStatus = lastTaskStatus;
-    }
+    private String releaseTime = "unknown";
+    private String releaseType = "unknown";
+    private LinkedHashMap<String, VmOption> vmOptions = new LinkedHashMap<>();
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
         this.id = id;
@@ -77,6 +68,86 @@ public class MinecraftVersionInformation {
 
     public MinecraftVersionInformation(JSONObject json) {
         apply(json);
+    }
+
+    public void addVmOptions(String... options) {
+        for(String details : options) {
+            addVmOption(details);
+        }
+    }
+
+    public void addVmOption(String option) {
+        addVmOption(new VmOption(option));
+    }
+
+    public void addVmOption(VmOption option) {
+        if(! vmOptionsName.containsKey(option.getName())) {
+            this.vmOptions.put(option.getId(), option);
+        } else {
+            this.vmOptions.get(vmOptionsName.get(option.getName())).apply(option.toJSONObject());
+        }
+    }
+
+    public void removeVmOption(VmOption option) {
+        this.vmOptions.remove(option.getId());
+    }
+
+    public void removeVmOption(String id) {
+        this.vmOptions.remove(id);
+    }
+
+    public LinkedHashMap<String, VmOption> getVmOptions() {
+        return vmOptions;
+    }
+
+    public void setVmOptions(LinkedHashMap<String, VmOption> vmOptions) {
+        this.vmOptions = vmOptions;
+    }
+
+    public LinkedHashMap<String, VmOption> getVmOptions(String search) {
+        String filter = search.toLowerCase();
+        LinkedHashMap<String, VmOption> options = new LinkedHashMap<>();
+        for(VmOption option : vmOptions.values()) {
+            if(option.getDetail().equals("")) {
+                continue;
+            }
+            if(option.getDetail().toLowerCase().contains(filter) || textFormat.getText(option.getDescription()).contains(filter) || (textFormat.getText("vm.options.information.enable").contains(filter) & option.isEnable())) {
+                options.put(option.getId(), option);
+            }
+        }
+        return options;
+    }
+
+    public String getReleaseType() {
+        return releaseType;
+    }
+
+    public void setReleaseType(String releaseType) {
+        this.releaseType = releaseType;
+    }
+
+    public String getReleaseTime() {
+        return releaseTime;
+    }
+
+    public void setReleaseTime(String releaseTime) {
+        this.releaseTime = releaseTime;
+    }
+
+    public String getTaskFeedback() {
+        return taskFeedback;
+    }
+
+    public void setTaskFeedback(String taskFeedback) {
+        this.taskFeedback = taskFeedback;
+    }
+
+    public RikaishiNikuiTaskStatus getLastTaskStatus() {
+        return lastTaskStatus;
+    }
+
+    public void setLastTaskStatus(RikaishiNikuiTaskStatus lastTaskStatus) {
+        this.lastTaskStatus = lastTaskStatus;
     }
 
     public String getLockStatus() {
@@ -150,6 +221,34 @@ public class MinecraftVersionInformation {
         this.taskId = json.getString("task-id");
         this.lastTaskStatus = RikaishiNikuiTaskStatus.of(json.getString("last-task-status"));
         this.taskFeedback = json.getString("task-feedback");
+        this.releaseTime = json.getString("release-time");
+        this.releaseType = json.getString("release-type");
+        this.vmOptions = new LinkedHashMap<>();
+
+        JSONObject options = json.getJSONObject("options");
+        for(String o : options.keySet()) {
+            VmOption option = new VmOption(options.getJSONObject(o));
+            option.setId(o);
+            addVmOption(option);
+        }
+
+        LinkedHashSet<VmOption> removes = new LinkedHashSet<>();
+        for(VmOption option : this.vmOptions.values()) {
+            try {
+                if(option.toString().equals("")) {
+                    removes.add(option);
+                }
+                if(!vmOptionsName.containsKey(option.getName())) {
+                    vmOptionsName.put(option.getName(), option.getId());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        for(VmOption option : removes) {
+            vmOptions.remove(option.getId());
+        }
     }
 
     public String getLastLaunch() {
@@ -180,6 +279,18 @@ public class MinecraftVersionInformation {
             json.put("last-task-status", "task.status.inactive");
         }
         json.put("task-feedback", taskFeedback);
+        json.put("release-time", releaseTime);
+        json.put("release-type", releaseType);
+
+        JSONObject vmOptions = new JSONObject();
+        for(VmOption option : this.vmOptions.values()) {
+            if(option.isPair()) {
+                vmOptions.put(option.getId(), option.toJSONObject());
+            } else {
+                vmOptions.put(option.getId(), option.toJSONObject());
+            }
+        }
+        json.put("options", vmOptions);
 
         return json;
     }

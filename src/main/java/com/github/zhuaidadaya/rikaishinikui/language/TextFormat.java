@@ -7,7 +7,9 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -33,6 +35,50 @@ public class TextFormat {
         return format(source, args).getText();
     }
 
+    public boolean hasFormat(String source) {
+        try {
+            format.get(language).get(source).toString();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+//    public Texts formatTexts(String source, Object... args) {
+//        try {
+//            JSONObject text = null;
+//            try {
+//                text = format.get(language).getJSONObject(source);
+//            } catch (Exception ex) {
+//
+//            }
+//
+//            Texts formatReturn;
+//            if(text == null)
+//                formatReturn = new Texts(new Text(format.get(language).getString(source)));
+//            else
+//                formatReturn = new Texts(text);
+//
+//            Collection<Text> texts = new LinkedHashSet<>();
+//            for(Object o : args) {
+//                try {
+//                    JSONObject json = new JSONObject();
+//                    texts.add(new Text(json));
+//                } catch (Exception e) {
+//                    try {
+//                        formatReturn.format(Matcher.quoteReplacement(o.toString()));
+//                    } catch (Exception ex) {
+//                        return formatReturn;
+//                    }
+//                }
+//            }
+//
+//            return formatReturn;
+//        } catch (Exception e) {
+//            return new Texts(new Text(source));
+//        }
+//    }
+
     public Text format(String source, Object... args) {
         try {
             JSONObject text = null;
@@ -48,11 +94,11 @@ public class TextFormat {
             else
                 formatReturn = new Text(text);
 
+            Collection<Text> texts = new LinkedHashSet<>();
             for(Object o : args) {
                 try {
                     formatReturn.format(Matcher.quoteReplacement(o.toString()));
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     return formatReturn;
                 }
             }

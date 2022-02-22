@@ -1,6 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import org.json.JSONObject;
@@ -10,11 +11,11 @@ import javax.swing.border.EmptyBorder;
 import java.util.Collection;
 import java.util.Vector;
 
-public class RikaishiNikuiScrollJavaList extends JScrollPane implements RikaishiNikuiComponent {
-    private final RikaishiNikuiJavaList list;
+public class RikaishiNikuiScrollVmOptionList extends JScrollPane implements RikaishiNikuiComponent {
+    private final RikaishiNikuiVmOptionList list;
     private boolean disableBorder = false;
 
-    public RikaishiNikuiScrollJavaList(RikaishiNikuiJavaList list) {
+    public RikaishiNikuiScrollVmOptionList(RikaishiNikuiVmOptionList list) {
         setViewportView(list);
         setSize(list.getSize());
         this.list = list;
@@ -43,15 +44,15 @@ public class RikaishiNikuiScrollJavaList extends JScrollPane implements Rikaishi
         list.setSelectionForeground(foreground);
     }
 
-    public void setListData(Collection<JavaVersionInformation> data) {
+    public void setListData(Collection<VmOption> data) {
         list.setListData(data);
     }
 
-    public void setListData(Vector<? extends JavaVersionInformation> data) {
+    public void setListData(Vector<? extends VmOption> data) {
         list.setListData(data);
     }
 
-    public void setListData(JavaVersionInformation[] data) {
+    public void setListData(VmOption[] data) {
         list.setListData(data);
     }
 
@@ -59,8 +60,12 @@ public class RikaishiNikuiScrollJavaList extends JScrollPane implements Rikaishi
         return list.getSelectedIndex();
     }
 
-    public JavaVersionInformation getSelectedValue() {
+    public VmOption getSelectedValue() {
         return list.getSelectedValue();
+    }
+
+    public void setSelectValue(VmOption option) {
+        list.setSelectedValue(option,true);
     }
 
     public void disableBorder() {

@@ -1,6 +1,8 @@
 package com.github.zhuaidadaya.rikaishinikui.storage;
 
 import com.github.zhuaidadaya.rikaishinikui.RikaishiNikuiLauncher;
+import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskManager;
 import com.github.zhuaidadaya.rikaishinikui.language.Language;
@@ -24,6 +26,8 @@ public class Variables {
     public static Object2ObjectRBTreeMap<String, RikaishiNikuiFrame> frames = new Object2ObjectRBTreeMap<>();
     public static RikaishiNikuiMinecraftDownloader minecraftDownloader = new RikaishiNikuiMinecraftDownloader();
     public static MinecraftVersionsRecorder minecraftVersions = new MinecraftVersionsRecorder();
+    public static JavaVersionsRecorder javaVersions = new JavaVersionsRecorder();
+    public static JavaVersionInformation usedJava;
     public static RikaishiNikuiTaskManager taskManager = new RikaishiNikuiTaskManager();
     public static String os;
 

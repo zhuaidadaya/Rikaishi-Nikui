@@ -1,10 +1,12 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
+import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 public class MinecraftLaunchInformation {
@@ -12,18 +14,14 @@ public class MinecraftLaunchInformation {
     private String os;
     private String java = "java";
     private Account account = new Account();
-    private Collection<String> vmOptions;
+    private LinkedHashMap<String,VmOption>vmOptions;
 
     public MinecraftLaunchInformation(MinecraftVersionInformation information, String os, String java, Account account) {
         versionInformation = information;
         this.os = os;
         this.java = java;
         this.account = account;
-        vmOptions = new LinkedHashSet<>();
-        vmOptions.add("-server");
-        // log4j2 - jndi inject
-        vmOptions.add("-Dlog4j2.formatMsgNoLookups=true");
-        vmOptions.add("-Dcom.sun.jndi.ldap.object.trustURLCodebase=false");
+        vmOptions = information.getVmOptions();
     }
 
     public String getOs() {
@@ -34,11 +32,11 @@ public class MinecraftLaunchInformation {
         return account;
     }
 
-    public Collection<String> getVmOptions() {
+    public LinkedHashMap<String,VmOption> getVmOptions() {
         return vmOptions;
     }
 
-    public void setVmOptions(Collection<String> vmOptions) {
+    public void setVmOptions(LinkedHashMap<String,VmOption> vmOptions) {
         this.vmOptions = vmOptions;
     }
 

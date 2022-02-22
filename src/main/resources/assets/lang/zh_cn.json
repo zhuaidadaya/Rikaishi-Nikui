@@ -12,6 +12,38 @@
             "alpha": 255
         }
     },
+    "release": {
+        "text": "发布版",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "snapshot": {
+        "text": "快照版",
+        "color": {
+            "r": 217,
+            "g": 163,
+            "b": 67
+        }
+    },
+    "old_alpha": {
+        "text": "远古alpha版",
+        "color": {
+            "r": 140,
+            "g": 122,
+            "b": 165
+        }
+    },
+    "old_beta": {
+        "text": "远古beta版",
+        "color": {
+            "r": 140,
+            "g": 122,
+            "b": 165
+        }
+    },
     "true": {
         "text": "是"
     },
@@ -44,6 +76,15 @@
     },
     "task.button": {
         "text": "任务"
+    },
+    "add.button": {
+        "text": "添加"
+    },
+    "remove.button": {
+        "text": "移除"
+    },
+    "select.button": {
+        "text": "选择"
     },
     "vm-options.button": {
         "text": "VM选项"
@@ -298,6 +339,12 @@
             "b": 89
         }
     },
+    "tip.search.java.path": {
+        "text": "从路径:"
+    },
+    "tip.search.java": {
+        "text": "查找Java:"
+    },
     "tip.search": {
         "text": "查找版本:"
     },
@@ -349,6 +396,14 @@
             "b": 65
         }
     },
+    "task.feedback.unknown.error": {
+        "text": "未知错误",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
     "none": {
         "text": "无",
         "color": {
@@ -357,8 +412,40 @@
             "b": 89
         }
     },
-    "tip.versions.not.found": {
+    "tip.versions.not.found.in.area": {
         "text": "未在\"%s\"应用域中找到minecraft游戏内容\n",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "tip.versions.not.found.in.manifest": {
+        "text": "未找到与\"%s\"有关的minecraft版本\n",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "tip.java.not.found.in.config": {
+        "text": "未找到与\"%s\"有关的java版本\n",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "error.java.not.found.in.manifest": {
+        "text": "未添加java, 将使用系统默认的java启动minecraft\n",
+        "color": {
+            "r": 217,
+            "g": 163,
+            "b": 67
+        }
+    },
+    "error.version.not.found.in.manifest": {
+        "text": "无法加载版本列表, 请尝试检查网络并刷新\n",
         "color": {
             "r": 198,
             "g": 55,
@@ -386,6 +473,22 @@
     },
     "minecraft.information.save-as": {
         "text": "格式化名称",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.release-time": {
+        "text": "发布时间",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "minecraft.information.release-type": {
+        "text": "发布时间",
         "color": {
             "r": 106,
             "g": 135,
@@ -422,6 +525,242 @@
             "r": 217,
             "g": 163,
             "b": 67
+        }
+    },
+    "java.information.64-bit": {
+        "text": "64位",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.name": {
+        "text": "名称",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.java-id": {
+        "text": "java版本id",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.id": {
+        "text": "id",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.type": {
+        "text": "类型",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.path": {
+        "text": "路径",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.available": {
+        "text": "可用",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.status": {
+        "text": "状态",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "java.information.used": {
+        "text": "使用中",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "status.default": {
+        "text": "系统默认",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "status.custom": {
+        "text": "自定义",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "path.java": {
+        "text": "默认路径"
+    },
+    "error.vm.options.not.found": {
+        "text": "无法读取VM选项",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "tip.vm.options.not.found": {
+        "text": "未找到与\"%s\"有关的VM选项",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "tip.edit": {
+        "text": "编辑:"
+    },
+    "tip.add": {
+        "text": "添加:"
+    },
+    "tip.search.vm.option": {
+        "text": "查找VM选项:"
+    },
+    "vm.options.information.pair": {
+        "text": "键值对",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.options.information.pair-head": {
+        "text": "选项名",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.options.information.pair-end": {
+        "text": "选项值",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.options.information.description": {
+        "text": "概述",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.options.information.details": {
+        "text": "详情",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.options.information.opt": {
+        "text": "VM选项",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.options.information.enable": {
+        "text": "启用",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.option.-version": {
+        "text": "输出java版本并退出(不应启用)",
+        "color": {
+            "r": 198,
+            "g": 55,
+            "b": 65
+        }
+    },
+    "vm.option.-server": {
+        "text": "启用服务器VM(更好的VM性能)",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.option.-client": {
+        "text": "启用客户端VM(更快的VM启动)",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.option.-Xmx": {
+        "text": "VM最大内存",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.option.-Xms": {
+        "text": "初始化内存栈大小",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.option.-Xss": {
+        "text": "线程堆栈大小",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.option.-Xmn": {
+        "text": "堆内新生代内存大小",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
+        }
+    },
+    "vm.option.-XX:UseG1GC": {
+        "text": "G1垃圾回收器",
+        "color": {
+            "r": 106,
+            "g": 135,
+            "b": 89
         }
     }
 }

@@ -12,9 +12,9 @@ import java.awt.*;
 import java.util.UUID;
 
 public class RikaishiNikuiEditingTextPanel extends JTextPane implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
-    private int lineLimit = -1;
+    private Document doc = new DefaultStyledDocument();
+    private final int lineLimit = - 1;
     private String text;
-    private final Document doc = new DefaultStyledDocument();
 
     public RikaishiNikuiEditingTextPanel() {
         setName("RikaishiNikuiComponent#" + this);
@@ -64,14 +64,14 @@ public class RikaishiNikuiEditingTextPanel extends JTextPane implements Rikaishi
     }
 
     public void apply(JSONObject json) {
-            getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "none");
-            setEditable(true);
-            setXY(json.getInt("x"), json.getInt("y"));
-            setSize(json.getInt("width"), json.getInt("height"));
-            setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
-            setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
-            setCaretColor(new RikaishiNikuiColor(json.getJSONObject("caret-color")));
-            repaint();
+        getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "none");
+        setEditable(true);
+        setXY(json.getInt("x"), json.getInt("y"));
+        setSize(json.getInt("width"), json.getInt("height"));
+        setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
+        setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
+        setCaretColor(new RikaishiNikuiColor(json.getJSONObject("caret-color")));
+        repaint();
     }
 
     public void setText(Text text) {
@@ -124,5 +124,6 @@ public class RikaishiNikuiEditingTextPanel extends JTextPane implements Rikaishi
 
     public void updateText() {
         setDocument(doc);
+        doc = new DefaultStyledDocument();
     }
 }

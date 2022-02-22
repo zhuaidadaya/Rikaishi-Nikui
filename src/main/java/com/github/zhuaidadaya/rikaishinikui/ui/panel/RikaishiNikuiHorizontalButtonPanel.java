@@ -3,11 +3,17 @@ package com.github.zhuaidadaya.rikaishinikui.ui.panel;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import it.unimi.dsi.fastutil.ints.Int2BooleanRBTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONObject;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
@@ -18,7 +24,6 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel implements RikaishiNikuiComponent {
     private final Int2ObjectRBTreeMap<RikaishiNikuiButton> buttonsQueue = new Int2ObjectRBTreeMap<>();
-    private final Object o = new Object();
     private int buttonsWidth = 0;
     private int width = 0;
     private int height = 0;
@@ -82,18 +87,14 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
     }
 
     public void setButtonVisible(int id, boolean visible) {
-        RikaishiNikuiButton button = buttonsQueue.get(id);
-        button.setVisible(visible);
-        buttonsQueue.put(id, button);
+        buttonsQueue.get(id).setVisible(visible);
     }
 
     public void applyButtons(RikaishiNikuiButton... buttons) {
         for(RikaishiNikuiButton button : buttons) {
-            if(button.isVisible()) {
-                button.setSize(button.getWidth(), height);
-                button.setBounds(0, 0, button.getWidth(), height);
-                buttonsQueue.put(button.getId(), button);
-            }
+            button.setSize(button.getWidth(), height);
+            button.setBounds(0, 0, button.getWidth(), height);
+            buttonsQueue.put(button.getId(), button);
         }
     }
 
@@ -113,15 +114,14 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
 
     public void rendingButtons(JSONObject json) {
         buttonsWidth = 0;
+        removeAll();
         for(RikaishiNikuiButton button : buttonsQueue.values()) {
             if(button.isVisible()) {
                 button.apply(json.getJSONObject(button.getName()));
-                button.setBounds(buttonsWidth, 0, button.getWidth(), height);
                 button.formatText();
+                button.setBounds(buttonsWidth, 0, button.getWidth(), height);
                 buttonsWidth += button.getWidth();
                 add(button);
-            } else {
-                remove(button);
             }
         }
     }
