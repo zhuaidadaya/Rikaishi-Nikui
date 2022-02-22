@@ -1,13 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launch.MinecraftLauncher;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.PaginateCachedLog;
 
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.minecraftVersions;
 
 public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
     private final MinecraftLauncher launcher;

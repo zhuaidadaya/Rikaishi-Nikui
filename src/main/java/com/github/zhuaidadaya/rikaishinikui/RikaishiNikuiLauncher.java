@@ -1,11 +1,10 @@
 package com.github.zhuaidadaya.rikaishinikui;
 
-import android.view.View;
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.version.JavaVersionChecker;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launch.MinecraftLauncher;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftVersionsParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftLaunchInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
@@ -34,8 +33,6 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
