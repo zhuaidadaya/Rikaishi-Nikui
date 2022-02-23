@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.utils.file.checker;
+package com.github.zhuaidadaya.rikaishinikui.handler.file.checker;
 
 import java.io.File;
 import java.io.FileInputStream;

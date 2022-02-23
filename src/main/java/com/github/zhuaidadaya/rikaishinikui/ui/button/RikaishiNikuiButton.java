@@ -89,9 +89,9 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
     }
 
     public RikaishiNikuiButton setActionListeners(ActionListener... listeners) {
-        for(ActionListener listener : super.getActionListeners())
+        for (ActionListener listener : super.getActionListeners())
             super.removeActionListener(listener);
-        for(ActionListener listener : listeners)
+        for (ActionListener listener : listeners)
             super.addActionListener(listener);
         return this;
     }
@@ -103,10 +103,10 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         super.setVisible(visible);
         this.text = json.getString("text");
         this.formatted = json.getBoolean("formatted");
-        //        this.active = json.getBoolean("active");
+//        this.active = json.getBoolean("active");
         this.borderPainted = json.getBoolean("border-painted");
 
-        if(active) {
+        if (active) {
             setBackground(new RikaishiNikuiColor(json.getJSONObject("active-background-color")));
             setForeground(new RikaishiNikuiColor(json.getJSONObject("active-foreground-color")));
         } else {
@@ -116,7 +116,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
 
         setName(json.getString("name"));
 
-        if(borderPainted)
+        if (borderPainted)
             enableBorderPainted();
         else
             disableBorderPainted();
@@ -125,7 +125,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
     }
 
     public void formatText() {
-        if(formatted) {
+        if (formatted) {
             setText(textFormat.format(text));
         } else {
             setText(text);
@@ -215,6 +215,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         json.put("name", getName());
         json.put("id", id);
         json.put("visible", visible);
+//        json.put("active", active);
 
         return json;
     }

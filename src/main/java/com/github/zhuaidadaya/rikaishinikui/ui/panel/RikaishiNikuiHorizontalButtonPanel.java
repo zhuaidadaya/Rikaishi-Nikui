@@ -53,14 +53,14 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
     }
 
     public void cancelButtonsActive() {
-        for(RikaishiNikuiButton button : buttonsQueue.values()) {
+        for (RikaishiNikuiButton button : buttonsQueue.values()) {
             button.setActive(false);
         }
     }
 
     public RikaishiNikuiButton getActiveButton() {
-        for(RikaishiNikuiButton button : buttonsQueue.values()) {
-            if(button.isActive())
+        for (RikaishiNikuiButton button : buttonsQueue.values()) {
+            if (button.isActive())
                 return button;
         }
         return null;
@@ -91,7 +91,7 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
     }
 
     public void applyButtons(RikaishiNikuiButton... buttons) {
-        for(RikaishiNikuiButton button : buttons) {
+        for (RikaishiNikuiButton button : buttons) {
             button.setSize(button.getWidth(), height);
             button.setBounds(0, 0, button.getWidth(), height);
             buttonsQueue.put(button.getId(), button);
@@ -99,10 +99,10 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
     }
 
     public void applyButtons(JSONObject json) {
-        for(String name : json.keySet()) {
+        for (String name : json.keySet()) {
             JSONObject buttonJson = json.getJSONObject(name);
             RikaishiNikuiButton button = buttonsQueue.get(buttonJson.getInt("id"));
-            if(button.isVisible()) {
+            if (button.isVisible()) {
                 applyButton(button, buttonJson);
             }
         }
@@ -115,8 +115,8 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
     public void rendingButtons(JSONObject json) {
         buttonsWidth = 0;
         removeAll();
-        for(RikaishiNikuiButton button : buttonsQueue.values()) {
-            if(button.isVisible()) {
+        for (RikaishiNikuiButton button : buttonsQueue.values()) {
+            if (button.isVisible()) {
                 button.apply(json.getJSONObject(button.getName()));
                 button.formatText();
                 button.setBounds(buttonsWidth, 0, button.getWidth(), height);
@@ -136,8 +136,12 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
 
         setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
 
-        applyButtons(json.getJSONObject("buttons"));
-        rendingButtons(json.getJSONObject("buttons"));
+        try {
+            applyButtons(json.getJSONObject("buttons"));
+            rendingButtons(json.getJSONObject("buttons"));
+        } catch (Exception e) {
+
+        }
         repaint();
     }
 
@@ -150,7 +154,7 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
         json.put("background-color", RikaishiNikuiColor.parse(getBackground()).toJSONObject());
 
         JSONObject buttons = new JSONObject();
-        for(RikaishiNikuiButton button : this.buttonsQueue.values()) {
+        for (RikaishiNikuiButton button : this.buttonsQueue.values()) {
             buttons.put(button.getName(), button.toJSONObject());
         }
 

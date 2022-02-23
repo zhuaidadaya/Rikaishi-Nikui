@@ -1,7 +1,7 @@
-package com.github.zhuaidadaya.rikaishinikui.network.downloader;
+package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
-import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
-import com.github.zhuaidadaya.utils.file.checker.FileCheckUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.checker.FileCheckUtil;
 import com.github.zhuaidadaya.utils.resource.Resources;
 
 import java.io.*;
@@ -20,7 +20,7 @@ public class FileDownloader {
     private boolean running = true;
 
     public StringBuilder downloadWithStringBuilder(String url) {
-        return NetworkFileUtil.downloadToStringBuilder(url);
+        return NetworkUtil.downloadToStringBuilder(url);
     }
 
     public void downloadFiles(Set<NetworkFileInformation> files) {
@@ -93,7 +93,7 @@ public class FileDownloader {
     public void downloadWithBuf(String url, String filePath) throws IOException {
         HttpURLConnection connection = null;
         try {
-            connection = NetworkFileUtil.getHttp(url);
+            connection = NetworkUtil.getHttp(url);
             connection.setRequestProperty("Charset", "UTF-8");
         } catch (Exception e) {
 
@@ -235,7 +235,7 @@ public class FileDownloader {
             while(true) {
                 tryCount++;
                 try {
-                    HttpURLConnection conn = NetworkFileUtil.getHttp(url);
+                    HttpURLConnection conn = NetworkUtil.getHttp(url);
                     conn.setRequestProperty("Range", "bytes=" + start + "-" + end);
                     conn.setRequestProperty("Charset", "UTF-8");
                     conn.setReadTimeout(20000);

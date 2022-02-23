@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task.log;
 
-import com.github.zhuaidadaya.utils.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 
 import java.io.BufferedReader;

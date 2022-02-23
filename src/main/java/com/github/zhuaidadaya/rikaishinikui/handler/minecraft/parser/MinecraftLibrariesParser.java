@@ -1,12 +1,10 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser;
 
-import com.github.zhuaidadaya.rikaishinikui.network.downloader.NetworkFileInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.NetworkFileInformation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
-import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;

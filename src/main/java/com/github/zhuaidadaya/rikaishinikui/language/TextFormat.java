@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.language;
 
-import com.github.zhuaidadaya.utils.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import com.github.zhuaidadaya.utils.resource.Resources;
 import org.json.JSONObject;
 

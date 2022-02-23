@@ -1,10 +1,8 @@
-package com.github.zhuaidadaya.rikaishinikui.network.downloader;
+package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
-import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
-import com.github.zhuaidadaya.utils.file.checker.FileCheckUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.checker.FileCheckUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 

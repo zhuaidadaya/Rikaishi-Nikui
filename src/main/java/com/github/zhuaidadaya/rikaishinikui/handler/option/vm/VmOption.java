@@ -32,10 +32,10 @@ public class VmOption {
     }
 
     public void setDetail(String detail) {
-        if(detail.contains("=")) {
+        if (detail.contains("=")) {
             isPair = true;
             pairHead = detail.substring(0, detail.indexOf("=") + 1);
-            pairEnd = detail.substring(detail.lastIndexOf("=") + 1);
+            pairEnd = detail.substring(detail.indexOf("=") + 1);
         } else {
             isPair = false;
             pairHead = detail;
@@ -57,10 +57,10 @@ public class VmOption {
         this.pairHead = json.getString("pair-head");
         this.pairEnd = json.getString("pair-end");
         String detail = pairHead + pairEnd;
-        if(isOption) {
+        if (isOption) {
             this.isEnable = json.getBoolean("enable");
         }
-        if(detail.startsWith("-XX:")) {
+        if (detail.startsWith("-XX:")) {
             isOption = true;
             isEnable = detail.startsWith("-XX:+");
         }
@@ -82,11 +82,12 @@ public class VmOption {
         json.put("pair", isPair);
         json.put("pair-head", pairHead);
         json.put("pair-end", pairEnd);
-        if(isOption) {
+
+        if (isOption) {
             json.put("enable", isEnable);
         }
 
-        if(isOption) {
+        if (isOption) {
             json.put("description", "vm.option." + getDetail().replace("-XX:+", "-XX:").replace("-XX:-", "-XX:"));
         } else {
             json.put("description", "vm.option." + getName().replace("=", ""));
@@ -101,18 +102,19 @@ public class VmOption {
     }
 
     public String toString() {
-        if(getName().matches("((-Xss)|(-Xm[xns]))[0-9]+[TGMKB]")) {
-            return getName().substring(0, 4);
+        String result;
+        if (getName().matches("((-Xss)|(-Xm[xns]))[0-9]+[TGMKB]")) {
+            result = getName().substring(0, 4);
         } else {
-            String result = pairHead.replace("=", "").replace("-XX:+", "").replace("-XX:-", "");
-            if(result.startsWith("-D")) {
+            result = pairHead.replace("=", "").replace("-XX:+", "").replace("-XX:-", "");
+            if (result.startsWith("-D")) {
                 result = result.replaceFirst("-D", "");
             }
-            if(result.startsWith("-")) {
-                result = result.replaceFirst("-", "");
-            }
-            return result;
         }
+        if (result.startsWith("-")) {
+            result = result.replaceFirst("-", "");
+        }
+        return result;
     }
 
     public String getPairHead() {
@@ -156,11 +158,11 @@ public class VmOption {
     }
 
     public static String getExample(String input) {
-        return switch(input.toLowerCase()) {
-            case "g1gc" -> "-XX:+UseG1GC";
+        return switch (input.toLowerCase()) {
+            case "g1", "g1gc" -> "-XX:+UseG1GC";
             case "server" -> "-server";
             case "client" -> "-client";
-            default -> "";
+            default -> input;
         };
     }
 }

@@ -10,8 +10,8 @@ import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftV
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
-import com.github.zhuaidadaya.utils.file.FileUtil;
-import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.utils.times.TimeType;
 import com.github.zhuaidadaya.utils.times.Times;
 import org.json.JSONObject;
@@ -19,7 +19,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,7 +66,7 @@ public class MinecraftLauncher {
         String gamePath = versionInformation.getPath();
         setGamePath(gamePath);
         setNativePath(gamePath + "/natives/");
-        setGameSource(new JSONObject(NetworkFileUtil.downloadToStringBuilder(versionInformation.formatManifest()).toString()));
+        setGameSource(new JSONObject(NetworkUtil.downloadToStringBuilder(versionInformation.formatManifest()).toString()));
         setClassifiers(new MinecraftClassifiersParser(gameSource, area, os));
 
         setVmOptions(information.getVmOptions());
@@ -258,7 +257,6 @@ public class MinecraftLauncher {
                 try {
                     while((readErr = minecraftError.readLine()) != null) {
                         logLines.getAndIncrement();
-                        System.out.println(readErr);
                         taskManager.log(taskId, readErr);
                         if(readErr.contains("java.lang.UnsupportedClassVersionError:")) {
                             versionInformation.setTaskFeedback("task.feedback.java.version.error");
@@ -279,7 +277,7 @@ public class MinecraftLauncher {
             errThread.setName(String.format("err submitter(%s)", versionInformation.getId()));
             logThread.setName(String.format("log submitter(%s)", versionInformation.getId()));
 
-            ThreadsConcurrentWaiting waiting = new ThreadsConcurrentWaiting(Executors.newCachedThreadPool(), ThreadsDoneCondition.ALIVE, logThread, errThread);
+            ThreadsConcurrentWaiting waiting = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE, logThread, errThread);
             waiting.start();
 
             if(logLines.get() < 5 & unknownError.get()) {

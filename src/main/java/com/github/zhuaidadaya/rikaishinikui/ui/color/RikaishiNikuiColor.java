@@ -5,6 +5,7 @@ import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.util.Random;
 
 public class RikaishiNikuiColor extends Color implements RikaishiNikuiComponent {
     private int alpha = 255;

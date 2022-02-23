@@ -13,6 +13,7 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
 public class JavaVersionsRecorder {
     private Object2ObjectLinkedOpenHashMap<String, JavaVersionInformation> versions = new Object2ObjectLinkedOpenHashMap<>();
     private Object2ObjectLinkedOpenHashMap<String, String> versionNames = new Object2ObjectLinkedOpenHashMap<>();
+    private JavaVersionInformation defaultInformation;
 
     public JavaVersionsRecorder() {
 
@@ -35,6 +36,9 @@ public class JavaVersionsRecorder {
     public void remove(JavaVersionInformation information) {
         versions.remove(information.getName());
         versionNames.remove(information.getName());
+        if (information.getName().equals(defaultInformation.getName())) {
+            defaultInformation = null;
+        }
         config.set("java-versions", toJSONObject());
     }
 
@@ -49,8 +53,8 @@ public class JavaVersionsRecorder {
     public Collection<JavaVersionInformation> getVersions(String search) {
         String filter = search.toLowerCase();
         Collection<JavaVersionInformation> result = new LinkedHashSet<>();
-        for(JavaVersionInformation information : versions.values()) {
-            if(information.getName().toLowerCase().contains(filter) || information.getType().toLowerCase().contains(filter) || information.getJavaId().toLowerCase().contains(filter) || (information.isIs64Bit()) & search.equals("64")) {
+        for (JavaVersionInformation information : versions.values()) {
+            if (information.getName().toLowerCase().contains(filter) || information.getType().toLowerCase().contains(filter) || information.getJavaId().toLowerCase().contains(filter) || (information.isIs64Bit()) & search.equals("64")) {
                 result.add(information);
             }
         }
@@ -58,8 +62,8 @@ public class JavaVersionsRecorder {
     }
 
     public JavaVersionInformation getVersionAsName(String name) {
-        for(JavaVersionInformation information : versions.values()) {
-            if(information.getName().equals(name)) {
+        for (JavaVersionInformation information : versions.values()) {
+            if (information.getName().equals(name)) {
                 return information;
             }
         }
@@ -73,8 +77,15 @@ public class JavaVersionsRecorder {
     public void apply(JSONObject json) throws Exception {
         versions = new Object2ObjectLinkedOpenHashMap<>();
         versionNames = new Object2ObjectLinkedOpenHashMap<>();
-        for(String name : json.keySet()) {
+        defaultInformation = null;
+        for (String name : json.keySet()) {
             JavaVersionInformation information = new JavaVersionInformation(json.getJSONObject(name));
+            if (information.getStatus().equals("status.default")) {
+                if (defaultInformation == null)
+                    defaultInformation = information;
+                else
+                    continue;
+            }
             versions.put(information.getName(), information);
             versionNames.put(information.getName(), information.getName());
         }
@@ -82,7 +93,7 @@ public class JavaVersionsRecorder {
 
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
-        for(String name : versions.keySet()) {
+        for (String name : versions.keySet()) {
             json.put(name, versions.get(name).toJSONObject());
         }
 

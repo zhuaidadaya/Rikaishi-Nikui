@@ -56,13 +56,13 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
     }
 
     public void apply(JSONObject json) {
-            setEditable(false);
-            setXY(json.getInt("x"), json.getInt("y"));
-            setSize(json.getInt("width"), json.getInt("height"));
-            setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
-            setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
-            repaint();
-        }
+        setEditable(false);
+        setXY(json.getInt("x"), json.getInt("y"));
+        setSize(json.getInt("width"), json.getInt("height"));
+        setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
+        setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
+        repaint();
+    }
 
     public void setText(Text text) {
         this.text = text.getText();
@@ -97,7 +97,7 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
 
     public void appendText(Text text, boolean clear) {
         try {
-            if(text.getText().equals("")) {
+            if (text.getText().equals("")) {
                 super.setText("");
                 return;
             }
@@ -108,7 +108,7 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
             } catch (Exception e) {
                 asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
             }
-            if(clear)
+            if (clear)
                 doc.remove(0, doc.getLength());
             doc.insertString(doc.getLength(), text.getText(), asset);
         } catch (Exception e) {

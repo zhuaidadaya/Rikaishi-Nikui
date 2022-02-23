@@ -1,13 +1,12 @@
-package com.github.zhuaidadaya.utils.file;
+package com.github.zhuaidadaya.rikaishinikui.handler.network;
 
 import com.github.zhuaidadaya.utils.resource.Resources;
 
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class NetworkFileUtil {
+public class NetworkUtil {
     public static HttpURLConnection getHttp(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setReadTimeout(5000);
@@ -28,13 +27,13 @@ public class NetworkFileUtil {
             }
 
             BufferedReader br;
-            if(connection != null) {
+            if (connection != null) {
                 br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             } else {
                 br = new BufferedReader(new FileReader(url));
             }
             String cache;
-            while((cache = br.readLine()) != null) {
+            while ((cache = br.readLine()) != null) {
                 builder.append(cache).append("\n");
             }
             br.close();
@@ -57,7 +56,7 @@ public class NetworkFileUtil {
         }
 
         BufferedInputStream br;
-        if(connection != null) {
+        if (connection != null) {
             br = new BufferedInputStream(connection.getInputStream());
         } else {
             br = new BufferedInputStream(new FileInputStream(url));
@@ -68,7 +67,7 @@ public class NetworkFileUtil {
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] buf = new byte[8192];
         int length;
-        while((length = br.read(buf)) >= 0) {
+        while ((length = br.read(buf)) >= 0) {
             out.write(buf, 0, length);
         }
         br.close();

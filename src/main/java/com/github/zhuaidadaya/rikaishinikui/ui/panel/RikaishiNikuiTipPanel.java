@@ -66,15 +66,15 @@ public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiCom
     }
 
     public void apply(JSONObject json) {
-            setEditable(false);
-            setXY(json.getInt("x"), json.getInt("y"));
-            setSize(json.getInt("width"), json.getInt("height"));
-            setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
-            setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
-            this.formatted = json.getBoolean("formatted");
-            this.text = json.getString("text");
-            updateText();
-            repaint();
+        setEditable(false);
+        setXY(json.getInt("x"), json.getInt("y"));
+        setSize(json.getInt("width"), json.getInt("height"));
+        setBackground(new RikaishiNikuiColor(json.getJSONObject("background-color")));
+        setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
+        this.formatted = json.getBoolean("formatted");
+        this.text = json.getString("text");
+        updateText();
+        repaint();
     }
 
     public void setFormatted(boolean formatted) {
@@ -117,7 +117,7 @@ public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiCom
     }
 
     public void updateText() {
-        if(formatted) {
+        if (formatted) {
             setDoc(textFormat.format(this.text));
         }
         setDocument(doc);

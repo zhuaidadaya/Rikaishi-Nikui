@@ -7,7 +7,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftV
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskManager;
 import com.github.zhuaidadaya.rikaishinikui.language.Language;
 import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
-import com.github.zhuaidadaya.rikaishinikui.network.downloader.RikaishiNikuiMinecraftDownloader;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
 import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;

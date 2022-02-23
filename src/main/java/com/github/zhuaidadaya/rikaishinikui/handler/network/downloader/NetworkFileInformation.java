@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.network.downloader;
+package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
 import org.jetbrains.annotations.NotNull;
 

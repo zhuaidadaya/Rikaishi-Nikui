@@ -19,15 +19,16 @@ import com.github.zhuaidadaya.rikaishinikui.language.Text;
 import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiTextFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
 import com.github.zhuaidadaya.utils.config.EncryptionType;
 import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
-import com.github.zhuaidadaya.utils.file.FileUtil;
-import com.github.zhuaidadaya.utils.file.IllegalFileName;
-import com.github.zhuaidadaya.utils.file.NetworkFileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.IllegalFileName;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONObject;
 
@@ -40,7 +41,7 @@ import java.util.*;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiLauncher {
-    private final int tickInterval = 250;
+    private final int tickInterval = 100;
 
     public RikaishiNikuiFrame mainFrame;
     public RikaishiNikuiTextFrame errorFrame;
@@ -169,6 +170,7 @@ public class RikaishiNikuiLauncher {
             javaVersionPanel = new RikaishiNikuiHorizontalButtonPanel("java");
             searchJavaVersion = new RikaishiNikuiEditingTextPanel("java");
             searchJavaTip = new RikaishiNikuiTipPanel();
+            javaOperationButtons = new RikaishiNikuiHorizontalButtonPanel("java");
             javaPathEditing = new RikaishiNikuiEditingTextPanel("java");
             javaPathTip = new RikaishiNikuiTipPanel();
 
@@ -177,13 +179,24 @@ public class RikaishiNikuiLauncher {
             vmOptionsList = new RikaishiNikuiScrollVmOptionList(new RikaishiNikuiVmOptionList("vm"));
             versionVmOptionList = new RikaishiNikuiScrollMinecraftList(new RikaishiNikuiMinecraftList("vm"));
             versionVmOptionListPanel = new RikaishiNikuiPanel("vm");
+            editVmOptionsKey = new RikaishiNikuiEditingTextPanel("vm");
+            editVmOptionsValue = new RikaishiNikuiEditingTextPanel("vm");
+            editVmOptionsTip = new RikaishiNikuiTipPanel("vm");
             vmOptionsPanel = new RikaishiNikuiPanel("vm");
             searchVmOptions = new RikaishiNikuiEditingTextPanel("vm");
             searchVmOptionsTip = new RikaishiNikuiTipPanel("vm");
             searchLocalMinecraftVmVersion = new RikaishiNikuiEditingTextPanel("vm");
             searchLocalMinecraftVmTip = new RikaishiNikuiTipPanel("vm");
+            vmOptionsOperationButtons = new RikaishiNikuiHorizontalButtonPanel("vm");
+            vmOptionsOperationButtons2 = new RikaishiNikuiHorizontalButtonPanel("vm");
+            addVmOptions = new RikaishiNikuiEditingTextPanel("vm");
+            addVmOptionsTip = new RikaishiNikuiTipPanel("vm");
 
             try {
+                functionButtons();
+
+                initUi();
+
                 testRending();
             } catch (Exception ex) {
                 defaultButtonsUi();
@@ -201,8 +214,6 @@ public class RikaishiNikuiLauncher {
 
                 testRending();
             }
-
-            addVmOptions.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "none");
 
             config.readConfig();
 
@@ -422,7 +433,7 @@ public class RikaishiNikuiLauncher {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
     }
 
@@ -503,7 +514,7 @@ public class RikaishiNikuiLauncher {
                 }
 
                 try {
-                    JSONObject gameSource = new JSONObject(NetworkFileUtil.downloadToStringBuilder(information.formatManifest()).toString());
+                    JSONObject gameSource = new JSONObject(NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString());
                     information.setVersion(gameSource.getString("id"));
                 } catch (Exception ex) {
 
@@ -677,7 +688,12 @@ public class RikaishiNikuiLauncher {
                 editVmOptionsTip.setVisible(true);
                 boolean editKeyFocus = true;
                 boolean editValueFocus = true;
-                if (!editVmOptionsKey.isFocusOwner()) {
+                boolean badKey = false;
+                String head = editVmOptionsKey.getText();
+                if (head.contains("=")) {
+                    badKey = head.substring(head.indexOf("=")).length() > 1;
+                }
+                if (!editVmOptionsKey.isFocusOwner() || badKey) {
                     editVmOptionsKey.setText(information.getName());
                     editVmOptionsKey.updateText();
                     editKeyFocus = false;
@@ -791,9 +807,11 @@ public class RikaishiNikuiLauncher {
         configUi.set("frame-main", frame.toJSONObject());
     }
 
-    public void applyUi() {
-        //        mainFrame.apply(configUi.getConfigJSONObject("frame-main"));
+    public void applyUi(RikaishiNikuiComponent component, String config) {
+        component.apply(configUi.getConfigJSONObject(config));
+    }
 
+    public void applyUi() {
         switch (buttons.getActiveButton().getId()) {
             case 0 -> {
                 setMainVisible();
@@ -801,18 +819,18 @@ public class RikaishiNikuiLauncher {
                 setLocalInformationList();
                 setLocalInformationText();
 
-                mainPanel.apply(configUi.getConfigJSONObject("panel-main"));
+                applyUi(mainPanel, "panel-main");
 
-                mainInformationPanel.apply(configUi.getConfigJSONObject("information-panel-main"));
-                mainVersionPanel.apply(configUi.getConfigJSONObject("information-panel-main-version"));
-                mainVersionList.apply(configUi.getConfigJSONObject("list-panel-versions"));
-                mainVersionDetailsPanel.apply(configUi.getConfigJSONObject("information-panel-main-version-details"));
+                applyUi(mainInformationPanel, "information-panel-main");
+                applyUi(mainVersionPanel, "information-panel-main-version");
+                applyUi(mainVersionList, "list-panel-versions");
+                applyUi(mainVersionDetailsPanel, "information-panel-main-version-details");
 
-                searchLocalVersion.apply(configUi.getConfigJSONObject("search-local"));
-                searchLocalTip.apply(configUi.getConfigJSONObject("search-local-tip"));
+                applyUi(searchLocalVersion, "search-local");
+                applyUi(searchLocalTip, "search-local-tip");
 
                 mainOperationButtons.applyButtons(configUi.getConfigJSONObject("button-panel-main-operation").getJSONObject("buttons"));
-                mainOperationButtons.apply(configUi.getConfigJSONObject("button-panel-main-operation"));
+                applyUi(mainOperationButtons, "button-panel-main-operation");
             }
             case 1 -> {
                 setDownloadVisible();
@@ -837,8 +855,8 @@ public class RikaishiNikuiLauncher {
             case 2 -> {
                 setJavaVisible();
 
-                detectJavaVersions();
                 setJavaInformationList();
+                detectJavaVersions();
                 setJavaInformationText();
 
                 javaInformationPanel.apply(configUi.getConfigJSONObject("information-panel-java"));
@@ -968,8 +986,23 @@ public class RikaishiNikuiLauncher {
         setMainVisible(false);
     }
 
+    public void setTaskVisible(boolean visible) {
+
+    }
+
+    public void setTaskVisible() {
+        setTaskVisible(true);
+        setVmVisible(false);
+        setJavaVisible(false);
+        setDownloadVisible(false);
+        setMainVisible(false);
+    }
+
     public void testRending() {
         mainPanel.apply(configUi.getConfigJSONObject("panel-main"));
+
+        buttons.applyButtons(configUi.getConfigJSONObject("button-panel-main").getJSONObject("buttons"));
+        buttons.apply(configUi.getConfigJSONObject("button-panel-main"));
 
         mainInformationPanel.apply(configUi.getConfigJSONObject("information-panel-main"));
         mainVersionPanel.apply(configUi.getConfigJSONObject("information-panel-main-version"));
@@ -1365,13 +1398,13 @@ public class RikaishiNikuiLauncher {
 
         addVmOptions = new RikaishiNikuiEditingTextPanel("vm");
         addVmOptions.setColor(new RikaishiNikuiColor(49, 51, 53), new RikaishiNikuiColor(214, 214, 214), new RikaishiNikuiColor(200, 200, 200));
-        addVmOptions.setXY(600, 670);
+        addVmOptions.setXY(600, 580);
         addVmOptions.setSize(250, 25);
         configUi.set("add-minecraft-vm-options", addVmOptions.toJSONObject());
 
         addVmOptionsTip = new RikaishiNikuiTipPanel("vm");
         addVmOptionsTip.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
-        addVmOptionsTip.setXY(500, 670);
+        addVmOptionsTip.setXY(500, 580);
         addVmOptionsTip.setSize(100, 25);
         addVmOptionsTip.setText("tip.add");
         configUi.set("add-minecraft-vm-options-tip", addVmOptionsTip.toJSONObject());
@@ -1575,7 +1608,7 @@ public class RikaishiNikuiLauncher {
     public void vmOptionsFunctionButtons() {
         RikaishiNikuiButton addOption = new RikaishiNikuiButton(100, 40, "add", "add.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(0);
         addOption.addActionListener(e -> {
-            VmOption option = new VmOption(addVmOptions.getText());
+            VmOption option = new VmOption(VmOption.getExample(addVmOptions.getText()));
             minecraftVersions.getVersionAsId(versionVmOptionList.getSelectedValue().getId()).addVmOption(option);
             config.set("minecraft-versions", minecraftVersions.toJSONObject());
             addVmOptions.setText("");
@@ -1593,13 +1626,13 @@ public class RikaishiNikuiLauncher {
 
         vmOptionsOperationButtons.applyButtons(removeOption);
 
-        RikaishiNikuiButton selectJava = new RikaishiNikuiButton(100, 40, "select", "select.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2);
-        selectJava.addActionListener(e -> {
-            usedJava = javaVersionList.getSelectedValue();
-            config.set("used_java", usedJava.toJSONObject());
-        });
+//        RikaishiNikuiButton selectJava = new RikaishiNikuiButton(100, 40, "select", "select.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2);
+//        selectJava.addActionListener(e -> {
+//            usedJava = javaVersionList.getSelectedValue();
+//            config.set("used_java", usedJava.toJSONObject());
+//        });
 
-        javaOperationButtons.applyButtons(selectJava);
+//        javaOperationButtons.applyButtons(selectJava);
     }
 
     public void functionButtons() {

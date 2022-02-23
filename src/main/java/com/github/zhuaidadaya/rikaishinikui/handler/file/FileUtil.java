@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.utils.file;
+package com.github.zhuaidadaya.rikaishinikui.handler.file;
 
 import com.github.zhuaidadaya.utils.resource.Resources;
 
