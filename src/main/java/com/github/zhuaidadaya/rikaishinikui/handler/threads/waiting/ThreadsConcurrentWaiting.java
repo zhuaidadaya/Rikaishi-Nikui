@@ -1,16 +1,14 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting;
 
-import org.apache.logging.log4j.core.util.ExecutorServices;
-
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ThreadsConcurrentWaiting {
     private final Collection<Thread> threads = new LinkedHashSet<>();
     private final ThreadsDoneCondition condition;
+    private int alive = 0;
     private ExecutorService useThreadPool;
 
     /**
@@ -30,13 +28,22 @@ public class ThreadsConcurrentWaiting {
         synchronized (this) {
             if (useThreadPool == null) {
                 try {
-                    threads.forEach(Thread::start);
+                    threads.forEach(t -> {
+                        t.start();
+                        alive++;
+                    });
 
                     while (threads.size() != 0) {
                         if (condition == ThreadsDoneCondition.ALIVE & threads.parallelStream().allMatch(Thread::isAlive)) {
-                            Thread.sleep(10);
+                            Thread.currentThread().join(10);
                         }
-                        threads.removeIf(t -> !t.isAlive());
+                        threads.removeIf(t -> {
+                            if (!t.isAlive()) {
+                                alive--;
+                                return true;
+                            }
+                            return false;
+                        });
                     }
                 } catch (Exception e) {
 
@@ -47,5 +54,9 @@ public class ThreadsConcurrentWaiting {
 
     public Collection<Thread> getThreads() {
         return threads;
+    }
+
+    public int aliveThreads() {
+        return alive;
     }
 }

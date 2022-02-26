@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.log.submitter;
 
-import com.github.zhuaidadaya.rikaishinikui.language.Text;
+import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
 
 public class RikaishiNikuiSubmitter {
@@ -11,7 +11,7 @@ public class RikaishiNikuiSubmitter {
     }
 
     public void submit(String log) {
-        component.setText(new Text(log));
+        component.setText(new SingleText(log));
         component.updateText();
         component.setCaretPosition(log.length());
     }

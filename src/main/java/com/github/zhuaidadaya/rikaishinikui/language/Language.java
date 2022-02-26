@@ -12,7 +12,7 @@ public enum Language {
      * @param value
      *         value(ID) of language
      * @param name
-     *         name of Languagel
+     *         name of Language
      */
     Language(int value, String name) {
         this.value = value;

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LanguageResource {
-    private Map<Language, String> map = new HashMap<>();
+    private final Map<Language, String> map = new HashMap<>();
 
     public void set(Language name, String resource) {
         map.put(name,resource);

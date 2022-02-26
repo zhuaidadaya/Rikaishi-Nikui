@@ -1,14 +1,14 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.panel;
 
+import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
-import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
 
@@ -97,7 +97,7 @@ public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiCom
     }
 
     private void setDoc(String text, Color color) {
-        setDoc(new Text(text, color));
+        setDoc(new SingleText(text, color));
     }
 
     private void setDoc(Text text) {

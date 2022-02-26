@@ -7,9 +7,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -79,7 +77,7 @@ public class TextFormat {
 //        }
 //    }
 
-    public Text format(String source, Object... args) {
+    public SingleText format(String source, Object... args) {
         try {
             JSONObject text = null;
             try {
@@ -88,13 +86,12 @@ public class TextFormat {
 
             }
 
-            Text formatReturn;
+            SingleText formatReturn;
             if(text == null)
-                formatReturn = new Text(format.get(language).getString(source));
+                formatReturn = new SingleText(format.get(language).getString(source));
             else
-                formatReturn = new Text(text);
+                formatReturn = new SingleText(text);
 
-            Collection<Text> texts = new LinkedHashSet<>();
             for(Object o : args) {
                 try {
                     formatReturn.format(Matcher.quoteReplacement(o.toString()));
@@ -104,7 +101,7 @@ public class TextFormat {
             }
             return formatReturn;
         } catch (Exception e) {
-            return new Text(source);
+            return new SingleText(source);
         }
     }
 }

@@ -1,8 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.frame;
 
+import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
-import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiScrollPanel;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiTextPanel;
@@ -56,7 +57,7 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
     }
 
     public void appendText(String text, boolean clear, Color color) {
-        appendText(new Text(text, color), clear);
+        appendText(new SingleText(text, color), clear);
     }
 
     public void appendText(Text text, boolean clear) {

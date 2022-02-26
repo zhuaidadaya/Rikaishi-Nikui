@@ -1,6 +1,8 @@
 package com.github.zhuaidadaya.rikaishinikui;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.IllegalFileName;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.version.JavaVersionChecker;
@@ -9,14 +11,12 @@ import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftVe
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftLaunchInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionsRecorder;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiDownloadRefreshTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftDownloadTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftTask;
-import com.github.zhuaidadaya.rikaishinikui.language.Language;
-import com.github.zhuaidadaya.rikaishinikui.language.LanguageResource;
-import com.github.zhuaidadaya.rikaishinikui.language.Text;
-import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
+import com.github.zhuaidadaya.rikaishinikui.language.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
@@ -24,19 +24,20 @@ import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiTextFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
+import com.github.zhuaidadaya.utils.config.DiskObjectConfigUtil;
 import com.github.zhuaidadaya.utils.config.EncryptionType;
-import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
-import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
-import com.github.zhuaidadaya.rikaishinikui.handler.file.IllegalFileName;
-import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
@@ -215,8 +216,6 @@ public class RikaishiNikuiLauncher {
                 testRending();
             }
 
-            config.readConfig();
-
             recoveryVersionsStatus();
 
             mainFrame.getContentPane().setBackground(RikaishiNikuiColor.BLACK);
@@ -313,13 +312,14 @@ public class RikaishiNikuiLauncher {
     }
 
     public void initConfig() {
-        configUi = new ObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui", "rikaishi_nikui_ui.mhf").setNote(textFormat.getText("config.note.ui")).setEncryption(false).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(50);
-        config = new ObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui", "rikaishi_nikui.mhf").setNote(textFormat.getText("config.note"));
+//        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/", "rikaishi_nikui_ui.mhf").setNote(textFormat.getText("config.note.ui")).setEncryption(true).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(50);
+//        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/", "rikaishi_nikui.mhf").setNote(textFormat.getText("config.note")).setEncryption(true);
+
+        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/", "rikaishi_nikui_ui.mhf").setEncryption(true).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(5000);
+        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/", "rikaishi_nikui.mhf").setEncryption(true);
     }
 
     public synchronized void tick() throws Exception {
-        configUi.readConfig(false);
-        config.readConfig(false);
         rending();
     }
 
@@ -327,7 +327,7 @@ public class RikaishiNikuiLauncher {
         parseError(throwable, source, true, configUi);
     }
 
-    public void parseError(Throwable throwable, String source, boolean shutdownCU, ObjectConfigUtil configUtil) {
+    public void parseError(Throwable throwable, String source, boolean shutdownCU, DiskObjectConfigUtil configUtil) {
         running = false;
 
         logger.error(source, throwable);
@@ -337,7 +337,6 @@ public class RikaishiNikuiLauncher {
         errorFrame.setVisible(true);
         if (shutdownCU) {
             logger.error("invaliding (UI)CU, protection the config file");
-            configUtil.invalid();
         }
         logger.error("showing error");
         appendErrorFrameText(textFormat.format("happened.error").setColor(new Color(0, 0, 0)), true);
@@ -362,13 +361,17 @@ public class RikaishiNikuiLauncher {
                         String id = name;
                         MinecraftVersionInformation information = new MinecraftVersionInformation(id, name, "status.undefined");
                         try {
-                            UUID.fromString(id);
+                            UUID.fromString(id.substring(id.length() - 36));
                             information.setIdFormatted(true);
                         } catch (Exception ex) {
                             id = UUID.randomUUID().toString();
                             information.setIdFormatted(false);
                         }
-                        information.setId(id);
+                        if (information.isIdFormatted()) {
+                            information.setId(id.substring(id.length() - 36));
+                        } else {
+                            information.setId(id);
+                        }
                         information.setName(name);
                         information.setArea(area);
                         information.setType("minecraft.type.vanilla");
@@ -497,6 +500,7 @@ public class RikaishiNikuiLauncher {
 
     public void setLocalInformationText() {
         try {
+            config.setIfNoExist("area", "rikaishi_nikui/minecraft/");
             String area = config.getConfigString("area");
             MinecraftVersionInformation information = mainVersionList.getSelectedValue();
             mainVersionDetailsPanel.setText("");
@@ -611,7 +615,7 @@ public class RikaishiNikuiLauncher {
             for (String s : inf.keySet()) {
                 try {
                     JSONObject json = new JSONObject(inf.getString(s));
-                    Text text = new Text(json);
+                    Text text = new SingleText(json);
                     downloadVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
                     downloadVersionDetailsPanel.appendText(": ");
                     downloadVersionDetailsPanel.appendText(text, false);
@@ -649,7 +653,7 @@ public class RikaishiNikuiLauncher {
             for (String s : inf.keySet()) {
                 try {
                     JSONObject json = new JSONObject(inf.getString(s));
-                    Text text = new Text(json);
+                    Text text = new SingleText(json);
                     javaVersionDetailsPanel.appendText(textFormat.format("java.information." + s));
                     javaVersionDetailsPanel.appendText(": ");
                     javaVersionDetailsPanel.appendText(text, false);
@@ -751,7 +755,7 @@ public class RikaishiNikuiLauncher {
             for (String s : inf.keySet()) {
                 try {
                     JSONObject json = new JSONObject(inf.getString(s));
-                    Text text = new Text(json);
+                    Text text = new SingleText(json);
                     vmOptionDetailsPanel.appendText(textFormat.format("vm.options.information." + s));
                     vmOptionDetailsPanel.appendText(": ");
                     vmOptionDetailsPanel.appendText(text, false);
@@ -770,7 +774,7 @@ public class RikaishiNikuiLauncher {
                             if (textFormat.hasFormat(value)) {
                                 vmOptionDetailsPanel.appendText(textFormat.format(value), false);
                             } else {
-                                vmOptionDetailsPanel.appendText(new Text(value.substring(10)), false);
+                                vmOptionDetailsPanel.appendText(new SingleText(value.substring(10)), false);
                             }
                         } else {
                             if (s.equals("pair-head"))
@@ -778,7 +782,7 @@ public class RikaishiNikuiLauncher {
                             vmOptionDetailsPanel.appendText(textFormat.format(value), false);
                         }
                     } else {
-                        vmOptionDetailsPanel.appendText(new Text(value), false);
+                        vmOptionDetailsPanel.appendText(new SingleText(value), false);
                     }
                     vmOptionDetailsPanel.appendText("\n");
                 }
