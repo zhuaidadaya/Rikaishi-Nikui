@@ -16,7 +16,11 @@ import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiDownloadRefreshTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftDownloadTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftTask;
-import com.github.zhuaidadaya.rikaishinikui.language.*;
+import com.github.zhuaidadaya.rikaishinikui.language.Language;
+import com.github.zhuaidadaya.rikaishinikui.language.LanguageResource;
+import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.language.Text;
+import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
@@ -25,7 +29,6 @@ import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiTextFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
 import com.github.zhuaidadaya.utils.config.DiskObjectConfigUtil;
-import com.github.zhuaidadaya.utils.config.EncryptionType;
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONObject;
 
@@ -235,15 +238,13 @@ public class RikaishiNikuiLauncher {
             }
 
             new Thread(() -> {
-                Thread.currentThread().setName("main tick thread");
+                Thread.currentThread().setName("UI tick thread");
 
                 while (running) {
                     long tickStart = System.currentTimeMillis();
 
                     try {
-                        if (mainFrame.isFocused()) {
-                            tick();
-                        }
+                        tickUI();
                     } catch (Exception e) {
                         parseError(e, "error in tick thread, stop tick task");
                         break;
@@ -314,13 +315,14 @@ public class RikaishiNikuiLauncher {
     public void initConfig() {
 //        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/", "rikaishi_nikui_ui.mhf").setNote(textFormat.getText("config.note.ui")).setEncryption(true).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(50);
 //        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/", "rikaishi_nikui.mhf").setNote(textFormat.getText("config.note")).setEncryption(true);
-
-        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/", "rikaishi_nikui_ui.mhf").setEncryption(true).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(5000);
-        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/", "rikaishi_nikui.mhf").setEncryption(true);
+        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/");
+        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/");
     }
 
-    public synchronized void tick() throws Exception {
-        rending();
+    public synchronized void tickUI() {
+        if (mainFrame.isFocused()) {
+            rendingMainFrame();
+        }
     }
 
     public void parseError(Throwable throwable, String source) {
@@ -337,6 +339,7 @@ public class RikaishiNikuiLauncher {
         errorFrame.setVisible(true);
         if (shutdownCU) {
             logger.error("invaliding (UI)CU, protection the config file");
+            configUtil.shutdown();
         }
         logger.error("showing error");
         appendErrorFrameText(textFormat.format("happened.error").setColor(new Color(0, 0, 0)), true);
@@ -347,7 +350,7 @@ public class RikaishiNikuiLauncher {
         errorFrame.updateText();
     }
 
-    public void rending() {
+    public void rendingMainFrame() {
         applyUi();
     }
 

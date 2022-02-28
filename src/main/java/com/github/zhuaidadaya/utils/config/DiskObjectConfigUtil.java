@@ -511,13 +511,7 @@ public class DiskObjectConfigUtil {
                 }
 
             } else {
-                while (true) {
-                    String startWith = cache + reader.readLine();
-                    if (startWith.replace(" ", "").startsWith("{")) {
-                        builder.append(startWith);
-                        break;
-                    }
-                }
+                builder.append(cache);
                 while ((cache = reader.readLine()) != null) {
                     if (!cache.startsWith("/**") || cache.startsWith(" *") || cache.startsWith(" */"))
                         builder.append(cache);
