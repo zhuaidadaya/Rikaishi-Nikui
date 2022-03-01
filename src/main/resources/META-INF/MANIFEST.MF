@@ -1,3 +1,11 @@
 Manifest-Version: 1.0
 Main-Class: com.github.zhuaidadaya.rikaishinikui.EntryPoint
+Class-Path: oshi-core-6.1.2.jar httpcore-4.4.13.jar junit-platform-engin
+ e-1.8.2.jar opengl-api-gl1.1-android-2.1_r1.jar slf4j-api-1.7.36.jar lo
+ g4j-api-2.17.1.jar joptsimple-6.3.2.1.jar commons-logging-1.2.jar jna-5
+ .10.0.jar jna-platform-5.10.0.jar json-20211205.jar annotations-22.0.0.
+ jar httpclient-4.5.13.jar log4j-core-2.17.1.jar xmlParserAPIs-2.6.2.jar
+  commons-codec-1.15.jar xpp3-1.1.4c.jar opentest4j-1.2.0.jar commons-io
+ -2.11.0.jar junit-platform-commons-1.8.2.jar fastutil-8.5.8.jar junit-j
+ upiter-engine-5.8.2.jar junit-jupiter-api-5.8.2.jar android-4.1.1.4.jar
 

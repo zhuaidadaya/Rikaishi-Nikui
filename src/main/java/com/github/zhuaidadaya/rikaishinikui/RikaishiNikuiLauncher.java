@@ -342,7 +342,7 @@ public class RikaishiNikuiLauncher {
             configUtil.shutdown();
         }
         logger.error("showing error");
-        appendErrorFrameText(textFormat.format("happened.error").setColor(new Color(0, 0, 0)), true);
+        appendErrorFrameText(textFormat.formatSingleText("happened.error").setColor(new Color(0, 0, 0)), true);
         errorFrame.appendText(throwable.getMessage() + "\n", new Color(152, 12, 10));
         for (StackTraceElement s : throwable.getStackTrace())
             appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
@@ -508,9 +508,9 @@ public class RikaishiNikuiLauncher {
             MinecraftVersionInformation information = mainVersionList.getSelectedValue();
             mainVersionDetailsPanel.setText("");
             if (information == null) {
-                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.in.area", area));
-                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.download"));
-                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.import"));
+//                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.in.area", area));
+                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found",area));
+//                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.import"));
                 mainVersionDetailsPanel.updateText();
                 mainOperationButtons.setButtonVisible(4, true);
                 throw new Exception();
@@ -605,13 +605,13 @@ public class RikaishiNikuiLauncher {
                 IllegalFileName illegal = FileUtil.legally(name);
                 if (!illegal.isIllegal()) {
                     if (new File(detect.formatPath()).exists()) {
-                        inf.put("save-as", textFormat.format("save.name.dump", name).toJSONObject().toString());
+                        inf.put("save-as", textFormat.formatSingleText("save.name.dump", name).toJSONObject().toString());
                         canDownload = false;
                     } else {
-                        inf.put("save-as", textFormat.format("save.name", name).toJSONObject().toString());
+                        inf.put("save-as", textFormat.formatSingleText("save.name", name).toJSONObject().toString());
                     }
                 } else {
-                    inf.put("save-as", textFormat.format("save.illegal", name, illegal.getIllegals()).toJSONObject().toString());
+                    inf.put("save-as", textFormat.formatSingleText("save.illegal", name, illegal.getIllegals()).toJSONObject().toString());
                     canDownload = false;
                 }
             }

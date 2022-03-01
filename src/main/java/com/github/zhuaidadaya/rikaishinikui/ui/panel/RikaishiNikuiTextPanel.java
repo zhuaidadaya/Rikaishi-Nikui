@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.panel;
 
+import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
 import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
@@ -97,20 +98,27 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
 
     public void appendText(Text text, boolean clear) {
         try {
-            if (text.getText().equals("")) {
-                super.setText("");
-                return;
+            if (text instanceof SingleText) {
+                if (text.getText().equals("")) {
+                    super.setText("");
+                    return;
+                }
+                StyleContext sc = StyleContext.getDefaultStyleContext();
+                AttributeSet asset;
+                try {
+                    asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, text.getAwtColor());
+                } catch (Exception e) {
+                    asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
+                }
+                if (clear)
+                    doc.remove(0, doc.getLength());
+                doc.insertString(doc.getLength(), text.getText(), asset);
+            } else {
+                if (text instanceof MultipleText) {
+                    for (SingleText singleText : ((MultipleText) text).get())
+                        appendText(singleText, clear);
+                }
             }
-            StyleContext sc = StyleContext.getDefaultStyleContext();
-            AttributeSet asset;
-            try {
-                asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, text.getAwtColor());
-            } catch (Exception e) {
-                asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
-            }
-            if (clear)
-                doc.remove(0, doc.getLength());
-            doc.insertString(doc.getLength(), text.getText(), asset);
         } catch (Exception e) {
             e.printStackTrace();
         }

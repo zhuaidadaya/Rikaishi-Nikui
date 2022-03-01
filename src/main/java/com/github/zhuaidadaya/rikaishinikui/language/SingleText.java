@@ -45,7 +45,11 @@ public class SingleText implements Text {
     }
 
     public void format(Object o) {
-        text = text.replaceFirst("%s",o.toString());
+        if (text.contains("%s")) {
+            text = text.replaceFirst("%s", o.toString());
+        } else {
+            throw new IllegalArgumentException("miss flag \"%s\"");
+        }
     }
 
     public String getText() {

@@ -17,7 +17,7 @@ public class TextFormat {
     private final Map<Language, JSONObject> format = new HashMap<>();
 
     public TextFormat(LanguageResource languageResource) {
-        for(Language lang : languageResource.getNames()) {
+        for (Language lang : languageResource.getNames()) {
             String resource = languageResource.get(lang);
 
             try {
@@ -77,7 +77,39 @@ public class TextFormat {
 //        }
 //    }
 
-    public SingleText format(String source, Object... args) {
+    public Text format(String source, Object... args) {
+        try {
+            JSONObject json = format.get(language).getJSONObject(source);
+            return formatMultipleText(json, args);
+        } catch (Exception e) {
+            return formatSingleText(source, args);
+        }
+    }
+
+    public MultipleText formatMultipleText(JSONObject json, Object... args) {
+        MultipleText texts = new MultipleText(json);
+        texts.format(args);
+        return texts;
+    }
+
+    public SingleText formatSingleText(String source, JSONObject json, Object... args) {
+        SingleText formatReturn;
+        if (json == null)
+            formatReturn = new SingleText(format.get(language).getString(source));
+        else
+            formatReturn = new SingleText(json);
+
+        for (Object o : args) {
+            try {
+                formatReturn.format(Matcher.quoteReplacement(o.toString()));
+            } catch (Exception ex) {
+                return formatReturn;
+            }
+        }
+        return formatReturn;
+    }
+
+    public SingleText formatSingleText(String source, Object... args) {
         try {
             JSONObject text = null;
             try {
@@ -86,20 +118,7 @@ public class TextFormat {
 
             }
 
-            SingleText formatReturn;
-            if(text == null)
-                formatReturn = new SingleText(format.get(language).getString(source));
-            else
-                formatReturn = new SingleText(text);
-
-            for(Object o : args) {
-                try {
-                    formatReturn.format(Matcher.quoteReplacement(o.toString()));
-                } catch (Exception ex) {
-                    return formatReturn;
-                }
-            }
-            return formatReturn;
+            return formatSingleText(source, text, args);
         } catch (Exception e) {
             return new SingleText(source);
         }
