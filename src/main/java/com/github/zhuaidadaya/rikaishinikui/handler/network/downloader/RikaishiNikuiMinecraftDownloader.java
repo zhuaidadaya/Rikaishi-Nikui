@@ -99,11 +99,16 @@ public class RikaishiNikuiMinecraftDownloader {
 
             information.setUrl(information.formatManifest());
 
+            information.setArea(area);
+            information.setId(versionId);
+
             minecraftVersions.add(information);
 
             MinecraftVersionsParser versionsParser = getVersions(url, downloader);
 
             String manifestPath = String.format("%s/versions/%s/%s.json", area, versionId, versionId);
+
+            information.setPath(String.format("%s/versions/%s", area, versionId));
 
             MinecraftVersionParser versionParser = versionsParser.getVersion(gameId);
 
@@ -200,6 +205,7 @@ public class RikaishiNikuiMinecraftDownloader {
                 information.addVmOptions("-server");
                 // log4j2 - jndi inject bug
                 information.addVmOptions("-Dlog4j2.formatMsgNoLookups=true", "-Dcom.sun.jndi.ldap.object.trustURLCodebase=false");
+                information.addVmOption("-Duser.dir=\"" + information.getAbsolutePath() + "\"");
             }
 
             information.setStatus("status.ready");

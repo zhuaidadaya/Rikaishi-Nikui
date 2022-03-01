@@ -73,6 +73,14 @@ public class MinecraftLibraryParser {
         return downloadParser.getPath();
     }
 
+    public void setArea(String area) {
+        downloadParser.setArea(area);
+    }
+
+    public String getAbsolutePath() {
+        return downloadParser.getAbsolutePath();
+    }
+
     public String getSha1() {
         return downloadParser.getSha1();
     }

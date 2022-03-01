@@ -4,7 +4,6 @@ import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextCompon
 import com.github.zhuaidadaya.rikaishinikui.ui.log.submitter.RikaishiNikuiSubmitter;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -13,7 +12,6 @@ import java.util.concurrent.Executors;
 
 public class RikaishiNikuiTaskManager {
     private final Object2ObjectRBTreeMap<UUID, RikaishiNikuiTask> tasks = new Object2ObjectRBTreeMap<>();
-    private final Object2ObjectRBTreeMap<UUID, Thread> tasksThread = new Object2ObjectRBTreeMap<>();
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public RikaishiNikuiTaskManager() {
@@ -91,6 +89,14 @@ public class RikaishiNikuiTaskManager {
     public void quitAll() {
         for(RikaishiNikuiTask task : tasks.values()) {
             task.done();
+        }
+    }
+
+    public void quitAll(RikaishiNikuiTask matcher) {
+        for(RikaishiNikuiTask task : tasks.values()) {
+            if (matcher.getTaskTypeName().equals(task.getTaskTypeName())) {
+                task.done();
+            }
         }
     }
 

@@ -2,11 +2,12 @@ package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.taskManager;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
@@ -251,6 +252,10 @@ public class MinecraftVersionInformation {
         }
     }
 
+    public String getAbsolutePath() {
+        return new File(path).getAbsolutePath();
+    }
+
     public String getLastLaunch() {
         return lastLaunch;
     }
@@ -336,6 +341,33 @@ public class MinecraftVersionInformation {
             return result;
         } else {
             return String.format("%s/versions/%s/%s_server.jar", area, name, name);
+        }
+    }
+
+    public String formatAbsoluteManifest() {
+        String result = String.format("%s/versions/%s/%s.json", new File(area).getAbsolutePath(), id, id);
+        if(idFormatted & new File(result).isFile()) {
+            return result;
+        } else {
+            return String.format("%s/versions/%s/%s.json", new File(area).getAbsolutePath(), name, name);
+        }
+    }
+
+    public String formatAbsoluteClientPath() {
+        String result = String.format("%s/versions/%s/%s_client.jar", new File(area).getAbsolutePath(), id, id);
+        if(idFormatted & new File(result).isFile()) {
+            return result;
+        } else {
+            return String.format("%s/versions/%s/%s_client.jar", new File(area).getAbsolutePath(), name, name);
+        }
+    }
+
+    public String formatAbsoluteServerPath() {
+        String result = String.format("%s/versions/%s/%s_server.jar", new File(area).getAbsolutePath(), id, id);
+        if(idFormatted & new File(result).isFile()) {
+            return result;
+        } else {
+            return String.format("%s/versions/%s/%s_server.jar", new File(area).getAbsolutePath(), name, name);
         }
     }
 

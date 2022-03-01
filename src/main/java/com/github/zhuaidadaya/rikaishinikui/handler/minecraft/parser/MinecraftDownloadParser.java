@@ -23,6 +23,14 @@ public class MinecraftDownloadParser {
         return artifactParser.getPath();
     }
 
+    public void setArea(String area) {
+        artifactParser.setArea(area);
+    }
+
+    public String getAbsolutePath() {
+        return artifactParser.getAbsolutePath();
+    }
+
     public String getSha1() {
         return artifactParser.getSha1();
     }

@@ -63,7 +63,7 @@ public class MinecraftLauncher {
         setOs(information.getOs());
         setJava(information.getJava());
         setAccount(information.getAccount());
-        String gamePath = versionInformation.getPath();
+        String gamePath = versionInformation.getAbsolutePath();
         setGamePath(gamePath);
         setNativePath(gamePath + "/natives/");
         setGameSource(new JSONObject(NetworkUtil.downloadToStringBuilder(versionInformation.formatManifest()).toString()));
@@ -74,7 +74,7 @@ public class MinecraftLauncher {
 
         MinecraftLibrariesParser librariesParser = new MinecraftLibrariesParser(gameSource, area, os);
         setClassPathString(librariesParser);
-        appendClassPath(versionInformation.formatClientPath() + (os.equals("windows") ? ";" : ":"));
+        appendClassPath(versionInformation.formatAbsoluteClientPath() + (os.equals("windows") ? ";" : ":"));
     }
 
     public void appendClassPath(String path) {
@@ -107,7 +107,9 @@ public class MinecraftLauncher {
     public void setClassPathString(MinecraftLibrariesParser libraries) {
         classPathString = new StringBuilder();
         for(MinecraftLibraryParser lib : libraries.getLibraries().values()) {
-            classPathString.append(area).append("/").append("libraries").append("/").append(lib.getPath()).append(os.equals("windows") ? ";" : ":");
+            lib.setArea(area);
+            classPathString.append(lib.getAbsolutePath()).append(os.equals("windows") ? ";" : ":");
+//            classPathString.append(area).append("/").append("libraries").append("/").append(lib.getPath()).append(os.equals("windows") ? ";" : ":");
         }
     }
 
@@ -223,6 +225,8 @@ public class MinecraftLauncher {
         }
 
         try {
+            logger.info("launching minecraft " + versionInformation.getTaskId() + " with arg: " + arg);
+
             minecraft = Runtime.getRuntime().exec(arg);
             BufferedReader minecraftLog = new BufferedReader(new InputStreamReader(minecraft.getInputStream(), "GBK"));
             BufferedReader minecraftError = new BufferedReader(new InputStreamReader(minecraft.getErrorStream(), "GBK"));
@@ -247,7 +251,6 @@ public class MinecraftLauncher {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     failed = true;
                 }
             });
@@ -269,7 +272,6 @@ public class MinecraftLauncher {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     failed = true;
                 }
             });
@@ -281,6 +283,7 @@ public class MinecraftLauncher {
             waiting.start();
 
             if(logLines.get() < 5 & unknownError.get()) {
+                logger.warn("minecraft " + versionInformation.getTaskId() + " exit with unknown error");
                 versionInformation.setTaskFeedback("task.feedback.unknown.error");
                 failed = true;
             }

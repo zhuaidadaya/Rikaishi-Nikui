@@ -264,6 +264,7 @@ public class RikaishiNikuiLauncher {
 
             mainFrame.setVisible(true);
 
+            logFrame.setVisible(true);
             //                                    RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask("1.16.5", "az1");
             //                                    downloadTask.join(taskManager);
             //                                    try {
@@ -692,6 +693,8 @@ public class RikaishiNikuiLauncher {
                 editVmOptionsTip.setVisible(false);
                 vmOptionsOperationButtons.setVisible(false);
             } else {
+                addVmOptionsTip.setVisible(true);
+                addVmOptions.setVisible(true);
                 vmOptionsOperationButtons.setVisible(true);
                 editVmOptionsKey.setVisible(true);
                 editVmOptionsTip.setVisible(true);
@@ -1565,14 +1568,16 @@ public class RikaishiNikuiLauncher {
             String version = downloadVersionList.getSelectedValue().getVersion();
             UUID taskId = UUID.randomUUID();
             MinecraftVersionInformation information;
-            if (name.equals(""))
+            if (name.equals("")) {
                 information = new MinecraftVersionInformation(id, version + "-" + id, "status.downloading");
-            else
+                information.setIdFormatted(true);
+            }else {
                 information = new MinecraftVersionInformation(id, name, "status.downloading");
+                information.setIdFormatted(false);
+            }
             information.setVersion(version);
             information.setTaskId(taskId.toString());
             information.setArea(area);
-            information.setIdFormatted(false);
             RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, taskId, false);
             taskManager.join(downloadTask);
         });
