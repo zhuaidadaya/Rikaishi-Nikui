@@ -28,7 +28,6 @@ set DIRNAME=%~dp0
 if "%DIRNAME%" == "" set DIRNAME=.
 set APP_BASE_NAME=%~n0
 set APP_HOME=%DIRNAME%
-set DEFAULT_JVM_OPTS="Dfile.encoding=UTF-8"
 
 @rem Resolve any "." and ".." in APP_HOME to make it shorter.
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
