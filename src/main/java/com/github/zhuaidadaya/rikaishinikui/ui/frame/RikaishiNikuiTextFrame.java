@@ -64,6 +64,11 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
         textPane.appendText(text, clear);
     }
 
+    @Override
+    public String getText() {
+        return textPane.getText();
+    }
+
     public void setText(Text text) {
         textPane.setText(text);
     }
