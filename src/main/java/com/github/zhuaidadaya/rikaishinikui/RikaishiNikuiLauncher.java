@@ -685,6 +685,8 @@ public class RikaishiNikuiLauncher {
             VmOption information = vmOptionsList.getSelectedValue();
             vmOptionsOperationButtons2.setButtonVisible(0, !addVmOptions.getText().equals(""));
             if (information == null) {
+                addVmOptionsTip.setVisible(false);
+                addVmOptions.setVisible(false);
                 editVmOptionsKey.setVisible(false);
                 editVmOptionsValue.setVisible(false);
                 editVmOptionsTip.setVisible(false);
