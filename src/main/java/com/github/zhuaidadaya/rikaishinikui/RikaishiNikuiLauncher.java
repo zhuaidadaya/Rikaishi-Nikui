@@ -41,7 +41,7 @@ import java.util.UUID;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiLauncher {
-    private final int tickInterval = 0;
+    private final int standardInterval = 50;
 
     public RikaishiNikuiFrame mainFrame;
     public RikaishiNikuiTextFrame errorFrame;
@@ -247,9 +247,9 @@ public class RikaishiNikuiLauncher {
                     }
 
                     long tickTime = System.currentTimeMillis() - tickStart;
-                    if (tickTime < tickInterval) {
+                    if (tickTime < standardInterval) {
                         try {
-                            Thread.sleep(tickInterval - tickTime);
+                            Thread.sleep(standardInterval - tickTime);
                         } catch (InterruptedException e) {
 
                         }
@@ -335,14 +335,14 @@ public class RikaishiNikuiLauncher {
         logger.error("showing error");
         appendErrorFrameText(textFormat.formatSingleText("happened.error").setColor(new Color(0, 0, 0)), true);
         appendErrorFrameText(new SingleText("\n\n"), false);
-        errorFrame.appendText("---------- STACK TRACE ----------\n", new RikaishiNikuiColor(0,0,0));
+        errorFrame.appendText("---------- STACK TRACE ----------\n", new RikaishiNikuiColor(0, 0, 0));
         errorFrame.appendText(source + ": \n", new Color(152, 12, 10));
         errorFrame.appendText(throwable.getClass().getName() + ": ", new Color(152, 12, 10));
         errorFrame.appendText(throwable.getMessage() + "\n", new Color(152, 12, 10));
         for (StackTraceElement s : throwable.getStackTrace())
             appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
         errorFrame.updateText();
-        errorFrame.appendText("---------- THREADS STACK TRACE ----------\n", new RikaishiNikuiColor(0,0,0));
+        errorFrame.appendText("---------- THREADS STACK TRACE ----------\n", new RikaishiNikuiColor(0, 0, 0));
         for (Thread thread : Thread.getAllStackTraces().keySet()) {
             if (thread.getStackTrace().length > 0) {
                 appendErrorFrameText(textFormat.format(thread.getName() + "\n"), false);
@@ -390,6 +390,12 @@ public class RikaishiNikuiLauncher {
                         information.setType("minecraft.type.vanilla");
                         minecraftVersions.add(information);
                     }
+                }
+            }
+
+            for (MinecraftVersionInformation information : minecraftVersions.getVersions()) {
+                if (!new File(information.getPath()).exists()) {
+                    minecraftVersions.remove(information);
                 }
             }
         } catch (Exception e) {
@@ -519,7 +525,7 @@ public class RikaishiNikuiLauncher {
             mainVersionDetailsPanel.setText("");
             if (information == null) {
 //                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.in.area", area));
-                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found",area));
+                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found", area));
 //                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.import"));
                 mainVersionDetailsPanel.updateText();
                 mainOperationButtons.setButtonVisible(4, true);
@@ -567,8 +573,9 @@ public class RikaishiNikuiLauncher {
                     mainVersionDetailsPanel.appendText("\n");
                 }
             }
-            mainVersionDetailsPanel.appendText(texts,true);
-            mainVersionDetailsPanel.updateText();
+            mainVersionDetailsPanel.appendText(texts, true);
+
+//            mainVersionDetailsPanel.updateText();
 
             if (information.getStatus().equals("status.interrupting"))
                 throw new Exception();
@@ -583,6 +590,8 @@ public class RikaishiNikuiLauncher {
             mainOperationButtons.setButtonVisible(2, false);
             mainOperationButtons.setButtonVisible(3, false);
         }
+
+        mainVersionDetailsPanel.updateText();
     }
 
     public void setDownloadInformationText() {
@@ -643,12 +652,13 @@ public class RikaishiNikuiLauncher {
                     downloadVersionDetailsPanel.appendText("\n");
                 }
             }
-            downloadVersionDetailsPanel.updateText();
 
             downloadOperationButtons.getButton(1).setVisible(information.getStatus().equals("status.download.ready") & canDownload);
         } catch (Exception ex) {
             downloadOperationButtons.getButton(1).setVisible(false);
         }
+
+        downloadVersionDetailsPanel.updateText();
     }
 
     public void setJavaInformationText() {
@@ -681,7 +691,6 @@ public class RikaishiNikuiLauncher {
                     javaVersionDetailsPanel.appendText("\n");
                 }
             }
-            javaVersionDetailsPanel.updateText();
 
             JavaVersionInformation checkInformation = new JavaVersionChecker().check(new File(javaPathEditing.getText()).getAbsolutePath());
             javaOperationButtons.setButtonVisible(0, checkInformation.isAvailable());
@@ -691,6 +700,8 @@ public class RikaishiNikuiLauncher {
             javaOperationButtons.setButtonVisible(0, false);
             javaOperationButtons.setButtonVisible(2, false);
         }
+
+        javaVersionDetailsPanel.updateText();
     }
 
     public void setVmOptionEditing() {
@@ -1588,7 +1599,7 @@ public class RikaishiNikuiLauncher {
             if (name.equals("")) {
                 information = new MinecraftVersionInformation(id, version + "-" + id, "status.downloading");
                 information.setIdFormatted(true);
-            }else {
+            } else {
                 information = new MinecraftVersionInformation(id, name, "status.downloading");
                 information.setIdFormatted(false);
             }

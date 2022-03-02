@@ -26,6 +26,7 @@ public interface RikaishiNikuiTextComponent {
 
     default void updateText() {
         setSuperDoc(getDoc());
+        setDoc(new DefaultStyledDocument());
     }
 
     default void appendText(Text text, boolean clear) {

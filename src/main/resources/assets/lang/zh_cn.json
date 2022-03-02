@@ -489,7 +489,7 @@
     }
   },
   "minecraft.information.release-type": {
-    "text": "发布时间",
+    "text": "游戏类型",
     "color": {
       "r": 106,
       "g": 135,
