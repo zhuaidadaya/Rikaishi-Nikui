@@ -3,7 +3,8 @@ package com.github.zhuaidadaya.rikaishinikui.language;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;
 
-import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.awt.*;
 
 public class PairText extends Text {
@@ -14,18 +15,6 @@ public class PairText extends Text {
     private RikaishiNikuiColor headColor = RikaishiNikuiColor.empty();
     private RikaishiNikuiColor splitColor = RikaishiNikuiColor.empty();
     private RikaishiNikuiColor endColor = RikaishiNikuiColor.empty();
-
-    public void setHeadColor(RikaishiNikuiColor headColor) {
-        this.headColor = headColor;
-    }
-
-    public RikaishiNikuiColor getEndColor() {
-        return endColor;
-    }
-
-    public void setEndColor(RikaishiNikuiColor endColor) {
-        this.endColor = endColor;
-    }
 
     public PairText() {
 
@@ -101,6 +90,14 @@ public class PairText extends Text {
         apply(json);
     }
 
+    public RikaishiNikuiColor getEndColor() {
+        return endColor;
+    }
+
+    public void setEndColor(RikaishiNikuiColor endColor) {
+        this.endColor = endColor;
+    }
+
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
         json.put("head", head);
@@ -146,6 +143,10 @@ public class PairText extends Text {
 
     public RikaishiNikuiColor getHeadColor() {
         return headColor;
+    }
+
+    public void setHeadColor(RikaishiNikuiColor headColor) {
+        this.headColor = headColor;
     }
 
     public Text setColor(Color color) {
