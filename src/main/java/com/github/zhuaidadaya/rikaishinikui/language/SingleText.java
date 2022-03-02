@@ -6,9 +6,9 @@ import org.json.JSONObject;
 import javax.swing.text.*;
 import java.awt.*;
 
-public class SingleText implements Text {
+public class SingleText extends Text {
     private String text = "";
-    private RikaishiNikuiColor color = null;
+    private RikaishiNikuiColor color = RikaishiNikuiColor.empty();
 
     public SingleText() {
 
@@ -43,6 +43,11 @@ public class SingleText implements Text {
         json.put("text", text);
         json.put("color", color.toJSONObject());
         return json;
+    }
+
+    public void apply(JSONObject json) {
+        this.text = json.getString("text");
+        this.color = new RikaishiNikuiColor(json.getJSONObject("color"));
     }
 
     public void format(Object o) {
@@ -94,7 +99,7 @@ public class SingleText implements Text {
         return this;
     }
 
-    public void applyToDoc(Document doc,boolean clear,Color defaultForeground) throws BadLocationException {
+    public void applyToDoc(Document doc, boolean clear, Color defaultForeground) throws BadLocationException {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet asset;
         try {

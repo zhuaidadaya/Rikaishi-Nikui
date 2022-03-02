@@ -5,13 +5,22 @@ import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.util.Random;
 
 public class RikaishiNikuiColor extends Color implements RikaishiNikuiComponent {
     private int alpha = 255;
+    private boolean empty = false;
     private int r;
     private int g;
     private int b;
+
+    public RikaishiNikuiColor() {
+        super(0, 0, 0);
+        empty = true;
+        r = -1;
+        g = -1;
+        b = -1;
+        alpha = -1;
+    }
 
     public RikaishiNikuiColor(int r, int g, int b) {
         super(r, g, b);
@@ -48,7 +57,19 @@ public class RikaishiNikuiColor extends Color implements RikaishiNikuiComponent 
         this.alpha = IntegerUtil.getIntFromJSON(json, "alpha", 255);
     }
 
+    public boolean isEmpty() {
+        return empty;
+    }
+
     public Color getAwtColor() {
-        return new Color(r, g, b, alpha);
+        if (empty) {
+            return null;
+        } else {
+            return new Color(r, g, b, alpha);
+        }
+    }
+
+    public static RikaishiNikuiColor empty() {
+        return new RikaishiNikuiColor();
     }
 }

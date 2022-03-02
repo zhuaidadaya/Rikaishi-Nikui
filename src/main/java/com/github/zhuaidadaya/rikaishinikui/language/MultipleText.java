@@ -2,12 +2,15 @@ package com.github.zhuaidadaya.rikaishinikui.language;
 
 import org.json.JSONObject;
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import java.awt.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class MultipleText implements Text {
+public class MultipleText extends Text {
     private Collection<SingleText> texts = new LinkedHashSet<>();
 
     public MultipleText() {
@@ -40,6 +43,13 @@ public class MultipleText implements Text {
             json.put(String.valueOf(i++), text.toJSONObject());
         }
         return json;
+    }
+
+    public void apply(JSONObject json) {
+        texts = new LinkedHashSet<>();
+        for (String s : json.keySet()) {
+            texts.add(new SingleText(json.getJSONObject(s)));
+        }
     }
 
     public String getText() {
@@ -83,5 +93,10 @@ public class MultipleText implements Text {
 
     public Collection<SingleText> get() {
         return texts;
+    }
+
+    public void applyToDoc(Document doc, boolean clear, Color defaultForeground) throws BadLocationException {
+        for (SingleText singleText : get())
+            singleText.applyToDoc(doc, clear, defaultForeground);
     }
 }

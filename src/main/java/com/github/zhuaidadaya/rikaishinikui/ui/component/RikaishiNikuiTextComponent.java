@@ -1,10 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.component;
 
-import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
 
-import javax.swing.text.*;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 import java.awt.*;
 
 public interface RikaishiNikuiTextComponent {
@@ -32,25 +31,7 @@ public interface RikaishiNikuiTextComponent {
     default void appendText(Text text, boolean clear) {
         try {
             Document doc = getDoc();
-            if (text instanceof SingleText) {
-                StyleContext sc = StyleContext.getDefaultStyleContext();
-                AttributeSet asset;
-                try {
-                    asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, text.getAwtColor());
-                } catch (Exception e) {
-                    asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
-                }
-                if (clear)
-                    doc.remove(0, doc.getLength());
-                doc.insertString(doc.getLength(), text.getText(), asset);
-            } else {
-                if (text instanceof MultipleText) {
-//                    if (clear)
-//                        doc.remove(0, doc.getLength());
-                    for (SingleText singleText : ((MultipleText) text).get())
-                        appendText(singleText, false);
-                }
-            }
+            text.applyToDoc(doc, clear, getForeground());
         } catch (Exception e) {
 
         }

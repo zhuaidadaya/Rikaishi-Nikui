@@ -42,6 +42,8 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiLauncher {
     private final int standardInterval = 50;
+    private long lastTick = -1;
+    private long lastTickMainFrame = -1;
 
     public RikaishiNikuiFrame mainFrame;
     public RikaishiNikuiTextFrame errorFrame;
@@ -246,7 +248,8 @@ public class RikaishiNikuiLauncher {
                         break;
                     }
 
-                    long tickTime = System.currentTimeMillis() - tickStart;
+                    lastTick = System.currentTimeMillis();
+                    long tickTime = lastTick - tickStart;
                     if (tickTime < standardInterval) {
                         try {
                             Thread.sleep(standardInterval - tickTime);
@@ -317,8 +320,9 @@ public class RikaishiNikuiLauncher {
     }
 
     public void tickUI() {
-        if (mainFrame.isFocused()) {
+        if (mainFrame.isFocused() || System.currentTimeMillis() - lastTickMainFrame > 500) {
             rendingMainFrame();
+            lastTickMainFrame = System.currentTimeMillis();
         }
     }
 
@@ -527,20 +531,24 @@ public class RikaishiNikuiLauncher {
 //                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.in.area", area));
                 mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found", area));
 //                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.import"));
-                mainVersionDetailsPanel.updateText();
                 mainOperationButtons.setButtonVisible(4, true);
                 throw new Exception();
             }
             if (new File(information.formatManifest()).isFile()) {
-                if (information.getStatus().equals("status.undefined") & !information.getStatus().equals("status.destroyed")) {
-                    information.setStatus("status.ready");
-                }
+                if (information.getStatus().equals("status.undefined")) {
+                    if (!information.getStatus().equals("status.destroyed")) {
+                        information.setStatus("status.ready");
+                    }
 
-                try {
-                    JSONObject gameSource = new JSONObject(NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString());
-                    information.setVersion(gameSource.getString("id"));
-                } catch (Exception ex) {
+                    try {
+                        JSONObject gameSource = new JSONObject(NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString());
+                        information.setVersion(gameSource.getString("id"));
+                        information.setReleaseTime(gameSource.getString("releaseTime"));
+                        information.setReleaseType(gameSource.getString("type"));
+                        information.setUrl(information.formatManifest());
+                    } catch (Exception ex) {
 
+                    }
                 }
             } else {
                 if (!information.getStatus().equals("status.checking") & !information.getStatus().equals("status.parsing"))
@@ -566,11 +574,7 @@ public class RikaishiNikuiLauncher {
                 try {
                     new JSONObject(inf.getString(s));
                 } catch (Exception e) {
-//                    texts.append((SingleText) textFormat.format("minecraft.information." + s));
-                    mainVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
-                    mainVersionDetailsPanel.appendText(": ");
-                    mainVersionDetailsPanel.appendText(textFormat.format(inf.get(s).toString()), false);
-                    mainVersionDetailsPanel.appendText("\n");
+                    mainVersionDetailsPanel.appendText(new PairText(textFormat.format("minecraft.information." + s), ((SingleText) textFormat.format(inf.get(s).toString())).append("\n"), new SingleText(": ")));
                 }
             }
             mainVersionDetailsPanel.appendText(texts, true);

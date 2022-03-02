@@ -2,6 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.PaginateCachedLog;
 import com.github.zhuaidadaya.rikaishinikui.ui.log.submitter.RikaishiNikuiSubmitter;
+import org.json.JSONObject;
 
 import java.util.UUID;
 
@@ -17,6 +18,19 @@ public abstract class RikaishiNikuiTask {
     protected RikaishiNikuiSubmitter submitter;
     protected RikaishiNikuiTask parent;
     private String taskTypeName = "RikaishiNikuiTask(Ab)";
+
+    public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
+        json.put("id",id);
+        json.put("status",getStatus().name());
+        json.put("parent", getParentTask().toJSONObject());
+        json.put("type", getTaskTypeName());
+        return json;
+    }
+
+    public String toString() {
+        return toJSONObject().toString();
+    }
 
     public RikaishiNikuiTask(UUID id,String taskTypeName) {
         this.id = id;

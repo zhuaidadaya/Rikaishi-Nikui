@@ -182,7 +182,7 @@ public class MinecraftLauncher {
     }
 
     public String formatArg() {
-        return String.format("\"%s\" %s -Djava.library.path=%s -cp \"%s\" %s --username %s --version \"%s\" --gameDir \"%s\" --assetsDir \"%s\" --assetIndex %s --uuid %s --accessToken %s --userProperties {%s} --userType %s --width %s --height %s", //stu
+        return String.format("\"%s\" %s -Djava.library.path=\"%s\" -cp \"%s\" %s --username %s --version \"%s\" --gameDir \"%s\" --assetsDir \"%s\" --assetIndex %s --uuid %s --accessToken %s --userProperties {%s} --userType %s --width %s --height %s", //stu
                 java, //java
                 vmOptionString, //java vm options
                 nativePath, //game native path
@@ -282,7 +282,7 @@ public class MinecraftLauncher {
             ThreadsConcurrentWaiting waiting = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE, logThread, errThread);
             waiting.start();
 
-            if(logLines.get() < 5 & unknownError.get()) {
+            if(logLines.get() < 5 & unknownError.get() || minecraft.exitValue() != 0) {
                 logger.warn("minecraft " + versionInformation.getTaskId() + " exit with unknown error");
                 versionInformation.setTaskFeedback("task.feedback.unknown.error");
                 failed = true;
