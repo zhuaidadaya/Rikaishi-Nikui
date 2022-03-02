@@ -1,6 +1,5 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.panel;
 
-import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
 import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
@@ -9,12 +8,14 @@ import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextCompon
 import org.json.JSONObject;
 
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 import java.awt.*;
 
 public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
-    private String text;
     private Document doc = new DefaultStyledDocument();
+    private Document docCached = new DefaultStyledDocument();
+    private String text;
 
     public RikaishiNikuiTextPanel() {
         setName("RikaishiNikuiComponent#" + this);
@@ -96,35 +97,19 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
         appendText(new SingleText(text, color), clear);
     }
 
-    public void appendText(Text text, boolean clear) {
-        try {
-            if (text instanceof SingleText) {
-                if (text.getText().equals("")) {
-                    super.setText("");
-                    return;
-                }
-                StyleContext sc = StyleContext.getDefaultStyleContext();
-                AttributeSet asset;
-                try {
-                    asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, text.getAwtColor());
-                } catch (Exception e) {
-                    asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
-                }
-                if (clear)
-                    doc.remove(0, doc.getLength());
-                doc.insertString(doc.getLength(), text.getText(), asset);
-            } else {
-                if (text instanceof MultipleText) {
-                    for (SingleText singleText : ((MultipleText) text).get())
-                        appendText(singleText, clear);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public Document getDoc() {
+        return doc;
     }
 
-    public void updateText() {
-        setDocument(doc);
+    public void setDoc(Document doc) {
+        this.doc = doc;
+    }
+
+    public void setSuperDoc(Document doc) {
+        super.setDocument(doc);
+    }
+
+    public Document getDocCached() {
+        return docCached;
     }
 }

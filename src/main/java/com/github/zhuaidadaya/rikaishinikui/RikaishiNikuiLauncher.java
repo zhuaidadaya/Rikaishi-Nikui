@@ -16,11 +16,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiDownloadRefreshTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftDownloadTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftTask;
-import com.github.zhuaidadaya.rikaishinikui.language.Language;
-import com.github.zhuaidadaya.rikaishinikui.language.LanguageResource;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
-import com.github.zhuaidadaya.rikaishinikui.language.Text;
-import com.github.zhuaidadaya.rikaishinikui.language.TextFormat;
+import com.github.zhuaidadaya.rikaishinikui.language.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
@@ -45,7 +41,7 @@ import java.util.UUID;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiLauncher {
-    private final int tickInterval = 100;
+    private final int tickInterval = 0;
 
     public RikaishiNikuiFrame mainFrame;
     public RikaishiNikuiTextFrame errorFrame;
@@ -320,7 +316,7 @@ public class RikaishiNikuiLauncher {
         config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/");
     }
 
-    public synchronized void tickUI() {
+    public void tickUI() {
         if (mainFrame.isFocused()) {
             rendingMainFrame();
         }
@@ -331,24 +327,37 @@ public class RikaishiNikuiLauncher {
     }
 
     public void parseError(Throwable throwable, String source, boolean shutdownCU, DiskObjectConfigUtil configUtil) {
-        running = false;
-
         logger.error(source, throwable);
 
         mainFrame.setVisible(false);
         logFrame.setVisible(false);
         errorFrame.setVisible(true);
+        logger.error("showing error");
+        appendErrorFrameText(textFormat.formatSingleText("happened.error").setColor(new Color(0, 0, 0)), true);
+        appendErrorFrameText(new SingleText("\n\n"), false);
+        errorFrame.appendText("---------- STACK TRACE ----------\n", new RikaishiNikuiColor(0,0,0));
+        errorFrame.appendText(source + ": \n", new Color(152, 12, 10));
+        errorFrame.appendText(throwable.getClass().getName() + ": ", new Color(152, 12, 10));
+        errorFrame.appendText(throwable.getMessage() + "\n", new Color(152, 12, 10));
+        for (StackTraceElement s : throwable.getStackTrace())
+            appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
+        errorFrame.updateText();
+        errorFrame.appendText("---------- THREADS STACK TRACE ----------\n", new RikaishiNikuiColor(0,0,0));
+        for (Thread thread : Thread.getAllStackTraces().keySet()) {
+            if (thread.getStackTrace().length > 0) {
+                appendErrorFrameText(textFormat.format(thread.getName() + "\n"), false);
+                for (StackTraceElement s : thread.getStackTrace()) {
+                    appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
+                }
+            }
+        }
+
         if (shutdownCU) {
             logger.error("invaliding (UI)CU, protection the config file");
             configUtil.shutdown();
         }
-        logger.error("showing error");
-        appendErrorFrameText(textFormat.formatSingleText("happened.error").setColor(new Color(0, 0, 0)), true);
-        errorFrame.appendText(throwable.getMessage() + "\n", new Color(152, 12, 10));
-        for (StackTraceElement s : throwable.getStackTrace())
-            appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
-        appendErrorFrameText(textFormat.format("happened.error.tip"), false);
-        errorFrame.updateText();
+
+        running = false;
     }
 
     public void rendingMainFrame() {
@@ -546,16 +555,19 @@ public class RikaishiNikuiLauncher {
 
             JSONObject inf = information.toJSONObject();
             inf.remove("options");
+            MultipleText texts = new MultipleText();
             for (String s : inf.keySet()) {
                 try {
                     new JSONObject(inf.getString(s));
                 } catch (Exception e) {
+//                    texts.append((SingleText) textFormat.format("minecraft.information." + s));
                     mainVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
                     mainVersionDetailsPanel.appendText(": ");
                     mainVersionDetailsPanel.appendText(textFormat.format(inf.get(s).toString()), false);
                     mainVersionDetailsPanel.appendText("\n");
                 }
             }
+            mainVersionDetailsPanel.appendText(texts,true);
             mainVersionDetailsPanel.updateText();
 
             if (information.getStatus().equals("status.interrupting"))
@@ -1450,30 +1462,35 @@ public class RikaishiNikuiLauncher {
         mainButton.addActionListener(e -> {
             buttons.cancelButtonsActive();
             buttons.getButton(0).setActive(true);
+            tickUI();
         });
         buttons.applyButtons(mainButton);
         RikaishiNikuiButton downloadButton = new RikaishiNikuiButton(100, 40, "download", "download.vanilla.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(1);
         downloadButton.addActionListener(e -> {
             buttons.cancelButtonsActive();
             buttons.getButton(1).setActive(true);
+            tickUI();
         });
         buttons.applyButtons(downloadButton);
         RikaishiNikuiButton javaButton = new RikaishiNikuiButton(100, 40, "vm", "vm.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(2);
         javaButton.addActionListener(e -> {
             buttons.cancelButtonsActive();
             buttons.getButton(2).setActive(true);
+            tickUI();
         });
         buttons.applyButtons(javaButton);
         RikaishiNikuiButton vmOptionButton = new RikaishiNikuiButton(100, 40, "vm-options", "vm-options.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(3);
         vmOptionButton.addActionListener(e -> {
             buttons.cancelButtonsActive();
             buttons.getButton(3).setActive(true);
+            tickUI();
         });
         buttons.applyButtons(vmOptionButton);
         RikaishiNikuiButton taskButton = new RikaishiNikuiButton(100, 40, "task", "task.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(4);
         taskButton.addActionListener(e -> {
             buttons.cancelButtonsActive();
             buttons.getButton(4).setActive(true);
+            tickUI();
         });
         buttons.applyButtons(taskButton);
 

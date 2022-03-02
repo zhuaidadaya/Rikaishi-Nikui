@@ -4,16 +4,17 @@ import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.language.Text;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
 import org.json.JSONObject;
 
 import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.*;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
 
-public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiComponent {
-    private final Document doc = new DefaultStyledDocument();
+public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
+    private Document doc = new DefaultStyledDocument();
     private String text;
     private boolean formatted = true;
 
@@ -83,43 +84,31 @@ public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiCom
 
     public void setText(Text text) {
         this.text = text.getText();
-        setDoc(text);
+        appendText(text, true);
     }
 
     public void setText(String text) {
         this.text = text;
-        setDoc(text, getForeground());
-    }
-
-    public void setText(String text, Color color) {
-        this.text = text;
-        setDoc(text, color);
-    }
-
-    private void setDoc(String text, Color color) {
-        setDoc(new SingleText(text, color));
-    }
-
-    private void setDoc(Text text) {
-        try {
-            StyleContext sc = StyleContext.getDefaultStyleContext();
-            AttributeSet asset;
-            try {
-                asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, text.getAwtColor());
-            } catch (Exception e) {
-                asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
-            }
-            doc.remove(0, doc.getLength());
-            doc.insertString(doc.getLength(), text.getText(), asset);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        appendText(new SingleText(text, getForeground()), true);
     }
 
     public void updateText() {
         if (formatted) {
-            setDoc(textFormat.format(this.text));
+            setText(textFormat.format(this.text));
         }
-        setDocument(doc);
+        setSuperDoc(doc);
+        this.doc = new DefaultStyledDocument();
+    }
+
+    public Document getDoc() {
+        return doc;
+    }
+
+    public void setDoc(Document doc) {
+        this.doc = doc;
+    }
+
+    public void setSuperDoc(Document doc) {
+        super.setDocument(doc);
     }
 }

@@ -1,8 +1,7 @@
 {
   "config.note.ui": "this is ui database of rikaishi nikui launcher\n -这是rikaishi nikui启动器的ui数据库\ndo not modify this database\n -不要修改此数据库",
   "config.note": "this is database of rikaishi nikui launcher\n -这是rikaishi nikui启动器的数据库\nyou can modify this database information if you understand how to modify\n -你可以在清楚如何修改的情况下修改此数据库内容\n\ndocument: https://github.com/zhuaidadaya/Rikaishi-Nikui/wiki\n -参考文档: https://github.com/zhuaidadaya/Rikaishi-Nikui/wiki\n",
-  "happened.error": "rikaishi nikui launcher遇到了意外的错误: ",
-  "happened.error.tip": "如果你修改过配置文件, 重启后会恢复正常, 但你将会丢失配置\n若没有修改过, 则可能是rikaishi nikui launcher出现了内部问题, 请创建一个issue让我们知道\n\n在下一次启动之前, rikaishi nikui launcher不会再修改配置文件\n你可以将其复制到其他位置或修复内容以保留配置",
+  "happened.error": "rikaishi nikui launcher遇到了意外的错误, 已暂停运行\n如果你修改过配置文件, 重启后会恢复正常, 但你将会丢失配置\n若没有修改过, 则可能是rikaishi nikui launcher出现了内部问题, 请创建一个issue让我们知道\n\n在下一次启动之前, rikaishi nikui launcher不会再修改配置文件\n你可以将其复制到其他位置或修复内容以保留配置",
   "happened.error.at": {
     "text": "     at %s",
     "color": {
@@ -227,118 +226,6 @@
       "b": 89
     }
   },
-  "minecraft.information.area": {
-    "text": "应用域",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.path": {
-    "text": "路径",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.name": {
-    "text": "名称",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.type": {
-    "text": "类型",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.status": {
-    "text": "状态",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.id": {
-    "text": "id",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.version": {
-    "text": "游戏版本",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.url": {
-    "text": "链接",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.last-launch": {
-    "text": "上一次启动",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.formatted-by-id": {
-    "text": "使用id格式化",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.lock-status": {
-    "text": "锁定状态",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.task-id": {
-    "text": "任务id",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.last-task-status": {
-    "text": "上一任务状态",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
-  "minecraft.information.task-feedback": {
-    "text": "任务反馈",
-    "color": {
-      "r": 106,
-      "g": 135,
-      "b": 89
-    }
-  },
   "tip.search.java.path": {
     "text": "从路径:"
   },
@@ -472,6 +359,118 @@
   },
   "tip.save.as": {
     "text": "保存名称:"
+  },
+  "minecraft.information.area": {
+    "text": "应用域",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.path": {
+    "text": "路径",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.name": {
+    "text": "名称",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.type": {
+    "text": "类型",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.status": {
+    "text": "状态",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.id": {
+    "text": "id",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.version": {
+    "text": "游戏版本",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.url": {
+    "text": "链接",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.last-launch": {
+    "text": "上一次启动",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.formatted-by-id": {
+    "text": "使用id格式化",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.lock-status": {
+    "text": "锁定状态",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.task-id": {
+    "text": "任务id",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.last-task-status": {
+    "text": "上一任务状态",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
+  },
+  "minecraft.information.task-feedback": {
+    "text": "任务反馈",
+    "color": {
+      "r": 106,
+      "g": 135,
+      "b": 89
+    }
   },
   "minecraft.information.save-as": {
     "text": "格式化名称",

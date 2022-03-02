@@ -10,6 +10,7 @@ import com.github.zhuaidadaya.rikaishinikui.ui.panel.RikaishiNikuiTextPanel;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import javax.swing.text.Document;
 import java.awt.*;
 
 public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
@@ -65,17 +66,17 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
     }
 
     @Override
+    public Document getDoc() {
+        return textPane.getDoc();
+    }
+
+    @Override
     public String getText() {
         return textPane.getText();
     }
 
     public void setText(Text text) {
         textPane.setText(text);
-    }
-
-    public void updateText() {
-        textPane.updateText();
-        textPane.repaint();
     }
 
     public void init() {
@@ -114,7 +115,6 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
         setSize(getWidth(), height);
     }
 
-
     public void setWidth(int width) {
         setSize(width, getHeight());
     }
@@ -128,5 +128,13 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
         json.put("foreground-color", RikaishiNikuiColor.parse(getForeground()).toJSONObject());
 
         return json;
+    }
+
+    public void setDoc(Document doc) {
+        textPane.setDoc(doc);
+    }
+
+    public void setSuperDoc(Document doc) {
+        textPane.setSuperDoc(doc);
     }
 }

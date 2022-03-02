@@ -70,7 +70,11 @@ public class MultipleText implements Text {
     }
 
     public void append(SingleText text) {
-        texts.add(text);
+        if (text.contains("\n")) {
+            texts.add(text);
+        } else {
+            texts.add(text.append("\n"));
+        }
     }
 
     public SingleText get(int index) {

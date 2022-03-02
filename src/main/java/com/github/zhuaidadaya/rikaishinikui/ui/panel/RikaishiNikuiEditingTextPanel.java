@@ -8,7 +8,8 @@ import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextCompon
 import org.json.JSONObject;
 
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
 import java.awt.*;
 
 public class RikaishiNikuiEditingTextPanel extends JTextPane implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
@@ -105,25 +106,15 @@ public class RikaishiNikuiEditingTextPanel extends JTextPane implements Rikaishi
         appendText(new SingleText(text, color), clear);
     }
 
-    public void appendText(Text text, boolean clear) {
-        try {
-            StyleContext sc = StyleContext.getDefaultStyleContext();
-            AttributeSet asset;
-            try {
-                asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, text.getAwtColor());
-            } catch (Exception e) {
-                asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, getForeground());
-            }
-            if(clear)
-                doc.remove(0, doc.getLength());
-            doc.insertString(doc.getLength(), text.getText(), asset);
-        } catch (Exception e) {
-
-        }
+    public Document getDoc() {
+        return doc;
     }
 
-    public void updateText() {
-        setDocument(doc);
-        doc = new DefaultStyledDocument();
+    public void setDoc(Document doc) {
+        this.doc = doc;
+    }
+
+    public void setSuperDoc(Document doc) {
+        super.setDocument(doc);
     }
 }
