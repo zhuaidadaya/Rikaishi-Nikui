@@ -261,13 +261,10 @@ public class RikaishiNikuiLauncher {
             }
 
             JavaVersionInformation javaInformation = new JavaVersionChecker().check("java");
-            if (javaInformation.isAvailable())
-                javaVersions.add(javaInformation);
+            if (javaInformation.isAvailable()) javaVersions.add(javaInformation);
         } catch (Exception e) {
             parseError(e, "error in rikaishi nikui launcher initializing");
         }
-
-        //        minecraftDownloader.download("1.17.1", "test-1.17.1");
     }
 
     public void recoveryVersionsStatus() {
@@ -373,6 +370,8 @@ public class RikaishiNikuiLauncher {
                 if (!new File(information.getPath()).exists()) {
                     minecraftVersions.remove(information);
                 }
+
+                information.setJavaSatisfy(usedJava.getVersion() >= information.getJavaRequires());
             }
         } catch (Exception e) {
 
@@ -385,6 +384,9 @@ public class RikaishiNikuiLauncher {
                 JavaVersionInformation javaInformation = new JavaVersionChecker().check("java");
                 if (javaInformation.isAvailable()) javaVersions.add(javaInformation);
             }
+            if (javaVersions.getVersions().size() == 1) {
+                javaVersions.getDefault().setUsed(true);
+            }
             JavaVersionInformation information = javaVersionList.getSelectedValue();
 
             information.setUsed(usedJava.getName().equals(information.getName()));
@@ -392,7 +394,6 @@ public class RikaishiNikuiLauncher {
             JavaVersionChecker checker = new JavaVersionChecker();
             JavaVersionInformation checkInformation = checker.check(information.getPath());
             information.setAvailable(!checkInformation.isUnknown());
-            javaVersions.add(information);
         } catch (Exception e) {
 
         }
@@ -537,14 +538,14 @@ public class RikaishiNikuiLauncher {
                 }
             }
 
-            JSONObject inf = information.toJSONObject();
+            LinkedHashMap<String, String> inf = information.getInformation();
             inf.remove("options");
             MultipleText texts = new MultipleText();
             for (String s : inf.keySet()) {
                 try {
-                    new JSONObject(inf.getString(s));
+                    new JSONObject(inf.get(s));
                 } catch (Exception e) {
-                    mainVersionDetailsPanel.appendText(new PairText(textFormatter.format("minecraft.information." + s), ((SingleText) textFormatter.format(inf.get(s).toString())).append("\n"), new SingleText(": ")));
+                    mainVersionDetailsPanel.appendText(new PairText(textFormatter.format("minecraft.information." + s), ((SingleText) textFormatter.format(inf.get(s))).append("\n"), new SingleText(": ")));
                 }
             }
             mainVersionDetailsPanel.appendText(texts, true);
@@ -582,7 +583,7 @@ public class RikaishiNikuiLauncher {
                 downloadVersionDetailsPanel.updateText();
                 throw new Exception();
             }
-            JSONObject inf = information.toJSONObject();
+            LinkedHashMap<String, String> inf = information.getInformation();
             inf.remove("last-launch");
             inf.remove("formatted-by-id");
             inf.remove("task-id");
@@ -590,6 +591,7 @@ public class RikaishiNikuiLauncher {
             inf.remove("task-feedback");
             inf.remove("lock-status");
             inf.remove("options");
+            inf.remove("java-satisfy");
             boolean canDownload = true;
             if (downloadSaveAs.getText().equals("")) {
                 inf.put("save-as", "save.auto");
@@ -612,7 +614,7 @@ public class RikaishiNikuiLauncher {
             }
             for (String s : inf.keySet()) {
                 try {
-                    JSONObject json = new JSONObject(inf.getString(s));
+                    JSONObject json = new JSONObject(inf.get(s));
                     Text text = new SingleText(json);
                     downloadVersionDetailsPanel.appendText(textFormatter.format("minecraft.information." + s));
                     downloadVersionDetailsPanel.appendText(": ");
@@ -621,7 +623,7 @@ public class RikaishiNikuiLauncher {
                 } catch (Exception e) {
                     downloadVersionDetailsPanel.appendText(textFormatter.format("minecraft.information." + s));
                     downloadVersionDetailsPanel.appendText(": ");
-                    downloadVersionDetailsPanel.appendText(textFormatter.format(inf.get(s).toString()), false);
+                    downloadVersionDetailsPanel.appendText(textFormatter.format(inf.get(s)), false);
                     downloadVersionDetailsPanel.appendText("\n");
                 }
             }
@@ -648,10 +650,10 @@ public class RikaishiNikuiLauncher {
                 javaVersionDetailsPanel.updateText();
                 throw new Exception();
             }
-            JSONObject inf = information.toJSONObject();
+            LinkedHashMap<String, String> inf = information.getInformation();
             for (String s : inf.keySet()) {
                 try {
-                    JSONObject json = new JSONObject(inf.getString(s));
+                    JSONObject json = new JSONObject(inf.get(s));
                     Text text = new SingleText(json);
                     javaVersionDetailsPanel.appendText(textFormatter.format("java.information." + s));
                     javaVersionDetailsPanel.appendText(": ");
@@ -660,7 +662,7 @@ public class RikaishiNikuiLauncher {
                 } catch (Exception e) {
                     javaVersionDetailsPanel.appendText(textFormatter.format("java.information." + s));
                     javaVersionDetailsPanel.appendText(": ");
-                    javaVersionDetailsPanel.appendText(textFormatter.format(inf.get(s).toString()), false);
+                    javaVersionDetailsPanel.appendText(textFormatter.format(inf.get(s)), false);
                     javaVersionDetailsPanel.appendText("\n");
                 }
             }
@@ -1484,7 +1486,7 @@ public class RikaishiNikuiLauncher {
                     information.setLockStatus("lock.launching");
                     information.setTaskFeedback("none");
                     minecraftVersions.add(information);
-                    RikaishiNikuiMinecraftTask minecraftTask = new RikaishiNikuiMinecraftTask(new MinecraftLauncher(new MinecraftLaunchInformation(mainVersionList.getSelectedValue(), os, usedJava.getPath(), new Account("zhuaidadaya", UUID.randomUUID().toString()))));
+                    RikaishiNikuiMinecraftTask minecraftTask = new RikaishiNikuiMinecraftTask(new MinecraftLauncher(new MinecraftLaunchInformation(mainVersionList.getSelectedValue(), os, usedJava, new Account("zhuaidadaya", UUID.randomUUID().toString()))));
                     information.setTaskId(minecraftTask.getId().toString());
                     RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, UUID.randomUUID(), true);
                     minecraftTask.setParentTask(downloadTask);

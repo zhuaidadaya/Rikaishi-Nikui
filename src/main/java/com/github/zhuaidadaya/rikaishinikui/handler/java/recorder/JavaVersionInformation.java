@@ -2,6 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.java.recorder;
 
 import org.json.JSONObject;
 
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 public class JavaVersionInformation {
@@ -14,6 +15,7 @@ public class JavaVersionInformation {
     private String type = "unknown";
     private String status = "unknown";
     private String path = "unknown";
+    private int version = 17;
     private boolean used = false;
 
     public JavaVersionInformation(JSONObject json) {
@@ -46,6 +48,14 @@ public class JavaVersionInformation {
         information.setUnknown(true);
         information.setAvailable(false);
         return information;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public boolean isUsed() {
@@ -138,6 +148,7 @@ public class JavaVersionInformation {
         this.status = json.getString("status");
         this.available = json.getBoolean("available");
         this.used = json.getBoolean("used");
+        this.version = json.getInt("version");;
     }
 
     public JSONObject toJSONObject() {
@@ -151,7 +162,23 @@ public class JavaVersionInformation {
         json.put("path", path);
         json.put("available", available);
         json.put("used", used);
+        json.put("version", version);
         return json;
+    }
+
+    public LinkedHashMap<String, String> getInformation() {
+        LinkedHashMap<String,String> information = new LinkedHashMap<>();
+        information.put("used", String.valueOf(used));
+        information.put("status", status);
+        information.put("java-id", javaId);
+        information.put("version", String.valueOf(version));
+        information.put("available", String.valueOf(available));
+        information.put("64-bit", String.valueOf(is64Bit));
+        information.put("type", type);
+        information.put("name", name);
+        information.put("id", id);
+        information.put("path", path);
+        return information;
     }
 
     public String toString() {

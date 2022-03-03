@@ -115,7 +115,7 @@ public abstract class RikaishiNikuiTask {
     protected void fail() {
         status = RikaishiNikuiTaskStatus.FAILED;
         if (!running) {
-            logger.info(taskTypeName + " " + getId() + " failed");
+            logger.warn(taskTypeName + " " + getId() + " failed");
         } else {
             stop();
         }

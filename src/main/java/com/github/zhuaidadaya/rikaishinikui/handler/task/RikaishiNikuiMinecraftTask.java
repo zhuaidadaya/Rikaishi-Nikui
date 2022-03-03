@@ -26,7 +26,12 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
         if (running) {
             logger.info(getTaskTypeName() + " " + getId() + " join to manager");
             synchronized (this) {
-                launcher.launch(getId().toString());
+                if (launcher.getJava().getVersion() >= launcher.getVersionInformation().getJavaRequires()) {
+                    launcher.launch(getId().toString());
+                } else {
+                    launcher.setTaskFeedback("task.feedback.java.version.error");
+                    launcher.fail();
+                }
             }
         }
         done = true;
@@ -58,7 +63,7 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
     protected void fail() {
         status = RikaishiNikuiTaskStatus.FAILED;
         if (!running) {
-            logger.info(getTaskTypeName() + " " + getId() + " failed");
+            logger.warn(getTaskTypeName() + " " + getId() + " failed");
         } else {
             stop();
         }

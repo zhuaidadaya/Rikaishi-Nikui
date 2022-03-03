@@ -1,6 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
+import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftClassifierParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftClassifiersParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftLibrariesParser;
@@ -37,7 +38,7 @@ public class MinecraftLauncher {
     private String area;
     private String gamePath;
     private MinecraftClassifiersParser classifiers;
-    private String java = "java";
+    private JavaVersionInformation java = new JavaVersionInformation("java", "", true);
     private Process minecraft;
 
     public MinecraftLauncher(MinecraftLaunchInformation information) {
@@ -169,11 +170,11 @@ public class MinecraftLauncher {
         this.classifiers = classifiers;
     }
 
-    public String getJava() {
+    public JavaVersionInformation getJava() {
         return java;
     }
 
-    public void setJava(String java) {
+    public void setJava(JavaVersionInformation java) {
         this.java = java;
     }
 
@@ -183,7 +184,7 @@ public class MinecraftLauncher {
 
     public String formatArg() {
         return String.format("\"%s\" %s -Djava.library.path=\"%s\" -cp \"%s\" %s --username %s --version \"%s\" --gameDir \"%s\" --assetsDir \"%s\" --assetIndex %s --uuid %s --accessToken %s --userProperties {%s} --userType %s --width %s --height %s", //stu
-                java, //java
+                java.getPath(), //java
                 vmOptionString, //java vm options
                 nativePath, //game native path
                 classPathString, //game libraries
@@ -251,7 +252,7 @@ public class MinecraftLauncher {
                         }
                     }
                 } catch (Exception e) {
-                    failed = true;
+                    fail();
                 }
             });
 
@@ -262,9 +263,8 @@ public class MinecraftLauncher {
                         logLines.getAndIncrement();
                         taskManager.log(taskId, readErr);
                         if(readErr.contains("java.lang.UnsupportedClassVersionError:")) {
-                            versionInformation.setTaskFeedback("task.feedback.java.version.error");
-                            minecraftVersions.add(versionInformation);
-                            failed = true;
+                            setTaskFeedback("task.feedback.java.version.error");
+                            fail();
                             unknownError.set(false);
                         }
                         if(failed) {
@@ -272,7 +272,7 @@ public class MinecraftLauncher {
                         }
                     }
                 } catch (Exception e) {
-                    failed = true;
+                    fail();
                 }
             });
 
@@ -284,16 +284,30 @@ public class MinecraftLauncher {
 
             if(logLines.get() < 5 & unknownError.get() || minecraft.exitValue() != 0) {
                 logger.warn("minecraft " + versionInformation.getTaskId() + " exit with unknown error");
-                versionInformation.setTaskFeedback("task.feedback.unknown.error");
-                failed = true;
+                setTaskFeedback("task.feedback.unknown.error");
+                fail();
             }
         } catch (Exception e) {
-            failed = true;
+            fail();
         }
+    }
+
+    public void fail() {
+        versionInformation.setLockStatus("lock.not");
+        versionInformation.setStatus("status.ready");
+
+        minecraftVersions.add(versionInformation);
+
+        this.failed = true;
     }
 
     public boolean isFailed() {
         return failed;
+    }
+
+    public void setTaskFeedback(String feedback) {
+        versionInformation.setTaskFeedback(feedback);
+        minecraftVersions.add(versionInformation);
     }
 
     public void stop() {

@@ -56,7 +56,7 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
     protected void fail() {
         status = RikaishiNikuiTaskStatus.FAILED;
         if (!running) {
-            logger.info(getTaskTypeName() + " " + getId() + " failed");
+            logger.warn(getTaskTypeName() + " " + getId() + " failed");
         } else {
             stop();
         }

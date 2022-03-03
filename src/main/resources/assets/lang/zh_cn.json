@@ -495,6 +495,22 @@
       "b": 89
     }
   },
+  "minecraft.information.java-requires": {
+    "text": "Java要求",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
+  "minecraft.information.java-satisfy": {
+    "text": "满足Java要求",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
   "save.name": {
     "text": "以\"%s\"保存此版本",
     "color": {
@@ -545,6 +561,14 @@
   },
   "java.information.java-id": {
     "text": "java版本id",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
+  "java.information.version": {
+    "text": "版本",
     "color": {
       "r": 106,
       "g": 169,
@@ -763,4 +787,4 @@
       "b": 89
     }
   }
-}
+},

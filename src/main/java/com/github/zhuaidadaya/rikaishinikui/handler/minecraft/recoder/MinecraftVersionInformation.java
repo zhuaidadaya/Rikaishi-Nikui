@@ -30,6 +30,8 @@ public class MinecraftVersionInformation {
     private String taskFeedback = "none";
     private String releaseTime = "unknown";
     private String releaseType = "unknown";
+    private int javaRequires = 17;
+    private boolean javaSatisfy = true;
     private LinkedHashMap<String, VmOption> vmOptions = new LinkedHashMap<>();
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
@@ -71,8 +73,20 @@ public class MinecraftVersionInformation {
         apply(json);
     }
 
+    public LinkedHashMap<String, String> getVmOptionsName() {
+        return vmOptionsName;
+    }
+
+    public int getJavaRequires() {
+        return javaRequires;
+    }
+
+    public void setJavaRequires(int javaRequires) {
+        this.javaRequires = javaRequires;
+    }
+
     public void addVmOptions(String... options) {
-        for(String details : options) {
+        for (String details : options) {
             addVmOption(details);
         }
     }
@@ -82,7 +96,7 @@ public class MinecraftVersionInformation {
     }
 
     public void addVmOption(VmOption option) {
-        if(! vmOptionsName.containsKey(option.getName())) {
+        if (!vmOptionsName.containsKey(option.getName())) {
             this.vmOptions.put(option.getId(), option);
         } else {
             this.vmOptions.get(vmOptionsName.get(option.getName())).apply(option.toJSONObject());
@@ -108,11 +122,11 @@ public class MinecraftVersionInformation {
     public LinkedHashMap<String, VmOption> getVmOptions(String search) {
         String filter = search.toLowerCase();
         LinkedHashMap<String, VmOption> options = new LinkedHashMap<>();
-        for(VmOption option : vmOptions.values()) {
-            if(option.getDetail().equals("")) {
+        for (VmOption option : vmOptions.values()) {
+            if (option.getDetail().equals("")) {
                 continue;
             }
-            if(option.getDetail().toLowerCase().contains(filter) || textFormatter.getText(option.getDescription()).contains(filter) || (textFormatter.getText("vm.options.information.enable").contains(filter) & option.isEnable())) {
+            if (option.getDetail().toLowerCase().contains(filter) || textFormatter.getText(option.getDescription()).contains(filter) || (textFormatter.getText("vm.options.information.enable").contains(filter) & option.isEnable())) {
                 options.put(option.getId(), option);
             }
         }
@@ -225,21 +239,23 @@ public class MinecraftVersionInformation {
         this.releaseTime = json.getString("release-time");
         this.releaseType = json.getString("release-type");
         this.vmOptions = new LinkedHashMap<>();
+        this.javaRequires = json.getInt("java-requires");
+        this.javaSatisfy = json.getBoolean("java-satisfy");
 
         JSONObject options = json.getJSONObject("options");
-        for(String o : options.keySet()) {
+        for (String o : options.keySet()) {
             VmOption option = new VmOption(options.getJSONObject(o));
             option.setId(o);
             addVmOption(option);
         }
 
         LinkedHashSet<VmOption> removes = new LinkedHashSet<>();
-        for(VmOption option : this.vmOptions.values()) {
+        for (VmOption option : this.vmOptions.values()) {
             try {
-                if(option.toString().equals("")) {
+                if (option.toString().equals("")) {
                     removes.add(option);
                 }
-                if(!vmOptionsName.containsKey(option.getName())) {
+                if (!vmOptionsName.containsKey(option.getName())) {
                     vmOptionsName.put(option.getName(), option.getId());
                 }
             } catch (Exception e) {
@@ -247,7 +263,7 @@ public class MinecraftVersionInformation {
             }
         }
 
-        for(VmOption option : removes) {
+        for (VmOption option : removes) {
             vmOptions.remove(option.getId());
         }
     }
@@ -286,10 +302,12 @@ public class MinecraftVersionInformation {
         json.put("task-feedback", taskFeedback);
         json.put("release-time", releaseTime);
         json.put("release-type", releaseType);
+        json.put("java-requires", javaRequires);
+        json.put("java-satisfy", javaSatisfy);
 
         JSONObject vmOptions = new JSONObject();
-        for(VmOption option : this.vmOptions.values()) {
-            if(option.isPair()) {
+        for (VmOption option : this.vmOptions.values()) {
+            if (option.isPair()) {
                 vmOptions.put(option.getId(), option.toJSONObject());
             } else {
                 vmOptions.put(option.getId(), option.toJSONObject());
@@ -300,6 +318,43 @@ public class MinecraftVersionInformation {
         return json;
     }
 
+    public LinkedHashMap<String, String> getInformation() {
+        LinkedHashMap<String, String> information = new LinkedHashMap<>();
+        information.put("status", status);
+        information.put("version", version);
+        information.put("type", type);
+        information.put("release-time", releaseTime);
+        information.put("release-type", releaseType);
+        information.put("area", area);
+        information.put("java-requires", String.valueOf(javaRequires));
+        information.put("java-satisfy", String.valueOf(javaSatisfy));
+        information.put("name", name);
+        information.put("id", id);
+        information.put("path", formatPath());
+        information.put("url", url);
+        information.put("last-launch", lastLaunch);
+        information.put("formatted-by-id", String.valueOf(idFormatted));
+        information.put("lock-status", lockStatus);
+        information.put("task-id", taskId);
+        try {
+            information.put("last-task-status", taskManager.getStatus(UUID.fromString(taskId)).toString());
+        } catch (Exception e) {
+            information.put("last-task-status", "task.status.inactive");
+        }
+        information.put("task-feedback", taskFeedback);
+
+        JSONObject vmOptions = new JSONObject();
+        for (VmOption option : this.vmOptions.values()) {
+            if (option.isPair()) {
+                vmOptions.put(option.getId(), option.toJSONObject());
+            } else {
+                vmOptions.put(option.getId(), option.toJSONObject());
+            }
+        }
+        information.put("options", String.valueOf(vmOptions));
+        return information;
+    }
+
     public boolean isIdFormatted() {
         return idFormatted;
     }
@@ -308,9 +363,17 @@ public class MinecraftVersionInformation {
         this.idFormatted = idFormatted;
     }
 
+    public boolean isJavaSatisfy() {
+        return javaSatisfy;
+    }
+
+    public void setJavaSatisfy(boolean javaSatisfy) {
+        this.javaSatisfy = javaSatisfy;
+    }
+
     public String formatPath() {
         String result = String.format("%s/versions/%s", area, id);
-        if(idFormatted & new File(result).isDirectory()) {
+        if (idFormatted & new File(result).isDirectory()) {
             return result;
         } else {
             return String.format("%s/versions/%s", area, name);
@@ -319,7 +382,7 @@ public class MinecraftVersionInformation {
 
     public String formatManifest() {
         String result = String.format("%s/versions/%s/%s.json", area, id, id);
-        if(idFormatted & new File(result).isFile()) {
+        if (idFormatted & new File(result).isFile()) {
             return result;
         } else {
             return String.format("%s/versions/%s/%s.json", area, name, name);
@@ -328,7 +391,7 @@ public class MinecraftVersionInformation {
 
     public String formatClientPath() {
         String result = String.format("%s/versions/%s/%s_client.jar", area, id, id);
-        if(idFormatted & new File(result).isFile()) {
+        if (idFormatted & new File(result).isFile()) {
             return result;
         } else {
             return String.format("%s/versions/%s/%s_client.jar", area, name, name);
@@ -337,7 +400,7 @@ public class MinecraftVersionInformation {
 
     public String formatServerPath() {
         String result = String.format("%s/versions/%s/%s_server.jar", area, id, id);
-        if(idFormatted & new File(result).isFile()) {
+        if (idFormatted & new File(result).isFile()) {
             return result;
         } else {
             return String.format("%s/versions/%s/%s_server.jar", area, name, name);
@@ -346,7 +409,7 @@ public class MinecraftVersionInformation {
 
     public String formatAbsoluteManifest() {
         String result = String.format("%s/versions/%s/%s.json", new File(area).getAbsolutePath(), id, id);
-        if(idFormatted & new File(result).isFile()) {
+        if (idFormatted & new File(result).isFile()) {
             return result;
         } else {
             return String.format("%s/versions/%s/%s.json", new File(area).getAbsolutePath(), name, name);
@@ -355,7 +418,7 @@ public class MinecraftVersionInformation {
 
     public String formatAbsoluteClientPath() {
         String result = String.format("%s/versions/%s/%s_client.jar", new File(area).getAbsolutePath(), id, id);
-        if(idFormatted & new File(result).isFile()) {
+        if (idFormatted & new File(result).isFile()) {
             return result;
         } else {
             return String.format("%s/versions/%s/%s_client.jar", new File(area).getAbsolutePath(), name, name);
@@ -364,7 +427,7 @@ public class MinecraftVersionInformation {
 
     public String formatAbsoluteServerPath() {
         String result = String.format("%s/versions/%s/%s_server.jar", new File(area).getAbsolutePath(), id, id);
-        if(idFormatted & new File(result).isFile()) {
+        if (idFormatted & new File(result).isFile()) {
             return result;
         } else {
             return String.format("%s/versions/%s/%s_server.jar", new File(area).getAbsolutePath(), name, name);

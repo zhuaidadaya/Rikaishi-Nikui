@@ -1,22 +1,20 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
+import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import org.json.JSONObject;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 
 public class MinecraftLaunchInformation {
     private MinecraftVersionInformation versionInformation;
     private String os;
-    private String java = "java";
+    private JavaVersionInformation java = new JavaVersionInformation("java","",true);
     private Account account = new Account();
     private LinkedHashMap<String,VmOption>vmOptions;
 
-    public MinecraftLaunchInformation(MinecraftVersionInformation information, String os, String java, Account account) {
+    public MinecraftLaunchInformation(MinecraftVersionInformation information, String os, JavaVersionInformation java, Account account) {
         versionInformation = information;
         this.os = os;
         this.java = java;
@@ -48,11 +46,11 @@ public class MinecraftLaunchInformation {
         this.os = os;
     }
 
-    public String getJava() {
+    public JavaVersionInformation getJava() {
         return java;
     }
 
-    public void setJava(String java) {
+    public void setJava(JavaVersionInformation java) {
         this.java = java;
     }
 

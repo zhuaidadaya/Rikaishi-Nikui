@@ -1,12 +1,10 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.java.recorder;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Locale;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
 
@@ -27,13 +25,13 @@ public class JavaVersionsRecorder {
         }
     }
 
-    public void add(JavaVersionInformation information) {
+    public synchronized void add(JavaVersionInformation information) {
         versions.put(information.getName(), information);
         versionNames.put(information.getName(), information.getName());
         config.set("java-versions", toJSONObject());
     }
 
-    public void remove(JavaVersionInformation information) {
+    public synchronized void remove(JavaVersionInformation information) {
         versions.remove(information.getName());
         versionNames.remove(information.getName());
         if (information.getName().equals(defaultInformation.getName())) {
@@ -98,5 +96,9 @@ public class JavaVersionsRecorder {
         }
 
         return json;
+    }
+
+    public JavaVersionInformation getDefault() {
+        return defaultInformation;
     }
 }
