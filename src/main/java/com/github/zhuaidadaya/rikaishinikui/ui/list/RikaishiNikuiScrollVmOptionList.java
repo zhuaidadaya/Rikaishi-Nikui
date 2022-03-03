@@ -1,6 +1,5 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
@@ -29,9 +28,10 @@ public class RikaishiNikuiScrollVmOptionList extends JScrollPane implements Rika
         list.setBounds(x, y, list.getWidth(), list.getHeight());
     }
 
-    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiScrollVmOptionList setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+        return this;
     }
 
     public void setListColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
@@ -107,5 +107,17 @@ public class RikaishiNikuiScrollVmOptionList extends JScrollPane implements Rika
         }
 
         list.apply(json.getJSONObject("list"));
+    }
+
+    @Override
+    public RikaishiNikuiComponent setBackground(RikaishiNikuiColor color) {
+        setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiComponent setForeground(RikaishiNikuiColor color) {
+        setForeground(color.getAwtColor());
+        return this;
     }
 }

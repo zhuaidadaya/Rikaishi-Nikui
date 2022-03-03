@@ -1,12 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.color;
 
-import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import org.json.JSONObject;
 
 import java.awt.*;
 
-public class RikaishiNikuiColor extends Color implements RikaishiNikuiComponent {
+public class RikaishiNikuiColor extends Color {
     private int alpha = 255;
     private boolean empty = false;
     private int r;

@@ -1,26 +1,10 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.panel;
 
-import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
-import it.unimi.dsi.fastutil.ints.Int2BooleanRBTreeMap;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONObject;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.LockSupport;
-import java.util.concurrent.locks.ReentrantLock;
-
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.launcher;
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel implements RikaishiNikuiComponent {
     private final Int2ObjectRBTreeMap<RikaishiNikuiButton> buttonsQueue = new Int2ObjectRBTreeMap<>();
@@ -126,8 +110,9 @@ public class RikaishiNikuiHorizontalButtonPanel extends RikaishiNikuiPanel imple
         }
     }
 
-    public void setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiHorizontalButtonPanel setBackground(RikaishiNikuiColor color) {
         setBackground(color.getAwtColor());
+        return this;
     }
 
     public void apply(JSONObject json) {

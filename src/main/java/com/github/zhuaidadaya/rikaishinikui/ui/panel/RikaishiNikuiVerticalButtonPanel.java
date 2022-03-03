@@ -6,8 +6,6 @@ import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import org.json.JSONObject;
 
-import java.util.UUID;
-
 public class RikaishiNikuiVerticalButtonPanel extends RikaishiNikuiPanel implements RikaishiNikuiComponent {
     private final Int2ObjectRBTreeMap<RikaishiNikuiButton> buttonsQueue = new Int2ObjectRBTreeMap<>();
     private int buttonsHeight = 0;
@@ -104,8 +102,9 @@ public class RikaishiNikuiVerticalButtonPanel extends RikaishiNikuiPanel impleme
         }
     }
 
-    public void setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiVerticalButtonPanel setBackground(RikaishiNikuiColor color) {
         setBackground(color.getAwtColor());
+        return this;
     }
 
     public void apply(JSONObject json) {

@@ -1,11 +1,10 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.panel;
 
-import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import org.json.JSONObject;
 
 import javax.swing.*;
-import java.util.UUID;
 
 public class RikaishiNikuiPanel extends JPanel implements RikaishiNikuiComponent {
     public RikaishiNikuiPanel() {
@@ -52,8 +51,15 @@ public class RikaishiNikuiPanel extends JPanel implements RikaishiNikuiComponent
         setBounds(x, y, getWidth(), getHeight());
     }
 
-    public void setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiPanel setBackground(RikaishiNikuiColor color) {
         setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiPanel setForeground(RikaishiNikuiColor color) {
+        setForeground(color.getAwtColor());
+        return this;
     }
 
     public JSONObject toJSONObject() {

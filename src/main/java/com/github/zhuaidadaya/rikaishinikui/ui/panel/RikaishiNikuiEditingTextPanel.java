@@ -35,9 +35,10 @@ public class RikaishiNikuiEditingTextPanel extends JTextPane implements Rikaishi
         setName(name);
     }
 
-    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiEditingTextPanel setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+        return this;
     }
 
     public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground, RikaishiNikuiColor caretColor) {
@@ -73,6 +74,18 @@ public class RikaishiNikuiEditingTextPanel extends JTextPane implements Rikaishi
         setForeground(new RikaishiNikuiColor(json.getJSONObject("foreground-color")));
         setCaretColor(new RikaishiNikuiColor(json.getJSONObject("caret-color")));
         repaint();
+    }
+
+    @Override
+    public RikaishiNikuiEditingTextPanel setBackground(RikaishiNikuiColor color) {
+        setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiEditingTextPanel setForeground(RikaishiNikuiColor color) {
+        setForeground(color.getAwtColor());
+        return this;
     }
 
     public void setText(Text text) {

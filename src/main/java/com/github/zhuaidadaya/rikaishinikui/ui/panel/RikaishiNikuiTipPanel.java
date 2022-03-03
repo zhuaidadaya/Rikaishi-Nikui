@@ -36,9 +36,10 @@ public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiCom
         setName(name);
     }
 
-    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiTipPanel setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+        return this;
     }
 
     public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground, RikaishiNikuiColor caretColor) {
@@ -110,5 +111,17 @@ public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiCom
 
     public void setSuperDoc(Document doc) {
         super.setDocument(doc);
+    }
+
+    @Override
+    public RikaishiNikuiComponent setBackground(RikaishiNikuiColor color) {
+        setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiComponent setForeground(RikaishiNikuiColor color) {
+        setForeground(color.getAwtColor());
+        return this;
     }
 }

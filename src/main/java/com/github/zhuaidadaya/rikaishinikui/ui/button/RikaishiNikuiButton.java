@@ -132,13 +132,15 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
         }
     }
 
-    public void setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiButton setBackground(RikaishiNikuiColor color) {
         setBackground(color.getAwtColor());
+        return this;
     }
 
 
-    public void setForeground(RikaishiNikuiColor color) {
+    public RikaishiNikuiButton setForeground(RikaishiNikuiColor color) {
         setForeground(color.getAwtColor());
+        return this;
     }
 
     public void setText(Text text) {

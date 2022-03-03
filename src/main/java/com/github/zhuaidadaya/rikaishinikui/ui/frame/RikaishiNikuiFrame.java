@@ -51,8 +51,25 @@ public class RikaishiNikuiFrame extends JFrame implements RikaishiNikuiComponent
         this.formatted = formatted;
     }
 
-    public void setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiComponent setBackground(RikaishiNikuiColor color) {
         this.getContentPane().setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiComponent setForeground(RikaishiNikuiColor color) {
+        this.getContentPane().setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiComponent setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+        return RikaishiNikuiComponent.super.setColor(background, foreground);
+    }
+
+    @Override
+    public void setColor() {
+        RikaishiNikuiComponent.super.setColor();
     }
 
     public void apply(JSONObject json) {

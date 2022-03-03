@@ -28,9 +28,10 @@ public class RikaishiNikuiScrollJavaList extends JScrollPane implements Rikaishi
         list.setBounds(x, y, list.getWidth(), list.getHeight());
     }
 
-    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiScrollJavaList setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+        return this;
     }
 
     public void setListColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
@@ -102,5 +103,17 @@ public class RikaishiNikuiScrollJavaList extends JScrollPane implements Rikaishi
         }
 
         list.apply(json.getJSONObject("list"));
+    }
+
+    @Override
+    public RikaishiNikuiComponent setBackground(RikaishiNikuiColor color) {
+        setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiComponent setForeground(RikaishiNikuiColor color) {
+        setForeground(color.getAwtColor());
+        return this;
     }
 }

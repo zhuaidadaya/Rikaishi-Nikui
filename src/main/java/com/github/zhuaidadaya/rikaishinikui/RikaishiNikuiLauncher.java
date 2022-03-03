@@ -102,8 +102,8 @@ public class RikaishiNikuiLauncher {
             errorFrame = new RikaishiNikuiTextFrame(1000, 800, "error in rikaishi nikui launcher");
             logFrame = new RikaishiNikuiTextFrame(1000, 800, "logs of rikaishi nikui launcher");
 
-            logFrame.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
-            errorFrame.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
+            logFrame.setColor();
+            errorFrame.setColor();
 
             logger.info(String.format("loading for %s %s", entrust, version));
 
@@ -742,6 +742,9 @@ public class RikaishiNikuiLauncher {
 
     public void setVmOptionInformationText() {
         try {
+            if (vmOptionDetailsPanel.getCaret().isSelectionVisible()) {
+                return;
+            }
             VmOption information = vmOptionsList.getSelectedValue();
             vmOptionDetailsPanel.setText("");
             if (information == null) {
@@ -769,14 +772,16 @@ public class RikaishiNikuiLauncher {
                 } catch (Exception e) {
                     String value = inf.get(s).toString();
                     if (value.equals("")) continue;
-                    vmOptionDetailsPanel.appendText(textFormatter.format("vm.options.information." + s));
+                    Text t = textFormatter.format("vm.options.information." + s);
+                    vmOptionDetailsPanel.appendText(t);
                     vmOptionDetailsPanel.appendText(": ");
                     if (!value.equals("true") & !value.equals("false") || s.equals("pair") || s.equals("enable")) {
                         if (s.equals("description")) {
                             if (information.getName().matches("((-Xss)|(-Xm[xns]))[0-9]+[TGMKB]")) {
                                 value = "vm.option." + information.getName().substring(0, 4);
-                            }
-                            if (textFormatter.hasFormat(value)) {
+                            } else {
+                                value = "vm.option." + information.getName() + (information.getName().equals("-client") ? (usedJava.isIs64Bit() ? ".64" : ".32") : "");
+                            } if (textFormatter.hasFormat(value)) {
                                 vmOptionDetailsPanel.appendText(textFormatter.format(value), false);
                             } else {
                                 vmOptionDetailsPanel.appendText(new SingleText(value.substring(10)), false);
@@ -788,10 +793,10 @@ public class RikaishiNikuiLauncher {
                     } else {
                         vmOptionDetailsPanel.appendText(new SingleText(value), false);
                     }
+
                     vmOptionDetailsPanel.appendText("\n");
                 }
-            }
-            vmOptionDetailsPanel.updateText();
+            } vmOptionDetailsPanel.updateText();
         } catch (Exception ex) {
 
         }

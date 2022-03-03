@@ -130,17 +130,20 @@ public class RikaishiNikuiTextFrame extends JFrame implements RikaishiNikuiCompo
         return json;
     }
 
-    public void setBackground(RikaishiNikuiColor color) {
+    public RikaishiNikuiTextFrame setBackground(RikaishiNikuiColor color) {
         textPane.setBackground(color);
+        return this;
     }
 
-    public void setForeground(RikaishiNikuiColor color) {
+    public RikaishiNikuiTextFrame setForeground(RikaishiNikuiColor color) {
         textPane.setForeground(color);
+        return this;
     }
 
-    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiTextFrame setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+        return this;
     }
 
     public void setDoc(Document doc) {

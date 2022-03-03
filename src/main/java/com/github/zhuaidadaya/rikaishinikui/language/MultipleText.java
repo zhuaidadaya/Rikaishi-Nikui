@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class MultipleText extends Text {
+    private boolean autoLine = true;
     private Collection<SingleText> texts = new LinkedHashSet<>();
 
     public MultipleText() {
@@ -24,6 +25,13 @@ public class MultipleText extends Text {
     public MultipleText(JSONObject json) {
         texts = new LinkedHashSet<>();
         int count = 0;
+
+        try {
+            autoLine = json.getBoolean("auto-line");
+        } catch (Exception e) {
+
+        }
+
         for (int i = 0; i < json.keySet().size() + 1; i++) {
             if (json.has(Integer.toString(i))) {
                 count++;
@@ -80,7 +88,7 @@ public class MultipleText extends Text {
     }
 
     public void append(SingleText text) {
-        if (text.contains("\n")) {
+        if (text.contains("\n") || !autoLine) {
             texts.add(text);
         } else {
             texts.add(text.append("\n"));

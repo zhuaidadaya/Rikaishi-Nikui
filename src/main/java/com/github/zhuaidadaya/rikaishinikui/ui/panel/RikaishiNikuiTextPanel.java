@@ -35,9 +35,10 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
         setName(name);
     }
 
-    public void setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
+    public RikaishiNikuiTextPanel setColor(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         setBackground(background);
         setForeground(foreground);
+        return this;
     }
 
     public void setXY(int x, int y) {
@@ -111,5 +112,17 @@ public class RikaishiNikuiTextPanel extends JTextPane implements RikaishiNikuiCo
 
     public Document getDocCached() {
         return docCached;
+    }
+
+    @Override
+    public RikaishiNikuiComponent setBackground(RikaishiNikuiColor color) {
+        setBackground(color.getAwtColor());
+        return this;
+    }
+
+    @Override
+    public RikaishiNikuiComponent setForeground(RikaishiNikuiColor color) {
+        setForeground(color.getAwtColor());
+        return this;
     }
 }
