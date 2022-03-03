@@ -253,19 +253,6 @@ public class RikaishiNikuiLauncher {
             logFrame.setVisible(true);
 
             taskManager.submitter(logFrame, rikaishiNikuiLauncherTaskId);
-            //                                    RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask("1.16.5", "az1");
-            //                                    downloadTask.join(taskManager);
-            //                                    try {
-            //                                        Thread.sleep(15000);
-            //                                    } catch (InterruptedException e) {
-            //
-            //                                    }
-            //            Collection<String> vmOption = new ObjectRBTreeSet<>();
-            //            vmOption.add("-Xmx2G");
-            //            vmOption.add("-Xms2G");
-            //            MinecraftLauncher launcher = new MinecraftLauncher(new MinecraftLaunchInformation(minecraftVersions.getVersion("aedbc04c-2e19-40ec-9569-378218f44453"), "windows", "C:\\Users\\lx\\.jdks\\adopt-openjdk-17\\bin\\java.exe", new Account("zhuaidadaya", UUID.randomUUID().toString())));
-            //            launcher.setVmOptions(vmOption);
-            //            launcher.launch();
 
             try {
                 downloadVersions = minecraftDownloader.getVersions();
