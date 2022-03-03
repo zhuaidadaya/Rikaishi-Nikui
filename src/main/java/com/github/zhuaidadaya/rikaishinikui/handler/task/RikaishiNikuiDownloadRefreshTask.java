@@ -1,6 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.task.log.PaginateCachedLog;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
 
 import java.util.UUID;
@@ -54,19 +55,23 @@ public class RikaishiNikuiDownloadRefreshTask extends RikaishiNikuiTask {
     }
 
     public void log(String log) {
-        logs.append(log);
-        submit(logs.read());
+        log(log, LogLevel.INFO);
     }
 
-    public PaginateCachedLog getPaginateCachedLog() {
+    public void log(String log, LogLevel level) {
+        logs.append(log);
+        submit(logs.readAsStringBuilder());
+    }
+
+    public PaginationCachedString getPaginateCachedLog() {
         return logs;
     }
 
     public StringBuilder getLog() {
-        return logs.read();
+        return logs.readAsStringBuilder();
     }
 
     public StringBuilder getLog(int page) {
-        return logs.read(page);
+        return logs.readAsStringBuilder(page);
     }
 }

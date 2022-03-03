@@ -1,8 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
+import com.github.zhuaidadaya.rikaishinikui.RikaishiNikuiLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedSingleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
 import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 
@@ -10,15 +11,17 @@ import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
-public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
+public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
     private final PaginationCachedSingleText logs;
-    private final MinecraftLauncher launcher;
     private LogLevel appendLoglevel = LogLevel.INFO;
+    private final RikaishiNikuiLauncher launcher;
+    private final String[] args;
 
-    public RikaishiNikuiMinecraftTask(MinecraftLauncher launcher) {
-        super(UUID.randomUUID(), "MinecraftTask(TS)");
+    public RikaishiNikuiLauncherTask(UUID id, RikaishiNikuiLauncher launcher, String... args) {
+        super(id, "RikaishiNikui(TS)");
         logs = new PaginationCachedSingleText(getId());
         this.launcher = launcher;
+        this.args = args;
     }
 
     @Override
@@ -26,16 +29,11 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
         if (running) {
             logger.info(getTaskTypeName() + " " + getId() + " join to manager");
             synchronized (this) {
-                launcher.launch(getId().toString());
+                launcher.init(args);
             }
         }
         done = true;
         running = false;
-        if (launcher.isFailed()) {
-            fail();
-        } else {
-            done();
-        }
     }
 
     protected void stop() {
@@ -46,7 +44,7 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
         }
         logger.info("stopping " + getTaskTypeName() + " " + getId());
         try {
-            launcher.stop();
+            launcher.shutdown();
         } catch (Exception e) {
 
         }
@@ -63,7 +61,7 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
             stop();
         }
         try {
-            launcher.stop();
+            launcher.shutdown();
         } catch (Exception e) {
 
         }
@@ -102,8 +100,8 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
                     appendLoglevel = LogLevel.ERROR;
                 } else if (match.contains("/warn]")) {
                     appendLoglevel = LogLevel.WARN;
-                } else if (match.contains("[chat]")) {
-                    appendLoglevel = LogLevel.CHAT;
+                } else if (match.contains("/debug]")) {
+                    appendLoglevel = LogLevel.DEBUG;
                 } else {
                     appendLoglevel = LogLevel.INFO;
                 }
@@ -125,5 +123,10 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
 
     public StringBuilder getLog(int page) {
         return logs.readStringBuilder(page);
+    }
+
+    public void setSubmitter(RikaishiNikuiSubmitter submitter) {
+        this.submitter = submitter;
+        submit(logs.read());
     }
 }

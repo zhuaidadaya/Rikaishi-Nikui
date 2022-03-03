@@ -1,8 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
-import com.github.zhuaidadaya.rikaishinikui.handler.task.log.PaginateCachedLog;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
 
 import java.util.UUID;
 
@@ -19,13 +20,13 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     private MinecraftVersionInformation information;
 
     public RikaishiNikuiMinecraftDownloadTask(MinecraftVersionInformation information, UUID id, boolean isFix) {
-        super(id,"DownloadTask(TS)");
+        super(id, "DownloadTask(TS)");
         this.information = information;
         this.isFix = isFix;
     }
 
     public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area, boolean isFix) {
-        super(id,"DownloadTask(TS)");
+        super(id, "DownloadTask(TS)");
         this.gameId = gameId;
         this.name = name;
         this.versionId = versionId;
@@ -34,7 +35,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     }
 
     public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area) {
-        super(id,"DownloadTask(TS)");
+        super(id, "DownloadTask(TS)");
         this.gameId = gameId;
         this.name = name;
         this.versionId = versionId;
@@ -43,18 +44,18 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
 
     @Override
     protected void join() {
-        if(running) {
+        if (running) {
             logger.info(getTaskTypeName() + " " + getId() + " join to manager");
-            synchronized(this) {
+            synchronized (this) {
                 try {
                     downloader.apply(config.getConfigJSONObject("minecraft-downloader"));
                 } catch (Exception e) {
                     config.set("version-manifest", downloader.toJSONObject());
                 }
-                if(information == null) {
+                if (information == null) {
                     downloader.downloadVanilla(area, gameId, name, versionId, isFix, getParentTask() != null ? getParentTask().getId().toString() : getId().toString());
                 } else {
-                    if(getParentTask() != null) {
+                    if (getParentTask() != null) {
                         information.setTaskId(getParentTask().getId().toString());
                     }
                     downloader.downloadVanilla(information, isFix);
@@ -69,7 +70,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     public void stop() {
         stop = true;
         RikaishiNikuiTask parent = getParentTask();
-        if(parent != null) {
+        if (parent != null) {
             parent.stop();
         }
         logger.info("stopping " + getTaskTypeName() + " " + getId());
@@ -92,19 +93,23 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     }
 
     public void log(String log) {
-        logs.append(log);
-        submit(logs.read());
+        log(log, LogLevel.INFO);
     }
 
-    public PaginateCachedLog getPaginateCachedLog() {
+    public void log(String log, LogLevel level) {
+        logs.append(log);
+        submit(logs.readAsStringBuilder());
+    }
+
+    public PaginationCachedString getPaginateCachedLog() {
         return logs;
     }
 
     public StringBuilder getLog() {
-        return logs.read();
+        return logs.readAsStringBuilder();
     }
 
     public StringBuilder getLog(int page) {
-        return logs.read(page);
+        return logs.readAsStringBuilder(page);
     }
 }

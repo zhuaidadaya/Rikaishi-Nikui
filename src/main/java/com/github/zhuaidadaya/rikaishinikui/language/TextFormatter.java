@@ -1,22 +1,25 @@
 package com.github.zhuaidadaya.rikaishinikui.language;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.utils.resource.Resources;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.regex.Matcher;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.language;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
-public class TextFormat {
+public class TextFormatter {
     private final Map<Language, JSONObject> format = new HashMap<>();
 
-    public TextFormat(LanguageResource languageResource) {
+    public TextFormatter(LanguageResource languageResource) {
         for (Language lang : languageResource.getNames()) {
             String resource = languageResource.get(lang);
 
@@ -94,10 +97,8 @@ public class TextFormat {
 
     public SingleText formatSingleText(String source, JSONObject json, Object... args) {
         SingleText formatReturn;
-        if (json == null)
-            formatReturn = new SingleText(format.get(language).getString(source));
-        else
-            formatReturn = new SingleText(json);
+        if (json == null) formatReturn = new SingleText(format.get(language).getString(source));
+        else formatReturn = new SingleText(json);
 
         for (Object o : args) {
             try {
@@ -122,5 +123,31 @@ public class TextFormat {
         } catch (Exception e) {
             return new SingleText(source);
         }
+    }
+
+    public Collection<SingleText> formatSingTextsFromFile(File file) {
+        Collection<SingleText> texts = new LinkedHashSet<>();
+        try {
+            StringBuilder builder = FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(file)));
+            BufferedReader reader = new BufferedReader(new StringReader(builder.toString()));
+            String cache;
+            while ((cache = reader.readLine()) != null) {
+                texts.add(new SingleText(cache));
+            }
+        } catch (Exception e) {
+
+        }
+
+        return texts;
+    }
+
+    public SingleText formatTrace(Throwable t) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(t.toString()).append("\n");
+        for (StackTraceElement s : t.getStackTrace()) {
+            builder.append(textFormatter.format("happened.error.at", s.toString() + "\n").getText());
+        }
+        builder.delete(builder.length() - 1, builder.length());
+        return new SingleText(builder.toString(), new RikaishiNikuiColor(246, 55, 65));
     }
 }

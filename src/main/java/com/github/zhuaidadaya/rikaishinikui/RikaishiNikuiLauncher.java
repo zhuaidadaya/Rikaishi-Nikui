@@ -29,7 +29,6 @@ import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
 import org.json.JSONObject;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -42,26 +41,18 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiLauncher {
     private final int standardInterval = 50;
-    private long lastTick = -1;
-    private long lastTickMainFrame = -1;
-
     public RikaishiNikuiFrame mainFrame;
     public RikaishiNikuiTextFrame errorFrame;
     public RikaishiNikuiTextFrame logFrame;
-
     public RikaishiNikuiHorizontalButtonPanel buttons;
-
     public RikaishiNikuiPanel mainPanel;
-
     public RikaishiNikuiPanel mainInformationPanel;
     public RikaishiNikuiPanel mainVersionPanel;
     public RikaishiNikuiScrollMinecraftList mainVersionList;
     public RikaishiNikuiTextPanel mainVersionDetailsPanel;
     public RikaishiNikuiTipPanel searchLocalTip;
     public RikaishiNikuiEditingTextPanel searchLocalVersion;
-
     public RikaishiNikuiHorizontalButtonPanel mainOperationButtons;
-
     public RikaishiNikuiPanel downloadInformationPanel;
     public RikaishiNikuiPanel downloadVersionPanel;
     public RikaishiNikuiScrollMinecraftList downloadVersionList;
@@ -70,9 +61,7 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiEditingTextPanel searchDownloadVersion;
     public RikaishiNikuiTipPanel downloadSaveAsTip;
     public RikaishiNikuiEditingTextPanel downloadSaveAs;
-
     public RikaishiNikuiHorizontalButtonPanel downloadOperationButtons;
-
     public RikaishiNikuiPanel javaInformationPanel;
     public RikaishiNikuiPanel javaVersionPanel;
     public RikaishiNikuiScrollJavaList javaVersionList;
@@ -81,9 +70,7 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiEditingTextPanel searchJavaVersion;
     public RikaishiNikuiTipPanel javaPathTip;
     public RikaishiNikuiEditingTextPanel javaPathEditing;
-
     public RikaishiNikuiHorizontalButtonPanel javaOperationButtons;
-
     public RikaishiNikuiPanel vmOptionsInformationPanel;
     public RikaishiNikuiPanel vmOptionsPanel;
     public RikaishiNikuiScrollVmOptionList vmOptionsList;
@@ -99,16 +86,14 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiEditingTextPanel editVmOptionsValue;
     public RikaishiNikuiTipPanel addVmOptionsTip;
     public RikaishiNikuiEditingTextPanel addVmOptions;
-
     public RikaishiNikuiHorizontalButtonPanel vmOptionsOperationButtons;
     public RikaishiNikuiHorizontalButtonPanel vmOptionsOperationButtons2;
-
     public MinecraftVersionsParser downloadVersions;
-
     public UUID REFRESH_TASK_ID = UUID.randomUUID();
     public UUID LAUNCH_DOWNLOAD_TASK_ID = UUID.randomUUID();
-
     public ObjectRBTreeSet<String> options = new ObjectRBTreeSet<>();
+    private long lastTick = -1;
+    private long lastTickMainFrame = -1;
     private boolean running = false;
     private boolean shutdown = false;
 
@@ -117,14 +102,17 @@ public class RikaishiNikuiLauncher {
             errorFrame = new RikaishiNikuiTextFrame(1000, 800, "error in rikaishi nikui launcher");
             logFrame = new RikaishiNikuiTextFrame(1000, 800, "logs of rikaishi nikui launcher");
 
-            logger.info("loading for {} {}", entrust, version);
+            logFrame.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
+            errorFrame.setColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214));
+
+            logger.info(String.format("loading for %s %s", entrust, version));
 
             this.options.addAll(Arrays.asList(options));
 
             LanguageResource resource = new LanguageResource();
             resource.set(Language.CHINESE, "/assets/lang/zh_cn.json");
             resource.set(Language.ENGLISH, "/assets/lang/en_us.json");
-            textFormat = new TextFormat(resource);
+            textFormatter = new TextFormatter(resource);
 
             initConfig();
 
@@ -134,8 +122,7 @@ public class RikaishiNikuiLauncher {
                 usedJava = new JavaVersionInformation(config.getConfigJSONObject("used_java"));
             } catch (Exception ex) {
                 JavaVersionInformation javaInformation = new JavaVersionChecker().check("java");
-                if (javaInformation.isAvailable())
-                    javaVersions.add(javaInformation);
+                if (javaInformation.isAvailable()) javaVersions.add(javaInformation);
                 usedJava = javaInformation;
                 config.set("used_java", usedJava.toJSONObject());
             }
@@ -264,6 +251,8 @@ public class RikaishiNikuiLauncher {
             mainFrame.setVisible(true);
 
             logFrame.setVisible(true);
+
+            taskManager.submitter(logFrame, rikaishiNikuiLauncherTaskId);
             //                                    RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask("1.16.5", "az1");
             //                                    downloadTask.join(taskManager);
             //                                    try {
@@ -334,27 +323,23 @@ public class RikaishiNikuiLauncher {
         logger.error(source, throwable);
 
         mainFrame.setVisible(false);
-        logFrame.setVisible(false);
         errorFrame.setVisible(true);
         logger.error("showing error");
-        appendErrorFrameText(textFormat.formatSingleText("happened.error").setColor(new Color(0, 0, 0)), true);
-        appendErrorFrameText(new SingleText("\n\n"), false);
-        errorFrame.appendText("---------- STACK TRACE ----------\n", new RikaishiNikuiColor(0, 0, 0));
-        errorFrame.appendText(source + ": \n", new Color(152, 12, 10));
-        errorFrame.appendText(throwable.getClass().getName() + ": ", new Color(152, 12, 10));
-        errorFrame.appendText(throwable.getMessage() + "\n", new Color(152, 12, 10));
-        for (StackTraceElement s : throwable.getStackTrace())
-            appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
-        errorFrame.updateText();
-        errorFrame.appendText("---------- THREADS STACK TRACE ----------\n", new RikaishiNikuiColor(0, 0, 0));
+        errorFrame.appendText(textFormatter.formatSingleText("happened.error"), true);
+        errorFrame.appendText(new SingleText("\n\n"), false);
+        errorFrame.appendText(new SingleText("---------- STACK TRACE ----------\n"), false);
+        errorFrame.appendText(new SingleText(source + ": \n", new RikaishiNikuiColor(198, 55, 65)), false);
+        errorFrame.appendText(textFormatter.formatTrace(throwable), false);
+        errorFrame.appendText(new SingleText("\n---------- THREADS STACK TRACE ----------\n"), false);
         for (Thread thread : Thread.getAllStackTraces().keySet()) {
             if (thread.getStackTrace().length > 0) {
-                appendErrorFrameText(textFormat.format(thread.getName() + "\n"), false);
+                errorFrame.appendText(textFormatter.format(thread.getName() + "\n"), false);
                 for (StackTraceElement s : thread.getStackTrace()) {
-                    appendErrorFrameText(textFormat.format("happened.error.at", s.toString() + "\n"), false);
+                    errorFrame.appendText(textFormatter.format("happened.error.at", s.toString() + "\n"), false);
                 }
             }
         }
+        errorFrame.updateText();
 
         if (shutdownCU) {
             logger.error("invaliding (UI)CU, protection the config file");
@@ -411,8 +396,7 @@ public class RikaishiNikuiLauncher {
         try {
             if (javaVersionList.getSelectedIndex() == -1) {
                 JavaVersionInformation javaInformation = new JavaVersionChecker().check("java");
-                if (javaInformation.isAvailable())
-                    javaVersions.add(javaInformation);
+                if (javaInformation.isAvailable()) javaVersions.add(javaInformation);
             }
             JavaVersionInformation information = javaVersionList.getSelectedValue();
 
@@ -441,8 +425,7 @@ public class RikaishiNikuiLauncher {
             Collection<MinecraftVersionInformation> names;
             if (buttons.getActiveButton().getId() == 0)
                 names = minecraftVersions.getVersions(searchLocalVersion.getText());
-            else
-                names = minecraftVersions.getVersions(searchLocalMinecraftVmVersion.getText());
+            else names = minecraftVersions.getVersions(searchLocalMinecraftVmVersion.getText());
 
             if (names.size() < 1) {
                 if (buttons.getActiveButton().getId() == 0) {
@@ -529,7 +512,7 @@ public class RikaishiNikuiLauncher {
             mainVersionDetailsPanel.setText("");
             if (information == null) {
 //                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.in.area", area));
-                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found", area));
+                mainVersionDetailsPanel.appendText(textFormatter.format("tip.versions.not.found", area));
 //                mainVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.import"));
                 mainOperationButtons.setButtonVisible(4, true);
                 throw new Exception();
@@ -574,15 +557,14 @@ public class RikaishiNikuiLauncher {
                 try {
                     new JSONObject(inf.getString(s));
                 } catch (Exception e) {
-                    mainVersionDetailsPanel.appendText(new PairText(textFormat.format("minecraft.information." + s), ((SingleText) textFormat.format(inf.get(s).toString())).append("\n"), new SingleText(": ")));
+                    mainVersionDetailsPanel.appendText(new PairText(textFormatter.format("minecraft.information." + s), ((SingleText) textFormatter.format(inf.get(s).toString())).append("\n"), new SingleText(": ")));
                 }
             }
             mainVersionDetailsPanel.appendText(texts, true);
 
 //            mainVersionDetailsPanel.updateText();
 
-            if (information.getStatus().equals("status.interrupting"))
-                throw new Exception();
+            if (information.getStatus().equals("status.interrupting")) throw new Exception();
             mainOperationButtons.setButtonVisible(0, information.getStatus().equals("status.ready") & information.getLockStatus().equals("lock.not"));
             mainOperationButtons.setButtonVisible(1, information.getLockStatus().equals("lock.launching") || information.getStatus().equals("status.downloading"));
             mainOperationButtons.setButtonVisible(2, true);
@@ -606,9 +588,9 @@ public class RikaishiNikuiLauncher {
             if (information == null) {
                 String search = searchDownloadVersion.getText();
                 if (search.equals("")) {
-                    downloadVersionDetailsPanel.appendText(textFormat.format("error.version.not.found.in.manifest"));
+                    downloadVersionDetailsPanel.appendText(textFormatter.format("error.version.not.found.in.manifest"));
                 } else {
-                    downloadVersionDetailsPanel.appendText(textFormat.format("tip.versions.not.found.in.manifest", search));
+                    downloadVersionDetailsPanel.appendText(textFormatter.format("tip.versions.not.found.in.manifest", search));
                 }
                 downloadVersionDetailsPanel.updateText();
                 throw new Exception();
@@ -631,13 +613,13 @@ public class RikaishiNikuiLauncher {
                 IllegalFileName illegal = FileUtil.legally(name);
                 if (!illegal.isIllegal()) {
                     if (new File(detect.formatPath()).exists()) {
-                        inf.put("save-as", textFormat.formatSingleText("save.name.dump", name).toJSONObject().toString());
+                        inf.put("save-as", textFormatter.formatSingleText("save.name.dump", name).toJSONObject().toString());
                         canDownload = false;
                     } else {
-                        inf.put("save-as", textFormat.formatSingleText("save.name", name).toJSONObject().toString());
+                        inf.put("save-as", textFormatter.formatSingleText("save.name", name).toJSONObject().toString());
                     }
                 } else {
-                    inf.put("save-as", textFormat.formatSingleText("save.illegal", name, illegal.getIllegals()).toJSONObject().toString());
+                    inf.put("save-as", textFormatter.formatSingleText("save.illegal", name, illegal.getIllegals()).toJSONObject().toString());
                     canDownload = false;
                 }
             }
@@ -645,14 +627,14 @@ public class RikaishiNikuiLauncher {
                 try {
                     JSONObject json = new JSONObject(inf.getString(s));
                     Text text = new SingleText(json);
-                    downloadVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
+                    downloadVersionDetailsPanel.appendText(textFormatter.format("minecraft.information." + s));
                     downloadVersionDetailsPanel.appendText(": ");
                     downloadVersionDetailsPanel.appendText(text, false);
                     downloadVersionDetailsPanel.appendText("\n");
                 } catch (Exception e) {
-                    downloadVersionDetailsPanel.appendText(textFormat.format("minecraft.information." + s));
+                    downloadVersionDetailsPanel.appendText(textFormatter.format("minecraft.information." + s));
                     downloadVersionDetailsPanel.appendText(": ");
-                    downloadVersionDetailsPanel.appendText(textFormat.format(inf.get(s).toString()), false);
+                    downloadVersionDetailsPanel.appendText(textFormatter.format(inf.get(s).toString()), false);
                     downloadVersionDetailsPanel.appendText("\n");
                 }
             }
@@ -672,9 +654,9 @@ public class RikaishiNikuiLauncher {
             if (information == null) {
                 String search = searchJavaVersion.getText();
                 if (search.equals("")) {
-                    javaVersionDetailsPanel.appendText(textFormat.format("error.java.not.found.in.manifest"));
+                    javaVersionDetailsPanel.appendText(textFormatter.format("error.java.not.found.in.manifest"));
                 } else {
-                    javaVersionDetailsPanel.appendText(textFormat.format("tip.java.not.found.in.config", search));
+                    javaVersionDetailsPanel.appendText(textFormatter.format("tip.java.not.found.in.config", search));
                 }
                 javaVersionDetailsPanel.updateText();
                 throw new Exception();
@@ -684,14 +666,14 @@ public class RikaishiNikuiLauncher {
                 try {
                     JSONObject json = new JSONObject(inf.getString(s));
                     Text text = new SingleText(json);
-                    javaVersionDetailsPanel.appendText(textFormat.format("java.information." + s));
+                    javaVersionDetailsPanel.appendText(textFormatter.format("java.information." + s));
                     javaVersionDetailsPanel.appendText(": ");
                     javaVersionDetailsPanel.appendText(text, false);
                     javaVersionDetailsPanel.appendText("\n");
                 } catch (Exception e) {
-                    javaVersionDetailsPanel.appendText(textFormat.format("java.information." + s));
+                    javaVersionDetailsPanel.appendText(textFormatter.format("java.information." + s));
                     javaVersionDetailsPanel.appendText(": ");
-                    javaVersionDetailsPanel.appendText(textFormat.format(inf.get(s).toString()), false);
+                    javaVersionDetailsPanel.appendText(textFormatter.format(inf.get(s).toString()), false);
                     javaVersionDetailsPanel.appendText("\n");
                 }
             }
@@ -776,10 +758,10 @@ public class RikaishiNikuiLauncher {
             if (information == null) {
                 String search = searchVmOptions.getText();
                 if (!search.equals("")) {
-                    vmOptionDetailsPanel.appendText(textFormat.format("tip.vm.options.not.found", search));
+                    vmOptionDetailsPanel.appendText(textFormatter.format("tip.vm.options.not.found", search));
                 } else {
                     vmOptionDetailsPanel.setText("");
-                    vmOptionDetailsPanel.appendText(textFormat.format("error.vm.options.not.found"));
+                    vmOptionDetailsPanel.appendText(textFormatter.format("error.vm.options.not.found"));
                 }
                 vmOptionDetailsPanel.updateText();
                 throw new Exception();
@@ -791,30 +773,28 @@ public class RikaishiNikuiLauncher {
                 try {
                     JSONObject json = new JSONObject(inf.getString(s));
                     Text text = new SingleText(json);
-                    vmOptionDetailsPanel.appendText(textFormat.format("vm.options.information." + s));
+                    vmOptionDetailsPanel.appendText(textFormatter.format("vm.options.information." + s));
                     vmOptionDetailsPanel.appendText(": ");
                     vmOptionDetailsPanel.appendText(text, false);
                     vmOptionDetailsPanel.appendText("\n");
                 } catch (Exception e) {
                     String value = inf.get(s).toString();
-                    if (value.equals(""))
-                        continue;
-                    vmOptionDetailsPanel.appendText(textFormat.format("vm.options.information." + s));
+                    if (value.equals("")) continue;
+                    vmOptionDetailsPanel.appendText(textFormatter.format("vm.options.information." + s));
                     vmOptionDetailsPanel.appendText(": ");
                     if (!value.equals("true") & !value.equals("false") || s.equals("pair") || s.equals("enable")) {
                         if (s.equals("description")) {
                             if (information.getName().matches("((-Xss)|(-Xm[xns]))[0-9]+[TGMKB]")) {
                                 value = "vm.option." + information.getName().substring(0, 4);
                             }
-                            if (textFormat.hasFormat(value)) {
-                                vmOptionDetailsPanel.appendText(textFormat.format(value), false);
+                            if (textFormatter.hasFormat(value)) {
+                                vmOptionDetailsPanel.appendText(textFormatter.format(value), false);
                             } else {
                                 vmOptionDetailsPanel.appendText(new SingleText(value.substring(10)), false);
                             }
                         } else {
-                            if (s.equals("pair-head"))
-                                value = value.replace("=", "");
-                            vmOptionDetailsPanel.appendText(textFormat.format(value), false);
+                            if (s.equals("pair-head")) value = value.replace("=", "");
+                            vmOptionDetailsPanel.appendText(textFormatter.format(value), false);
                         }
                     } else {
                         vmOptionDetailsPanel.appendText(new SingleText(value), false);

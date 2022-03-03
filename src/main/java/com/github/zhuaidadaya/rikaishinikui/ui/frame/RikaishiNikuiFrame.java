@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class RikaishiNikuiFrame extends JFrame implements RikaishiNikuiComponent {
     private String text = "";
@@ -84,7 +84,7 @@ public class RikaishiNikuiFrame extends JFrame implements RikaishiNikuiComponent
 
     public void formatText() {
         if(formatted) {
-            setTitle(textFormat.format(text));
+            setTitle(textFormatter.format(text));
         } else {
             setTitle(text);
         }

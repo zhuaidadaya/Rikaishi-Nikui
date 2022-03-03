@@ -14,6 +14,11 @@ public class SingleText extends Text {
 
     }
 
+    public SingleText(SingleText text) {
+        this.text = text.getText();
+        this.color = text.getColor();
+    }
+
     public SingleText(String text) {
         this.text = text;
     }
@@ -99,6 +104,10 @@ public class SingleText extends Text {
         return this;
     }
 
+    public int length() {
+        return text.length();
+    }
+
     public void applyToDoc(Document doc, boolean clear, Color defaultForeground) throws BadLocationException {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet asset;
@@ -107,8 +116,7 @@ public class SingleText extends Text {
         } catch (Exception e) {
             asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, defaultForeground);
         }
-        if (clear)
-            doc.remove(0, doc.getLength());
+        if (clear) doc.remove(0, doc.getLength());
         doc.insertString(doc.getLength(), getText(), asset);
     }
 }

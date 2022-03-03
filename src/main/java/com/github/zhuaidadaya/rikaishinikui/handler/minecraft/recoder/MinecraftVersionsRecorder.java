@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class MinecraftVersionsRecorder {
     private Object2ObjectLinkedOpenHashMap<String, MinecraftVersionInformation> versions = new Object2ObjectLinkedOpenHashMap<>();
@@ -49,7 +49,7 @@ public class MinecraftVersionsRecorder {
         String filter = search.toLowerCase();
         Collection<MinecraftVersionInformation> result = new LinkedHashSet<>();
         for(MinecraftVersionInformation information : versions.values()) {
-            if(information.getId().toLowerCase().contains(filter) || information.getReleaseTime().toLowerCase().contains(filter) || information.getType().toLowerCase().contains(filter) || textFormat.getText(information.getType()).toLowerCase().contains(filter) || information.getName().toLowerCase().contains(filter)) {
+            if(information.getId().toLowerCase().contains(filter) || information.getReleaseTime().toLowerCase().contains(filter) || information.getType().toLowerCase().contains(filter) || textFormatter.getText(information.getType()).toLowerCase().contains(filter) || information.getName().toLowerCase().contains(filter)) {
                 result.add(information);
             }
         }

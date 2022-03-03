@@ -1,16 +1,20 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.task.log.PaginateCachedLog;
-import com.github.zhuaidadaya.rikaishinikui.ui.log.submitter.RikaishiNikuiSubmitter;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedLog;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
+import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public abstract class RikaishiNikuiTask {
     protected final UUID id;
-    protected PaginateCachedLog logs;
+    protected PaginationCachedString logs;
     protected RikaishiNikuiTaskStatus status = RikaishiNikuiTaskStatus.INACTIVE;
     protected boolean running = false;
     protected boolean done = false;
@@ -19,10 +23,20 @@ public abstract class RikaishiNikuiTask {
     protected RikaishiNikuiTask parent;
     private String taskTypeName = "RikaishiNikuiTask(Ab)";
 
+    public RikaishiNikuiTask(UUID id, String taskTypeName) {
+        this.id = id;
+        this.taskTypeName = taskTypeName;
+        logs = new PaginationCachedString(getId(), -1, "rikaishi_nikui");
+    }
+
+    public RikaishiNikuiTask(UUID id) {
+        this.id = id;
+    }
+
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
-        json.put("id",id);
-        json.put("status",getStatus().name());
+        json.put("id", id);
+        json.put("status", getStatus().name());
         json.put("parent", getParentTask().toJSONObject());
         json.put("type", getTaskTypeName());
         return json;
@@ -30,16 +44,6 @@ public abstract class RikaishiNikuiTask {
 
     public String toString() {
         return toJSONObject().toString();
-    }
-
-    public RikaishiNikuiTask(UUID id,String taskTypeName) {
-        this.id = id;
-        this.taskTypeName = taskTypeName;
-        logs = new PaginateCachedLog(getId(),-1,"rikaishi_nikui");
-    }
-
-    public RikaishiNikuiTask(UUID id) {
-        this.id = id;
     }
 
     public void join(RikaishiNikuiTaskManager manager) {
@@ -75,11 +79,11 @@ public abstract class RikaishiNikuiTask {
         running = true;
         status = RikaishiNikuiTaskStatus.RUNNING;
         logger.info(taskTypeName + " " + getId() + " pre join");
-        if(parent != null) {
+        if (parent != null) {
             parent.preJoin();
             parent.join();
         }
-        if(! stop) {
+        if (!stop) {
             done = false;
         } else {
             running = false;
@@ -91,7 +95,7 @@ public abstract class RikaishiNikuiTask {
     protected void stop() {
         stop = true;
         RikaishiNikuiTask parent = getParentTask();
-        if(parent != null) {
+        if (parent != null) {
             parent.stop();
         }
         logger.info("stopping " + taskTypeName + " " + getId());
@@ -101,7 +105,7 @@ public abstract class RikaishiNikuiTask {
 
     protected void done() {
         status = RikaishiNikuiTaskStatus.DONE;
-        if(! running) {
+        if (!running) {
             logger.info(taskTypeName + " " + getId() + " done");
         } else {
             stop();
@@ -110,7 +114,7 @@ public abstract class RikaishiNikuiTask {
 
     protected void fail() {
         status = RikaishiNikuiTaskStatus.FAILED;
-        if(! running) {
+        if (!running) {
             logger.info(taskTypeName + " " + getId() + " failed");
         } else {
             stop();
@@ -119,7 +123,9 @@ public abstract class RikaishiNikuiTask {
 
     protected abstract void log(String log);
 
-    protected abstract PaginateCachedLog getPaginateCachedLog();
+    protected abstract void log(String log, LogLevel level);
+
+    protected abstract PaginationCachedLog getPaginateCachedLog();
 
     protected abstract StringBuilder getLog();
 
@@ -134,8 +140,14 @@ public abstract class RikaishiNikuiTask {
     }
 
     protected void submit(StringBuilder log) {
-        if(submitter != null) {
+        if (submitter != null) {
             submitter.submit(log.toString());
+        }
+    }
+
+    protected void submit(Collection<SingleText> log) {
+        if (submitter != null) {
+            submitter.submit(log);
         }
     }
 

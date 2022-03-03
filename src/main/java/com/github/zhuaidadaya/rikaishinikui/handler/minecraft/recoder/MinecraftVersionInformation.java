@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.taskManager;
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class MinecraftVersionInformation {
     private final LinkedHashMap<String, String> vmOptionsName = new LinkedHashMap<>();
@@ -112,7 +112,7 @@ public class MinecraftVersionInformation {
             if(option.getDetail().equals("")) {
                 continue;
             }
-            if(option.getDetail().toLowerCase().contains(filter) || textFormat.getText(option.getDescription()).contains(filter) || (textFormat.getText("vm.options.information.enable").contains(filter) & option.isEnable())) {
+            if(option.getDetail().toLowerCase().contains(filter) || textFormatter.getText(option.getDescription()).contains(filter) || (textFormatter.getText("vm.options.information.enable").contains(filter) & option.isEnable())) {
                 options.put(option.getId(), option);
             }
         }

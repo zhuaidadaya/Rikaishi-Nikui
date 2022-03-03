@@ -1,7 +1,8 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
-import com.github.zhuaidadaya.rikaishinikui.ui.log.submitter.RikaishiNikuiSubmitter;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 
 import java.util.Collection;
@@ -24,7 +25,7 @@ public class RikaishiNikuiTaskManager {
 
     public void join(RikaishiNikuiTask task) {
         RikaishiNikuiTask old = tasks.get(task.getId());
-        if(old == null || ! old.isRunning()) {
+        if (old == null || !old.isRunning()) {
             tasks.put(task.getId(), task);
             Thread thread = new Thread(() -> {
                 task.preJoin();
@@ -35,7 +36,7 @@ public class RikaishiNikuiTaskManager {
     }
 
     public void quit(RikaishiNikuiTask task) {
-        if(task.isRunning())
+        if (task.isRunning())
             task.stop();
         tasks.remove(task.getId());
     }
@@ -64,6 +65,14 @@ public class RikaishiNikuiTaskManager {
         log(UUID.fromString(id), log);
     }
 
+    public void log(UUID id, String log, LogLevel level) {
+        tasks.get(id).log(log, level);
+    }
+
+    public void log(String id, String log,  LogLevel level) {
+        log(UUID.fromString(id), log, level);
+    }
+
     public Collection<RikaishiNikuiTask> getTasks() {
         return tasks.values();
     }
@@ -81,19 +90,19 @@ public class RikaishiNikuiTaskManager {
     }
 
     public void clearSubmitter() {
-        for(RikaishiNikuiTask task : tasks.values()) {
+        for (RikaishiNikuiTask task : tasks.values()) {
             task.setSubmitter(null);
         }
     }
 
     public void quitAll() {
-        for(RikaishiNikuiTask task : tasks.values()) {
+        for (RikaishiNikuiTask task : tasks.values()) {
             task.done();
         }
     }
 
     public void quitAll(RikaishiNikuiTask matcher) {
-        for(RikaishiNikuiTask task : tasks.values()) {
+        for (RikaishiNikuiTask task : tasks.values()) {
             if (matcher.getTaskTypeName().equals(task.getTaskTypeName())) {
                 task.done();
             }

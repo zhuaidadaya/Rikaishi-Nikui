@@ -1,9 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui;
 
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.launcher;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiLauncherTask;
+
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class EntryPoint {
     public static void main(String[] args) {
-        launcher.init(args);
+        taskManager.join(new RikaishiNikuiLauncherTask(rikaishiNikuiLauncherTaskId, launcher));
     }
 }

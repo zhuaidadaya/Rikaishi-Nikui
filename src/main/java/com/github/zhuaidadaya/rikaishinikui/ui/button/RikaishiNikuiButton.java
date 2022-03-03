@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.UUID;
 
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class RikaishiNikuiButton extends JButton implements RikaishiNikuiComponent {
     private int height = 0;
@@ -126,7 +126,7 @@ public class RikaishiNikuiButton extends JButton implements RikaishiNikuiCompone
 
     public void formatText() {
         if (formatted) {
-            setText(textFormat.format(text));
+            setText(textFormatter.format(text));
         } else {
             setText(text);
         }

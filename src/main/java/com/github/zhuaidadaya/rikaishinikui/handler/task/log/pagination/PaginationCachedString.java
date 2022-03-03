@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.handler.task.log;
+package com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
@@ -8,26 +8,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.UUID;
 
-public class PaginateCachedLog {
-    private final UUID cachedId;
-    private Int2ObjectRBTreeMap<String> pages = new Int2ObjectRBTreeMap<>();
-    private int pageSize = 1024 * 256;
-    private StringBuilder log = new StringBuilder();
-    private String base;
+public class PaginationCachedString extends PaginationCachedLog<String, String> {
+    public StringBuilder log = new StringBuilder();
 
-    public PaginateCachedLog(UUID id) {
-        this.cachedId = id;
+    public PaginationCachedString(UUID id) {
+        super(id);
     }
 
-    public PaginateCachedLog(UUID id, int pageSize) {
-        this.cachedId = id;
-        this.pageSize = pageSize > 0 ? pageSize : this.pageSize;
+    public PaginationCachedString(UUID id, int pageSize) {
+        super(id, pageSize);
     }
 
-    public PaginateCachedLog(UUID id, int pageSize,String base) {
-        this.cachedId = id;
-        this.pageSize = pageSize > 0 ? pageSize : this.pageSize;
-        this.base = base;
+    public PaginationCachedString(UUID id, int pageSize, String base) {
+        super(id, pageSize, base);
     }
 
     public void setBase(String base) {
@@ -52,16 +45,29 @@ public class PaginateCachedLog {
         log = new StringBuilder();
     }
 
-    public StringBuilder read(int index) {
+    public String read(int index) {
         try {
-            log = FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(pages.get(Math.min(pages.size(), index)))));
+            return FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(pages.get(Math.min(pages.size(), index))))).toString();
         } catch (Exception e) {
 
         }
-        return log;
+        return "";
     }
 
-    public StringBuilder read() {
+    public StringBuilder readAsStringBuilder(int index) {
+        try {
+            return FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(pages.get(Math.min(pages.size(), index)))));
+        } catch (Exception e) {
+
+        }
+        return new StringBuilder("");
+    }
+
+    public String read() {
+        return log.toString();
+    }
+
+    public StringBuilder readAsStringBuilder() {
         return log;
     }
 

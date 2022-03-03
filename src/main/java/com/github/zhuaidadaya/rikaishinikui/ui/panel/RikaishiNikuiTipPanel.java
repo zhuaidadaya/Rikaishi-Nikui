@@ -11,7 +11,7 @@ import javax.swing.*;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
 
-import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormat;
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiComponent, RikaishiNikuiTextComponent {
     private Document doc = new DefaultStyledDocument();
@@ -94,7 +94,7 @@ public class RikaishiNikuiTipPanel extends JTextPane implements RikaishiNikuiCom
 
     public void updateText() {
         if (formatted) {
-            setText(textFormat.format(this.text));
+            setText(textFormatter.format(this.text));
         }
         setSuperDoc(doc);
         this.doc = new DefaultStyledDocument();
