@@ -1,13 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
-import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedLog;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedText;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import org.json.JSONObject;
 
-import java.util.Collection;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
@@ -125,7 +123,7 @@ public abstract class RikaishiNikuiTask {
 
     protected abstract void log(String log, LogLevel level);
 
-    protected abstract PaginationCachedLog getPaginateCachedLog();
+    protected abstract PaginationCachedText<?,?> getPaginateCachedLog();
 
     protected abstract StringBuilder getLog();
 
@@ -136,18 +134,17 @@ public abstract class RikaishiNikuiTask {
     }
 
     protected void setSubmitter(RikaishiNikuiSubmitter submitter) {
+        try {
+            getPaginateCachedLog().setComponent(submitter.getComponent());
+        } catch (Exception e) {
+
+        }
         this.submitter = submitter;
     }
 
-    protected void submit(StringBuilder log) {
+    protected void submit() {
         if (submitter != null) {
-            submitter.submit(log.toString());
-        }
-    }
-
-    protected void submit(Collection<SingleText> log) {
-        if (submitter != null) {
-            submitter.submit(log);
+            submitter.submit();
         }
     }
 

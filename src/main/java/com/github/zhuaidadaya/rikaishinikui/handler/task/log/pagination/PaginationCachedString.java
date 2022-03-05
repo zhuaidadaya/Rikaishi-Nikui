@@ -1,6 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 
 import java.io.BufferedReader;
@@ -8,7 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.UUID;
 
-public class PaginationCachedString extends PaginationCachedLog<String, String> {
+public class PaginationCachedString extends PaginationCachedText<String, String> {
     public StringBuilder log = new StringBuilder();
 
     public PaginationCachedString(UUID id) {
@@ -23,16 +24,20 @@ public class PaginationCachedString extends PaginationCachedLog<String, String> 
         super(id, pageSize, base);
     }
 
-    public void setBase(String base) {
-        this.base = base;
+    public void spawnTextManager(RikaishiNikuiLogComponent component) {
+        setTextManager(new PaginationStringTextManager(this, component));
     }
 
     public String getBase() {
         return base;
     }
 
+    public void setBase(String base) {
+        this.base = base;
+    }
+
     public void append(String log) {
-        if(this.log.length() > pageSize) {
+        if (this.log.length() > pageSize) {
             cache();
         }
         this.log.append(log).append("\n");
@@ -47,7 +52,11 @@ public class PaginationCachedString extends PaginationCachedLog<String, String> 
 
     public String read(int index) {
         try {
-            return FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(pages.get(Math.min(pages.size(), index))))).toString();
+            if (index != -1) {
+                return FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(pages.get(Math.min(pages.size(), index))))).toString();
+            } else {
+                return read();
+            }
         } catch (Exception e) {
 
         }
@@ -60,7 +69,7 @@ public class PaginationCachedString extends PaginationCachedLog<String, String> 
         } catch (Exception e) {
 
         }
-        return new StringBuilder("");
+        return new StringBuilder();
     }
 
     public String read() {

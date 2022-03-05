@@ -89,7 +89,7 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
                 logs.append(new SingleText(log,new RikaishiNikuiColor(106,169,89)));
             }
         }
-        submit(logs.read());
+        submit();
     }
 
     public void log(String log) {
@@ -127,6 +127,6 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
 
     public void setSubmitter(RikaishiNikuiSubmitter submitter) {
         this.submitter = submitter;
-        submit(logs.read());
+        submit();
     }
 }

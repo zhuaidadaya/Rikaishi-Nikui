@@ -21,7 +21,7 @@ import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
-import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiTextFrame;
+import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiLogFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
 import com.github.zhuaidadaya.utils.config.DiskObjectConfigUtil;
@@ -42,8 +42,8 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 public class RikaishiNikuiLauncher {
     private final int standardInterval = 50;
     public RikaishiNikuiFrame mainFrame;
-    public RikaishiNikuiTextFrame errorFrame;
-    public RikaishiNikuiTextFrame logFrame;
+    public RikaishiNikuiLogFrame errorFrame;
+    public RikaishiNikuiLogFrame logFrame;
     public RikaishiNikuiHorizontalButtonPanel buttons;
     public RikaishiNikuiPanel mainPanel;
     public RikaishiNikuiPanel mainInformationPanel;
@@ -99,8 +99,8 @@ public class RikaishiNikuiLauncher {
 
     public void init(String[] options) {
         try {
-            errorFrame = new RikaishiNikuiTextFrame(1000, 800, "error in rikaishi nikui launcher");
-            logFrame = new RikaishiNikuiTextFrame(1000, 800, "logs of rikaishi nikui launcher");
+            errorFrame = new RikaishiNikuiLogFrame(1000, 800, "error in rikaishi nikui launcher");
+            logFrame = new RikaishiNikuiLogFrame(1000, 800, "logs of rikaishi nikui launcher");
 
             logFrame.setColor();
             errorFrame.setColor();

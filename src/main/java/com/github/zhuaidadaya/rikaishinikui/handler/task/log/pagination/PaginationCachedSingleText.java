@@ -2,6 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 
 import java.io.File;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
-public class PaginationCachedSingleText extends PaginationCachedLog<Collection<SingleText>, SingleText> {
+public class PaginationCachedSingleText extends PaginationCachedText<Collection<SingleText>, SingleText> {
     private Collection<SingleText> texts = new LinkedHashSet<>();
     private int length = 0;
 
@@ -25,6 +26,10 @@ public class PaginationCachedSingleText extends PaginationCachedLog<Collection<S
 
     public PaginationCachedSingleText(UUID id, int pageSize, String base) {
         super(id, pageSize, base);
+    }
+
+    public void spawnTextManager(RikaishiNikuiLogComponent component) {
+        setTextManager(new PaginationSingleTextManager(this,component));
     }
 
     public String getBase() {
@@ -51,8 +56,13 @@ public class PaginationCachedSingleText extends PaginationCachedLog<Collection<S
     }
 
     public Collection<SingleText> read(int index) {
+        Collection<SingleText> texts = new LinkedHashSet<>();
         try {
-            texts = textFormatter.formatSingTextsFromFile(new File(pages.get(Math.min(pages.size(), index))));
+            if (index != -1) {
+                texts = textFormatter.formatSingTextsFromFile(new File(pages.get(Math.min(pages.size(), index))));
+            } else {
+                return read();
+            }
         } catch (Exception e) {
 
         }

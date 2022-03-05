@@ -2,7 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
-import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 
 import java.util.Collection;
@@ -81,12 +81,13 @@ public class RikaishiNikuiTaskManager {
         return tasks;
     }
 
-    public void submitter(RikaishiNikuiTextComponent component, RikaishiNikuiTask task) {
+    public void submitter(RikaishiNikuiLogComponent component, RikaishiNikuiTask task) {
         submitter(component, task.getId());
     }
 
-    public void submitter(RikaishiNikuiTextComponent component, UUID task) {
-        tasks.get(task).setSubmitter(new RikaishiNikuiSubmitter(component));
+    public void submitter(RikaishiNikuiLogComponent component, UUID task) {
+        tasks.get(task).getPaginateCachedLog().setComponent(component);
+        tasks.get(task).setSubmitter(new RikaishiNikuiSubmitter(tasks.get(task).getPaginateCachedLog().getTextManager()));
     }
 
     public void clearSubmitter() {

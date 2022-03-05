@@ -98,7 +98,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
 
     public void log(String log, LogLevel level) {
         logs.append(log);
-        submit(logs.readAsStringBuilder());
+        submit();
     }
 
     public PaginationCachedString getPaginateCachedLog() {

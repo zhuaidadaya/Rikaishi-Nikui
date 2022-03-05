@@ -1,36 +1,26 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter;
 
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
-import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiTextComponent;
-
-import java.util.Collection;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationTextManager;
+import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 
 public class RikaishiNikuiSubmitter {
-    private final RikaishiNikuiTextComponent component;
+    private final RikaishiNikuiLogComponent component;
+    private final PaginationTextManager<?> manager;
 
-    public RikaishiNikuiSubmitter(RikaishiNikuiTextComponent component) {
-        this.component = component;
+    public RikaishiNikuiSubmitter(PaginationTextManager<?> manager) {
+        this.component = manager.getComponent();
+        this.manager = manager;
     }
 
-    public void submit(String log) {
-        submit(new SingleText(log));
+    public RikaishiNikuiLogComponent getComponent() {
+        return component;
     }
 
-    public void submit(SingleText log) {
-        component.setText(log);
-        component.updateText();
-        component.setCaretPosition(log.getText().length());
+    public PaginationTextManager<?> getManager() {
+        return manager;
     }
 
-    public void submit(Collection<SingleText> logs) {
-        int caret = 0;
-        component.setText(new SingleText(""));
-        for (SingleText text : logs) {
-            SingleText text1 = new SingleText(text);
-            component.appendText(text1.append("\n"), false);
-            caret += text1.getText().length();
-        }
-        component.updateText();
-        component.setCaretPosition(caret);
+    public void submit() {
+        manager.submit();
     }
 }
