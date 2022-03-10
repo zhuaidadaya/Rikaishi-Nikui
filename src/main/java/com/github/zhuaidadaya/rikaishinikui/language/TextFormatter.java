@@ -132,7 +132,7 @@ public class TextFormatter {
             BufferedReader reader = new BufferedReader(new StringReader(builder.toString()));
             String cache;
             while ((cache = reader.readLine()) != null) {
-                texts.add(new SingleText(cache));
+                texts.add(new SingleText(new JSONObject(cache)));
             }
         } catch (Exception e) {
 
@@ -141,7 +141,23 @@ public class TextFormatter {
         return texts;
     }
 
-    public SingleText formatTrace(Throwable t) {
+    public Collection<MultipleText> formatMultipleTextsFromFile(File file) {
+        Collection<MultipleText> texts = new LinkedHashSet<>();
+        try {
+            StringBuilder builder = FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(file)));
+            BufferedReader reader = new BufferedReader(new StringReader(builder.toString()));
+            String cache;
+            while ((cache = reader.readLine()) != null) {
+                texts.add(new MultipleText(new JSONObject(cache)));
+            }
+        } catch (Exception e) {
+
+        }
+
+        return texts;
+    }
+
+        public SingleText formatTrace(Throwable t) {
         StringBuilder builder = new StringBuilder();
         builder.append(t.toString()).append("\n");
         for (StackTraceElement s : t.getStackTrace()) {

@@ -2,10 +2,10 @@
 <Configuration status="WARN">
     <Appenders>
         <Console name="SysOut" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{yyyy-mm-dd HH:mm:ss:SSS}] [%c/%level] %msg%n" />
+            <PatternLayout pattern="[%d{yyyy-mm-dd HH:mm:ss}] [%c/%level] %msg%n" />
         </Console>
         <RollingRandomAccessFile name="File" fileName="rikaishi_nikui/logs/latest.log" filePattern="rikaishi_nikui/logs/%d{yyyy-MM-dd}-%i.log.gz">
-            <PatternLayout pattern="[%d{yyyy-mm-dd HH:mm:ss:SSS}] [%c/%level] %msg%n" />
+            <PatternLayout pattern="[%d{yyyy-mm-dd HH:mm:ss}] [%c/%level] %msg%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
                 <OnStartupTriggeringPolicy />

@@ -12,6 +12,7 @@ import java.util.List;
 
 public class MultipleText extends Text {
     private boolean autoLine = true;
+    private int length = 0;
     private Collection<SingleText> texts = new LinkedHashSet<>();
 
     public MultipleText() {
@@ -50,6 +51,7 @@ public class MultipleText extends Text {
         for (SingleText text : texts) {
             json.put(String.valueOf(i++), text.toJSONObject());
         }
+        json.put("auto-line", autoLine);
         return json;
     }
 
@@ -58,6 +60,7 @@ public class MultipleText extends Text {
         for (String s : json.keySet()) {
             texts.add(new SingleText(json.getJSONObject(s)));
         }
+        setAutoLine(json.getBoolean("auto-line"));
     }
 
     public String getText() {
@@ -87,12 +90,25 @@ public class MultipleText extends Text {
         }
     }
 
+    public boolean isAutoLine() {
+        return autoLine;
+    }
+
+    public void setAutoLine(boolean autoLine) {
+        this.autoLine = autoLine;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
     public void append(SingleText text) {
         if (text.contains("\n") || !autoLine) {
             texts.add(text);
         } else {
             texts.add(text.append("\n"));
         }
+        length += text.length();
     }
 
     public SingleText get(int index) {

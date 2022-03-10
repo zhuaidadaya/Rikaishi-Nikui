@@ -31,7 +31,7 @@ public class Times {
             case AS_YEAR -> {
                 return new SimpleDateFormat("yyyy").format(new Date());
             } case LOG -> {
-                return new SimpleDateFormat("[HH:mm:ss] ").format(new Date());
+                return new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss] ").format(new Date());
             }
             case LONG_LOG -> {
                 return new SimpleDateFormat("[yyyy-MM-dd+HH:mm:ss:SSS] ").format(new Date());

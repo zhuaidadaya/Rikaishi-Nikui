@@ -2,22 +2,21 @@ package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
-import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedSingleText;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
-import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedMultipleText;
+import com.github.zhuaidadaya.rikaishinikui.ui.style.RikaishiNikuiColorStyle;
 
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
-    private final PaginationCachedSingleText logs;
+    private final PaginationCachedMultipleText logs;
     private final MinecraftLauncher launcher;
     private LogLevel appendLoglevel = LogLevel.INFO;
 
     public RikaishiNikuiMinecraftTask(MinecraftLauncher launcher) {
         super(UUID.randomUUID(), "MinecraftTask(TS)");
-        logs = new PaginationCachedSingleText(getId());
+        logs = new PaginationCachedMultipleText(getId());
         this.launcher = launcher;
     }
 
@@ -85,17 +84,7 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
     }
 
     public void log(String log, LogLevel level) {
-        switch (level) {
-            case ERROR -> {
-                logs.append(new SingleText(log, new RikaishiNikuiColor(246, 55, 65)));
-            }
-            case WARN -> {
-                logs.append(new SingleText(log,new RikaishiNikuiColor(217,163,67)));
-            }
-            case CHAT, INFO -> {
-                logs.append(new SingleText(log,new RikaishiNikuiColor(106,169,89)));
-            }
-        }
+        logs.append(RikaishiNikuiColorStyle.formatBlackLog(log, level));
         submit();
     }
 
@@ -107,6 +96,8 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
                     appendLoglevel = LogLevel.ERROR;
                 } else if (match.contains("/warn]")) {
                     appendLoglevel = LogLevel.WARN;
+                } else if (match.contains("/debug]")) {
+                    appendLoglevel = LogLevel.DEBUG;
                 } else if (match.contains("[chat]")) {
                     appendLoglevel = LogLevel.CHAT;
                 } else {
@@ -120,7 +111,7 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
         log(log, appendLoglevel);
     }
 
-    public PaginationCachedSingleText getPaginateCachedLog() {
+    public PaginationCachedMultipleText getPaginateCachedLog() {
         return logs;
     }
 

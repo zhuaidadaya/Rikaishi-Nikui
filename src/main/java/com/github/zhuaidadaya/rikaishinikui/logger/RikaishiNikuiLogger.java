@@ -15,7 +15,7 @@ public class RikaishiNikuiLogger {
     private final UUID taskId;
     private final RikaishiNikuiTaskManager manager;
     private final String name;
-    private String format = "%t=f [%c/%level] %msg%n";
+    private String format = "%t=s [%c/%level] %msg%n";
 
     public RikaishiNikuiLogger(UUID taskId, RikaishiNikuiTaskManager manager, Logger logger) {
         name = logger.getName();
@@ -33,45 +33,69 @@ public class RikaishiNikuiLogger {
     }
 
     public void info(String log) {
-        logger.info(log);
-        manager.log(taskId, format(log, "INFO"));
+        synchronized (this) {
+            logger.info(log);
+            manager.log(taskId, format(log, "INFO"));
+        }
     }
 
     public void info(String log, Throwable throwable) {
-        logger.info(log, throwable);
-        manager.log(taskId, format(log, "INFO"), LogLevel.INFO);
-        manager.log(taskId, format(textFormatter.formatTrace(throwable).getText(), "INFO"));
+        synchronized (this) {
+            logger.info(log, throwable);
+            manager.log(taskId, format(log, "INFO"), LogLevel.INFO);
+            manager.log(taskId, format(textFormatter.formatTrace(throwable).getText(), "INFO"));
+        }
     }
 
     public void error(String log) {
-        logger.error(log);
-        manager.log(taskId, format(log, "ERROR"));
+        synchronized (this) {
+            logger.error(log);
+            manager.log(taskId, format(log, "ERROR"));
+        }
     }
 
     public void error(String log, Throwable throwable) {
-        logger.error(log, throwable);
-        manager.log(taskId, format(log, "ERROR"), LogLevel.ERROR);
-        manager.log(taskId, format(textFormatter.formatTrace(throwable).getText(), "ERROR"));
+        synchronized (this) {
+            logger.error(log, throwable);
+            manager.log(taskId, format(log, "ERROR"), LogLevel.ERROR);
+            manager.log(taskId, format(textFormatter.formatTrace(throwable).getText(), "ERROR"));
+        }
     }
 
     public void warn(String log) {
-        logger.error(log);
-        manager.log(taskId, format(log, "WARN"));
+        synchronized (this) {
+            logger.warn(log);
+            manager.log(taskId, format(log, "WARN"));
+        }
     }
 
     public void warn(String log, Throwable throwable) {
-        logger.warn(log, throwable);
-        manager.log(taskId, format(log, "WARN"), LogLevel.WARN);
-        manager.log(taskId, format(textFormatter.formatTrace(throwable).getText(), "WARN"));
+        synchronized (this) {
+            logger.warn(log, throwable);
+            manager.log(taskId, format(log, "WARN"), LogLevel.WARN);
+            manager.log(taskId, format(textFormatter.formatTrace(throwable).getText(), "WARN"));
+        }
+    }
+
+    public void debug(String log) {
+        synchronized (this) {
+            logger.debug(log);
+            manager.log(taskId, format(log, "DEBUG"));
+        }
+    }
+
+    public void debug(String log, Throwable throwable) {
+        synchronized (this) {
+            logger.debug(log, throwable);
+            manager.log(taskId, format(log, "DEBUG"), LogLevel.DEBUG);
+            manager.log(taskId, format(textFormatter.formatTrace(throwable).getText(), "DEBUG"));
+        }
     }
 
     public String format(String log, String level) {
         String formatted = format;
-        if (formatted.contains("%t=f")) {
-            formatted = formatted.replace("%t=f", Times.getTime(TimeType.LONG_LOG));
-        } else if (formatted.contains("%t=s")) {
-            formatted = formatted.replace("%t=f", Times.getTime(TimeType.LOG));
-        }
+        formatted = formatted.replace("%t=f", Times.getTime(TimeType.LONG_LOG));
+        formatted = formatted.replace("%t=s", Times.getTime(TimeType.LOG));
 
         formatted = formatted.replace("%c", name);
         formatted = formatted.replace("%level", level);

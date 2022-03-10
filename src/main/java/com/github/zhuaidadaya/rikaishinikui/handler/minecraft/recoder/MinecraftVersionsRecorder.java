@@ -26,65 +26,83 @@ public class MinecraftVersionsRecorder {
     }
 
     public void add(MinecraftVersionInformation information) {
-        versions.put(information.getId(), information);
-        versionNames.put(information.getId(), information.getName());
-        config.set("minecraft-versions", toJSONObject());
+        synchronized (this) {
+            versions.put(information.getId(), information);
+            versionNames.put(information.getId(), information.getName());
+            config.set("minecraft-versions", toJSONObject());
+        }
     }
 
     public void remove(MinecraftVersionInformation information) {
-        versions.remove(information.getId());
-        versionNames.remove(information.getId());
-        config.set("minecraft-versions", toJSONObject());
+        synchronized (this) {
+            versions.remove(information.getId());
+            versionNames.remove(information.getId());
+            config.set("minecraft-versions", toJSONObject());
+        }
     }
 
     public Collection<String> getVersionNames() {
-        return versionNames.values();
+        synchronized (this) {
+            return versionNames.values();
+        }
     }
 
     public Collection<MinecraftVersionInformation> getVersions() {
-        return versions.values();
+        synchronized (this) {
+            return versions.values();
+        }
     }
 
     public Collection<MinecraftVersionInformation> getVersions(String search) {
-        String filter = search.toLowerCase();
-        Collection<MinecraftVersionInformation> result = new LinkedHashSet<>();
-        for(MinecraftVersionInformation information : versions.values()) {
-            if(information.getId().toLowerCase().contains(filter) || information.getReleaseTime().toLowerCase().contains(filter) || information.getType().toLowerCase().contains(filter) || textFormatter.getText(information.getType()).toLowerCase().contains(filter) || information.getName().toLowerCase().contains(filter)) {
-                result.add(information);
+        synchronized (this) {
+            String filter = search.toLowerCase();
+            Collection<MinecraftVersionInformation> result = new LinkedHashSet<>();
+            for (MinecraftVersionInformation information : versions.values()) {
+                if (information.getId().toLowerCase().contains(filter) || information.getReleaseTime().toLowerCase().contains(filter) || information.getType().toLowerCase().contains(filter) || textFormatter.getText(information.getType()).toLowerCase().contains(filter) || information.getName().toLowerCase().contains(filter)) {
+                    result.add(information);
+                }
             }
+            return result;
         }
-        return result;
     }
 
     public MinecraftVersionInformation getVersionAsName(String name) {
-        for(MinecraftVersionInformation information : versions.values()) {
-            if(information.getName().equals(name)) {
-                return information;
+        synchronized (this) {
+            for (MinecraftVersionInformation information : versions.values()) {
+                if (information.getName().equals(name)) {
+                    return information;
+                }
             }
+            return null;
         }
-        return null;
     }
 
     public MinecraftVersionInformation getVersionAsId(String id) {
-        return versions.get(id);
+        synchronized (this) {
+            return versions.get(id);
+        }
     }
 
     public void apply(JSONObject json) throws Exception {
-        versions = new Object2ObjectLinkedOpenHashMap<>();
-        versionNames = new Object2ObjectLinkedOpenHashMap<>();
-        for(String id : json.keySet()) {
-            MinecraftVersionInformation information = new MinecraftVersionInformation(json.getJSONObject(id));
-            versions.put(information.getId(), information);
-            versionNames.put(information.getId(), information.getName());
+        synchronized (this) {
+            versions = new Object2ObjectLinkedOpenHashMap<>();
+            versionNames = new Object2ObjectLinkedOpenHashMap<>();
+            for (String id : json.keySet()) {
+                MinecraftVersionInformation information = new MinecraftVersionInformation(json.getJSONObject(id));
+                versions.put(information.getId(), information);
+                versionNames.put(information.getId(), information.getName());
+            }
         }
     }
 
     public JSONObject toJSONObject() {
-        JSONObject json = new JSONObject();
-        for(String id : versions.keySet()) {
-            json.put(id, versions.get(id).toJSONObject());
-        }
+        synchronized (this) {
+            JSONObject json = new JSONObject();
+            for (String id : versions.keySet()) {
+                json.put(id, versions.get(id).toJSONObject());
+            }
 
-        return json;
+            return json;
+        }
     }
 }

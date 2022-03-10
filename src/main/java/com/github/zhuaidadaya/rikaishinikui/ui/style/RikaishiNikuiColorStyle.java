@@ -1,5 +1,8 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.style;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
+import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
+import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 
 public class RikaishiNikuiColorStyle {
@@ -7,6 +10,10 @@ public class RikaishiNikuiColorStyle {
     private RikaishiNikuiColor foreground = RikaishiNikuiColor.empty();
 
     private RikaishiNikuiColor caret = RikaishiNikuiColor.empty();
+
+    public RikaishiNikuiColorStyle() {
+
+    }
 
     public RikaishiNikuiColorStyle(RikaishiNikuiColor background, RikaishiNikuiColor foreground) {
         this.background = background;
@@ -45,5 +52,27 @@ public class RikaishiNikuiColorStyle {
 
     public void setCaret(RikaishiNikuiColor caret) {
         this.caret = caret;
+    }
+
+    public static MultipleText formatBlackLog(String log, LogLevel level) {
+        MultipleText text = new MultipleText();
+        int timeSpa = log.startsWith("[") ? log.indexOf("]") : -1;
+        text.setAutoLine(false);
+        text.append(new SingleText(log.substring(0, timeSpa + 1), new RikaishiNikuiColor(140, 122, 165)));
+        switch (level) {
+            case ERROR -> {
+                text.append(new SingleText(log.substring(timeSpa + 1), new RikaishiNikuiColor(246, 55, 65)));
+            }
+            case WARN -> {
+                text.append(new SingleText(log.substring(timeSpa + 1), new RikaishiNikuiColor(217, 163, 67)));
+            }
+            case DEBUG -> {
+                text.append(new SingleText(log.substring(timeSpa + 1), new RikaishiNikuiColor(0, 164, 255)));
+            }
+            case CHAT, INFO -> {
+                text.append(new SingleText(log.substring(timeSpa + 1), new RikaishiNikuiColor(106, 169, 89)));
+            }
+        }
+        return text;
     }
 }

@@ -2,24 +2,23 @@ package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
 import com.github.zhuaidadaya.rikaishinikui.RikaishiNikuiLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
-import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedSingleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedMultipleText;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
-import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
+import com.github.zhuaidadaya.rikaishinikui.ui.style.RikaishiNikuiColorStyle;
 
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
-    private final PaginationCachedSingleText logs;
-    private LogLevel appendLoglevel = LogLevel.INFO;
+    private final PaginationCachedMultipleText logs;
     private final RikaishiNikuiLauncher launcher;
     private final String[] args;
+    private LogLevel appendLoglevel = LogLevel.INFO;
 
     public RikaishiNikuiLauncherTask(UUID id, RikaishiNikuiLauncher launcher, String... args) {
         super(id, "RikaishiNikui(TS)");
-        logs = new PaginationCachedSingleText(getId());
+        logs = new PaginationCachedMultipleText(getId());
         this.launcher = launcher;
         this.args = args;
     }
@@ -78,17 +77,7 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
     }
 
     public void log(String log, LogLevel level) {
-        switch (level) {
-            case ERROR -> {
-                logs.append(new SingleText(log, new RikaishiNikuiColor(246, 55, 65)));
-            }
-            case WARN -> {
-                logs.append(new SingleText(log,new RikaishiNikuiColor(217,163,67)));
-            }
-            case CHAT, INFO -> {
-                logs.append(new SingleText(log,new RikaishiNikuiColor(106,169,89)));
-            }
-        }
+        logs.append(RikaishiNikuiColorStyle.formatBlackLog(log, level));
         submit();
     }
 
@@ -113,7 +102,7 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
         log(log, appendLoglevel);
     }
 
-    public PaginationCachedSingleText getPaginateCachedLog() {
+    public PaginationCachedMultipleText getPaginateCachedLog() {
         return logs;
     }
 

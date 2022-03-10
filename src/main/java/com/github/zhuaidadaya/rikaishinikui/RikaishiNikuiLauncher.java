@@ -7,6 +7,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInf
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.version.JavaVersionChecker;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftLibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftVersionsParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftLaunchInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
@@ -362,6 +363,14 @@ public class RikaishiNikuiLauncher {
                         information.setArea(area);
                         information.setType("minecraft.type.vanilla");
                         minecraftVersions.add(information);
+                        logger.info("minecraft information " + information.getName() + " found");
+                        logger.info("added " + information.getName());
+                        String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
+                        try {
+                            new MinecraftLibrariesParser(new JSONObject(inf), area, os);
+                        } catch (Exception e) {
+                            logger.error("unusable minecraft: " + information.getName());
+                        }
                     }
                 }
             }
@@ -369,6 +378,9 @@ public class RikaishiNikuiLauncher {
             for (MinecraftVersionInformation information : minecraftVersions.getVersions()) {
                 if (!new File(information.getPath()).exists()) {
                     minecraftVersions.remove(information);
+                    logger.warn("minecraft information " + information.getName() + " is not exists");
+                    logger.warn("path: " + information.getAbsolutePath());
+                    logger.info("removed " + information.getName());
                 }
 
                 information.setJavaSatisfy(usedJava.getVersion() >= information.getJavaRequires());

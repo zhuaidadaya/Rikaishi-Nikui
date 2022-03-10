@@ -31,7 +31,7 @@ public class Variables {
     public static JavaVersionsRecorder javaVersions = new JavaVersionsRecorder();
     public static JavaVersionInformation usedJava;
     public static RikaishiNikuiTaskManager taskManager = new RikaishiNikuiTaskManager();
-    public static RikaishiNikuiLogger logger = new RikaishiNikuiLogger(rikaishiNikuiLauncherTaskId, taskManager, "%t=f [%c/%level] %msg", LogManager.getLogger(entrust));
+    public static RikaishiNikuiLogger logger = new RikaishiNikuiLogger(rikaishiNikuiLauncherTaskId, taskManager, "%t=s [%c/%level] %msg", LogManager.getLogger(entrust));
     public static String os;
 
     static {

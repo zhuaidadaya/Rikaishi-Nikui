@@ -32,7 +32,7 @@ public abstract class PaginationTextManager<T> {
         this.page = page;
     }
 
-    public T get() {
+    public synchronized T get() {
         return get(page);
     }
 
