@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.list;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import org.json.JSONObject;

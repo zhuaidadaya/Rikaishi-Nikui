@@ -1,8 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.fabric;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import org.json.JSONObject;
 
-public class FabricMinecraftLibraryParser {
+public class FabricMinecraftLibraryParser extends Parser {
     private final JSONObject library;
     private final FabricMinecraftDownloadParser downloadParser;
 

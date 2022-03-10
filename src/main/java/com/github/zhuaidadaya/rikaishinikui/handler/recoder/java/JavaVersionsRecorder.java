@@ -1,5 +1,6 @@
-package com.github.zhuaidadaya.rikaishinikui.handler.java.recorder;
+package com.github.zhuaidadaya.rikaishinikui.handler.recoder.java;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
 

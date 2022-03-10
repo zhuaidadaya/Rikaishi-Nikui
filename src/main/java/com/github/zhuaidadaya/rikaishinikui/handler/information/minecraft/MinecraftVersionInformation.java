@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
+package com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;

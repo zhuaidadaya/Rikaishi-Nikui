@@ -1,10 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.fabric;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import org.json.JSONObject;
 
 import java.io.File;
 
-public class FabricMinecraftArtifactParser {
+public class FabricMinecraftArtifactParser extends Parser {
     private final JSONObject artifact;
     private final String name;
     private String area = "";

@@ -1,7 +1,7 @@
-package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder;
+package com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
-import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import org.json.JSONObject;
 

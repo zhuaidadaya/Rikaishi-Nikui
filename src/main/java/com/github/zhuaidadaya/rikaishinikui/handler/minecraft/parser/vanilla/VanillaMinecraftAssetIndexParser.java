@@ -1,8 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import org.json.JSONObject;
 
-public class VanillaMinecraftAssetIndexParser {
+public class VanillaMinecraftAssetIndexParser extends Parser {
     private final JSONObject asset;
     private final String version;
     private String area;

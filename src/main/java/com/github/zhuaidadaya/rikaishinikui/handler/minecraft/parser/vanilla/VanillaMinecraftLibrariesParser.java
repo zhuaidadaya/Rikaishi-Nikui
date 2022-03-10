@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.NetworkFileInformation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.json.JSONArray;
@@ -9,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class VanillaMinecraftLibrariesParser {
+public class VanillaMinecraftLibrariesParser extends Parser {
     private final JSONArray libraries;
     private String area;
     private String os;

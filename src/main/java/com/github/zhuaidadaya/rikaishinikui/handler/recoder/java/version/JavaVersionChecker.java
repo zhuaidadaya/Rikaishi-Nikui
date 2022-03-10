@@ -1,6 +1,6 @@
-package com.github.zhuaidadaya.rikaishinikui.handler.java.version;
+package com.github.zhuaidadaya.rikaishinikui.handler.recoder.java.version;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
 
 import java.io.BufferedReader;
 import java.io.File;

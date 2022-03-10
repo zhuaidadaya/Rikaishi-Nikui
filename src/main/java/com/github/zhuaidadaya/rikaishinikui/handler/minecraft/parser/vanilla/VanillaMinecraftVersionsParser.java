@@ -1,6 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
-public class VanillaMinecraftVersionsParser {
+public class VanillaMinecraftVersionsParser extends Parser {
     private final JSONArray versions;
     private final Object2ObjectLinkedOpenHashMap<String, VanillaMinecraftVersionParser> versionsMap = new Object2ObjectLinkedOpenHashMap<>();
     private final String latestRelease;

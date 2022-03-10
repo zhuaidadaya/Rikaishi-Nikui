@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.handler.java.recorder;
+package com.github.zhuaidadaya.rikaishinikui.handler.information.java;
 
 import org.json.JSONObject;
 

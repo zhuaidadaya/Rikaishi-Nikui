@@ -1,9 +1,10 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.MinecraftType;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import org.json.JSONObject;
 
-public class VanillaMinecraftVersionParser {
+public class VanillaMinecraftVersionParser extends Parser {
     private final JSONObject version;
     private final String id;
     private final MinecraftType type;

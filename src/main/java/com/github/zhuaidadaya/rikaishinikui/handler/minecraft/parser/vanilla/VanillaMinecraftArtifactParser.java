@@ -1,10 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import org.json.JSONObject;
 
 import java.io.File;
 
-public class VanillaMinecraftArtifactParser {
+public class VanillaMinecraftArtifactParser extends Parser {
     private final JSONObject artifact;
     private String area = "";
 

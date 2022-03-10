@@ -1,8 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import org.json.JSONObject;
 
-public class VanillaMinecraftDownloadParser {
+public class VanillaMinecraftDownloadParser extends Parser {
     private final JSONObject download;
     private final VanillaMinecraftArtifactParser artifactParser;
 

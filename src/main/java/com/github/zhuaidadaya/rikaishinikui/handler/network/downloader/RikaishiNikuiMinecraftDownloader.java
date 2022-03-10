@@ -1,7 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.*;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
 import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import com.github.zhuaidadaya.utils.string.checker.StringCheckUtil;

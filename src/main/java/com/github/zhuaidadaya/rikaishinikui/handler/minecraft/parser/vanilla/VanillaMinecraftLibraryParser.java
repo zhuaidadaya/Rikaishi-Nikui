@@ -1,10 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class VanillaMinecraftLibraryParser {
+public class VanillaMinecraftLibraryParser extends Parser {
     private final JSONObject library;
     private final VanillaMinecraftDownloadParser downloadParser;
     private Object2ObjectRBTreeMap<String, Boolean> rulesAllow = new Object2ObjectRBTreeMap<>();
