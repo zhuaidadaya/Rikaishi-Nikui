@@ -1,7 +1,5 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
-import org.jetbrains.annotations.NotNull;
-
 public class NetworkFileInformation {
     private String sha1 = "";
     private String url = "";
@@ -15,7 +13,9 @@ public class NetworkFileInformation {
 
     public NetworkFileInformation(String url, String filePath, String sha1) {
         this.url = url;
-        this.filePath = filePath;
+        if (filePath.startsWith("/") || filePath.startsWith("\\")) {
+            this.filePath = filePath.substring(1);
+        }
         this.sha1 = sha1;
     }
 

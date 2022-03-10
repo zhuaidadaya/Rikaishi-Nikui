@@ -1,9 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.*;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.*;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
 import com.github.zhuaidadaya.utils.integer.IntegerUtil;
 import com.github.zhuaidadaya.utils.string.checker.StringCheckUtil;
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
@@ -12,7 +14,6 @@ import java.util.concurrent.Executors;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiMinecraftDownloader {
-    private final int taskThreads = 0;
     private final ResourceDownloader downloader = new ResourceDownloader();
     private final String DEFAULT_MANIFEST = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
     private final String DEFAULT_RESOURCE = "http://resources.download.minecraft.net";
@@ -21,7 +22,7 @@ public class RikaishiNikuiMinecraftDownloader {
     private boolean running = true;
 
     public RikaishiNikuiMinecraftDownloader() {
-
+        logger = new RikaishiNikuiLogger(rikaishiNikuiLauncherTaskId, taskManager, "%t=s [%c/%level] %msg", LogManager.getLogger(entrust + "-Downloader"));
     }
 
     public void apply(JSONObject json) {
@@ -34,7 +35,7 @@ public class RikaishiNikuiMinecraftDownloader {
         return json;
     }
 
-    public MinecraftVersionsParser getVersions() {
+    public VanillaMinecraftVersionsParser getVersions() {
         String manifest = config.getConfigString("minecraft-versions-manifest-url");
         if (manifest == null) {
             config.set("minecraft-versions-manifest-url", DEFAULT_MANIFEST);
@@ -44,15 +45,15 @@ public class RikaishiNikuiMinecraftDownloader {
         }
     }
 
-    public MinecraftVersionsParser getVersions(String url) {
+    public VanillaMinecraftVersionsParser getVersions(String url) {
         ResourceDownloader downloader = new ResourceDownloader();
         return getVersions(url, downloader);
     }
 
-    public MinecraftVersionsParser getVersions(String url, ResourceDownloader downloader) {
+    public VanillaMinecraftVersionsParser getVersions(String url, ResourceDownloader downloader) {
         String result = downloader.downloadFileToStringBuilder(url).toString();
         JSONObject versionManifest = new JSONObject(result);
-        return new MinecraftVersionsParser(versionManifest);
+        return new VanillaMinecraftVersionsParser(versionManifest);
     }
 
     public boolean downloadVanilla(String area, String gameId, String name, String versionId, boolean isFix, String taskId) {
@@ -63,9 +64,13 @@ public class RikaishiNikuiMinecraftDownloader {
         return downloadVanilla(information, isFix);
     }
 
-    public boolean downloadVanilla(MinecraftVersionInformation information, boolean isFix) {
+    public boolean downloadVanilla(MinecraftVersionInformation information, boolean checking) {
         try {
-            logger.debug("download thread " + information.getTaskId() + "#0 started");
+            String identity = (checking ? "check" : "download");
+
+            String operation = (checking ? "checking" : "downloading");
+
+            logger.debug(identity + " thread " + information.getTaskId() + "#0 started");
 
             minecraftVersions.add(information);
 
@@ -81,7 +86,7 @@ public class RikaishiNikuiMinecraftDownloader {
             }
             String area = information.getArea();
             String gameId = information.getVersion();
-            if (isFix) {
+            if (checking) {
                 information.setStatus("status.checking");
             } else {
                 information.setStatus("status.downloading");
@@ -110,43 +115,45 @@ public class RikaishiNikuiMinecraftDownloader {
 
             minecraftVersions.add(information);
 
-            MinecraftVersionsParser versionsParser = getVersions(url, downloader);
+            VanillaMinecraftVersionsParser versionsParser = getVersions(url, downloader);
 
             String manifestPath = String.format("%s/versions/%s/%s.json", area, versionId, versionId);
 
             information.setPath(String.format("%s/versions/%s", area, versionId));
 
-            MinecraftVersionParser versionParser = versionsParser.getVersion(gameId);
+            VanillaMinecraftVersionParser versionParser = versionsParser.getVersion(gameId);
 
             downloader.downloadFile(new NetworkFileInformation(versionParser.getUrl(), manifestPath), 0);
             JSONObject version = new JSONObject(downloader.downloadFileToStringBuilder(manifestPath).toString());
 
-            MinecraftAssetIndexParser assetsIndexParser = new MinecraftAssetIndexParser(version, area);
+            VanillaMinecraftAssetIndexParser assetsIndexParser = new VanillaMinecraftAssetIndexParser(version, area);
 
             downloader.downloadFile(new NetworkFileInformation(assetsIndexParser.getUrl(), assetsIndexParser.getPath(), assetsIndexParser.getSha1()), -1);
 
-            MinecraftLibrariesParser downloadParser = new MinecraftLibrariesParser(version, area, os);
+            VanillaMinecraftLibrariesParser downloadParser = new VanillaMinecraftLibrariesParser(version, area, os);
 
             String finalOs = os;
-            MinecraftClassifiersParser classifiersParser = new MinecraftClassifiersParser(version, area, finalOs);
+            VanillaMinecraftClassifiersParser classifiersParser = new VanillaMinecraftClassifiersParser(version, area, finalOs);
 
-            MinecraftAssetsParser assetsParser = new MinecraftAssetsParser(resourceUrl, area, new JSONObject(downloader.downloadFileToStringBuilder(assetsIndexParser.getPath()).toString()));
+            VanillaMinecraftAssetsParser assetsParser = new VanillaMinecraftAssetsParser(resourceUrl, area, new JSONObject(downloader.downloadFileToStringBuilder(assetsIndexParser.getPath()).toString()));
 
-            MinecraftServiceJarParser serviceJarParser = new MinecraftServiceJarParser(version.getJSONObject("downloads"), area, versionId);
+            VanillaMinecraftServiceJarParser serviceJarParser = new VanillaMinecraftServiceJarParser(version.getJSONObject("downloads"), area, versionId);
 
             Thread classifiersThread = new Thread(() -> {
-                logger.debug("download thread " + information.getTaskId() + "#1 started");
+                logger.debug(identity + " thread " + information.getTaskId() + "#1 started");
+                logger.debug("thread #1 " + operation + " " + classifiersParser.getClassifiersDownloads().size() + " files");
                 try {
                     downloader.downloadFiles(classifiersParser.getClassifiersDownloads());
                 } catch (Exception ex) {
 
                 }
-                logger.info("download thread " + information.getTaskId() + "#1 done");
+                logger.info((checking ? "check" : "download") + " thread " + information.getTaskId() + "#1 done");
                 done();
             });
 
             Thread serviceJarThread = new Thread(() -> {
-                logger.debug("download thread " + information.getTaskId() + "#2 started");
+                logger.debug((checking ? "check" : "download") + " thread " + information.getTaskId() + "#2 started");
+                logger.debug("thread #2 " + operation + " 2 files");
                 try {
                     downloader.downloadFile(new NetworkFileInformation(serviceJarParser.getClientUrl(), serviceJarParser.getClientPath(), serviceJarParser.getClientSha1()), threads);
                     downloader.downloadFile(new NetworkFileInformation(serviceJarParser.getServerUrl(), serviceJarParser.getServerPath(), serviceJarParser.getServerSha1()), threads);
@@ -154,29 +161,31 @@ public class RikaishiNikuiMinecraftDownloader {
 
                 }
                 done();
-                logger.info("download thread " + information.getTaskId() + "#2 done");
+                logger.info((checking ? "check" : "download") + " thread " + information.getTaskId() + "#2 done");
             });
 
             Thread librariesThread = new Thread(() -> {
-                logger.debug("download thread " + information.getTaskId() + "#3 started");
+                logger.debug((checking ? "check" : "download") + " thread " + information.getTaskId() + "#3 started");
+                logger.debug("thread #3 " + operation + " " + downloadParser.getLibrariesDownloads().size() + " files");
                 try {
                     downloader.downloadFiles(downloadParser.getLibrariesDownloads());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                logger.info("download thread " + information.getTaskId() + "#3 done");
+                logger.info((checking ? "check" : "download") + " thread " + information.getTaskId() + "#3 done");
                 done();
             });
 
             Thread resourcesThread = new Thread(() -> {
-                logger.debug("download thread " + information.getTaskId() + "#4 started");
+                logger.debug((checking ? "check" : "download") + " thread " + information.getTaskId() + "#4 started");
+                logger.debug("thread #4 " + operation + " " + assetsParser.getAssetsDownloads().size() + " files");
                 try {
                     assetsParser.getAssetsDownloads();
                     downloader.downloadFiles(assetsParser.getAssetsDownloads());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                logger.info("download thread " + information.getTaskId() + "#4 done");
+                logger.info((checking ? "check" : "download") + " thread " + information.getTaskId() + "#4 done");
                 done();
             });
 
@@ -189,7 +198,7 @@ public class RikaishiNikuiMinecraftDownloader {
 
             threadPool.shutdown();
 
-            if (isFix) information.setStatus("status.checking");
+            if (checking) information.setStatus("status.checking");
             else information.setStatus("status.downloading");
 
             information.setUrl(information.formatManifest());
@@ -199,7 +208,7 @@ public class RikaishiNikuiMinecraftDownloader {
             minecraftVersions.add(information);
 
             while (lastTaskThreads != 0) {
-                if (!running & !isFix) {
+                if (!running & !checking) {
                     logger.warn("interrupting download task: " + information.getTaskId());
                     information.setStatus("status.interrupting");
                     minecraftVersions.add(information);
@@ -207,14 +216,14 @@ public class RikaishiNikuiMinecraftDownloader {
                 Thread.sleep(25);
             }
 
-            if (!running & !isFix) {
+            if (!running & !checking) {
                 information.setStatus("status.interrupted");
                 information.setLockStatus("lock.interrupted");
                 minecraftVersions.add(information);
                 return false;
             }
 
-            if (!isFix) {
+            if (!checking) {
                 information.addVmOptions("-server");
                 // log4j2 - jndi inject bug
                 information.addVmOptions("-Dlog4j2.formatMsgNoLookups=true", "-Dcom.sun.jndi.ldap.object.trustURLCodebase=false");
@@ -224,7 +233,7 @@ public class RikaishiNikuiMinecraftDownloader {
             information.setStatus("status.ready");
             minecraftVersions.add(information);
 
-            logger.info("download thread " + information.getTaskId() + "#0 done");
+            logger.info((checking ? "check" : "download") + " thread " + information.getTaskId() + "#0 done");
         } catch (Exception e) {
             e.printStackTrace();
             return false;

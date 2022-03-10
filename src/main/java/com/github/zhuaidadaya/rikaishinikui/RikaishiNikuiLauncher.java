@@ -7,8 +7,8 @@ import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInf
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.version.JavaVersionChecker;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftLibrariesParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftVersionsParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftVersionsParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftLaunchInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionsRecorder;
@@ -89,7 +89,7 @@ public class RikaishiNikuiLauncher {
     public RikaishiNikuiEditingTextPanel addVmOptions;
     public RikaishiNikuiHorizontalButtonPanel vmOptionsOperationButtons;
     public RikaishiNikuiHorizontalButtonPanel vmOptionsOperationButtons2;
-    public MinecraftVersionsParser downloadVersions;
+    public VanillaMinecraftVersionsParser downloadVersions;
     public UUID REFRESH_TASK_ID = UUID.randomUUID();
     public UUID LAUNCH_DOWNLOAD_TASK_ID = UUID.randomUUID();
     public ObjectRBTreeSet<String> options = new ObjectRBTreeSet<>();
@@ -367,7 +367,7 @@ public class RikaishiNikuiLauncher {
                         logger.info("added " + information.getName());
                         String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
                         try {
-                            new MinecraftLibrariesParser(new JSONObject(inf), area, os);
+                            new VanillaMinecraftLibrariesParser(new JSONObject(inf), area, os);
                         } catch (Exception e) {
                             logger.error("unusable minecraft: " + information.getName());
                         }

@@ -1,18 +1,18 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
+import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.java.recorder.JavaVersionInformation;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftClassifierParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftClassifiersParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftLibrariesParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.MinecraftLibraryParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftClassifierParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftClassifiersParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibraryParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftLaunchInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.recoder.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
-import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
-import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.utils.times.TimeType;
 import com.github.zhuaidadaya.utils.times.Times;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ public class MinecraftLauncher {
     private JSONObject gameSource;
     private String area;
     private String gamePath;
-    private MinecraftClassifiersParser classifiers;
+    private VanillaMinecraftClassifiersParser classifiers;
     private JavaVersionInformation java = new JavaVersionInformation("java", "", true);
     private Process minecraft;
 
@@ -68,12 +68,12 @@ public class MinecraftLauncher {
         setGamePath(gamePath);
         setNativePath(gamePath + "/natives/");
         setGameSource(new JSONObject(NetworkUtil.downloadToStringBuilder(versionInformation.formatManifest()).toString()));
-        setClassifiers(new MinecraftClassifiersParser(gameSource, area, os));
+        setClassifiers(new VanillaMinecraftClassifiersParser(gameSource, area, os));
 
         setVmOptions(information.getVmOptions());
         setVmOptionString(vmOptions);
 
-        MinecraftLibrariesParser librariesParser = new MinecraftLibrariesParser(gameSource, area, os);
+        VanillaMinecraftLibrariesParser librariesParser = new VanillaMinecraftLibrariesParser(gameSource, area, os);
         setClassPathString(librariesParser);
         appendClassPath(versionInformation.formatAbsoluteClientPath() + (os.equals("windows") ? ";" : ":"));
     }
@@ -105,9 +105,9 @@ public class MinecraftLauncher {
         return classPathString;
     }
 
-    public void setClassPathString(MinecraftLibrariesParser libraries) {
+    public void setClassPathString(VanillaMinecraftLibrariesParser libraries) {
         classPathString = new StringBuilder();
-        for(MinecraftLibraryParser lib : libraries.getLibraries().values()) {
+        for(VanillaMinecraftLibraryParser lib : libraries.getLibraries().values()) {
             lib.setArea(area);
             classPathString.append(lib.getAbsolutePath()).append(os.equals("windows") ? ";" : ":");
 //            classPathString.append(area).append("/").append("libraries").append("/").append(lib.getPath()).append(os.equals("windows") ? ";" : ":");
@@ -162,11 +162,11 @@ public class MinecraftLauncher {
         this.gamePath = gamePath;
     }
 
-    public MinecraftClassifiersParser getClassifiers() {
+    public VanillaMinecraftClassifiersParser getClassifiers() {
         return classifiers;
     }
 
-    public void setClassifiers(MinecraftClassifiersParser classifiers) {
+    public void setClassifiers(VanillaMinecraftClassifiersParser classifiers) {
         this.classifiers = classifiers;
     }
 
@@ -212,7 +212,7 @@ public class MinecraftLauncher {
         } catch (Exception e) {
 
         }
-        for(MinecraftClassifierParser classifier : classifiers.getClassifiers().values()) {
+        for(VanillaMinecraftClassifierParser classifier : classifiers.getClassifiers().values()) {
             try {
                 FileUtil.unzip(area + "/libraries/" + classifier.getNative().getPath(), nativePath);
             } catch (Exception e) {
