@@ -7,6 +7,7 @@ public class Account {
     private String name;
     private String uuid;
     private String type = "offline";
+    private String token = "";
 
     public Account() {
         this.name = "Player-" + new Random().nextInt(10000);
@@ -53,4 +54,11 @@ public class Account {
         this.type = type;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

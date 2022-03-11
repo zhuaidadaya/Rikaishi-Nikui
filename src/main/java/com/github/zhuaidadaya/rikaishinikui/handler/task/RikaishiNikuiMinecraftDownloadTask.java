@@ -2,6 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.download.MinecraftDownloadEntrustType;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
 
@@ -17,22 +18,22 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     private String name;
     private String versionId;
     private String area;
-    private boolean isFix = false;
+    private MinecraftDownloadEntrustType entrustType;
     private MinecraftVersionInformation information;
 
-    public RikaishiNikuiMinecraftDownloadTask(MinecraftVersionInformation information, UUID id, boolean isFix) {
+    public RikaishiNikuiMinecraftDownloadTask(MinecraftVersionInformation information, UUID id, MinecraftDownloadEntrustType entrustType) {
         super(id, "DownloadTask(TS)");
         this.information = information;
-        this.isFix = isFix;
+        this.entrustType = entrustType;
     }
 
-    public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area, boolean isFix) {
+    public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area, MinecraftDownloadEntrustType entrustType) {
         super(id, "DownloadTask(TS)");
         this.gameId = gameId;
         this.name = name;
         this.versionId = versionId;
         this.area = area;
-        this.isFix = isFix;
+        this.entrustType = entrustType;
     }
 
     public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area) {
@@ -54,12 +55,12 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
                     config.set("version-manifest", downloader.toJSONObject());
                 }
                 if (information == null) {
-                    downloader.downloadVanilla(area, gameId, name, versionId, isFix, getParentTask() != null ? getParentTask().getId().toString() : getId().toString());
+                    downloader.downloadVanilla(area, gameId, name, versionId, entrustType, getParentTask() != null ? getParentTask().getId().toString() : getId().toString());
                 } else {
                     if (getParentTask() != null) {
                         information.setTaskId(getParentTask().getId().toString());
                     }
-                    downloader.downloadVanilla(information, isFix);
+                    downloader.downloadVanilla(information, entrustType);
                 }
             }
         }

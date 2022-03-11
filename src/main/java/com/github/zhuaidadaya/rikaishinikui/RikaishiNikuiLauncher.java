@@ -4,19 +4,20 @@ import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.file.IllegalFileName;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
-import com.github.zhuaidadaya.rikaishinikui.handler.recoder.java.JavaVersionsRecorder;
-import com.github.zhuaidadaya.rikaishinikui.handler.recoder.java.version.JavaVersionChecker;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftLaunchInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftVersionsParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftLaunchInformation;
-import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
-import com.github.zhuaidadaya.rikaishinikui.handler.recoder.minecrtaft.MinecraftVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
+import com.github.zhuaidadaya.rikaishinikui.handler.recoder.java.JavaVersionsRecorder;
+import com.github.zhuaidadaya.rikaishinikui.handler.recoder.java.version.JavaVersionChecker;
+import com.github.zhuaidadaya.rikaishinikui.handler.recoder.minecrtaft.MinecraftVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiDownloadRefreshTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftDownloadTask;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiMinecraftTask;
+import com.github.zhuaidadaya.rikaishinikui.handler.task.download.MinecraftDownloadEntrustType;
 import com.github.zhuaidadaya.rikaishinikui.language.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.button.RikaishiNikuiButton;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
@@ -26,7 +27,8 @@ import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiLogFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
 import com.github.zhuaidadaya.utils.config.DiskObjectConfigUtil;
-import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -92,7 +94,7 @@ public class RikaishiNikuiLauncher {
     public VanillaMinecraftVersionsParser downloadVersions;
     public UUID REFRESH_TASK_ID = UUID.randomUUID();
     public UUID LAUNCH_DOWNLOAD_TASK_ID = UUID.randomUUID();
-    public ObjectRBTreeSet<String> options = new ObjectRBTreeSet<>();
+    public ObjectArraySet<String> options = new ObjectArraySet<>();
     private long lastTick = -1;
     private long lastTickMainFrame = -1;
     private boolean running = false;
@@ -282,7 +284,7 @@ public class RikaishiNikuiLauncher {
                 }
             }
             information.setTaskFeedback("none");
-            minecraftVersions.add(information);
+            minecraftVersions.update(information);
         }
     }
 
@@ -362,7 +364,7 @@ public class RikaishiNikuiLauncher {
                         information.setName(name);
                         information.setArea(area);
                         information.setType("minecraft.type.vanilla");
-                        minecraftVersions.add(information);
+                        minecraftVersions.update(information);
                         logger.info("minecraft information " + information.getName() + " found");
                         logger.info("added " + information.getName());
                         String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
@@ -490,7 +492,7 @@ public class RikaishiNikuiLauncher {
             }
 
             try {
-                LinkedHashMap<String, VmOption> names = versionVmOptionList.getSelectedValue().getVmOptions(searchVmOptions.getText());
+                Object2ObjectLinkedOpenHashMap<String, VmOption> names = versionVmOptionList.getSelectedValue().getVmOptions(searchVmOptions.getText());
 
                 if (names.size() < 1) {
                     vmOptionsList.setListData(new VmOption[0]);
@@ -539,7 +541,7 @@ public class RikaishiNikuiLauncher {
                     information.setStatus("status.undefined");
             }
 
-            if (information.getLockStatus().equals("lock.launching")) {
+            if (information.getLockStatus().equals("lock.launching") || information.getLockStatus().equals("lock.fixing")) {
                 try {
                     if (!taskManager.hasTask(UUID.fromString(information.getTaskId()))) {
                         information.setLockStatus("lock.not");
@@ -1504,18 +1506,28 @@ public class RikaishiNikuiLauncher {
                 if (!information.getLockStatus().equals("lock.launching")) {
                     information.setLockStatus("lock.launching");
                     information.setTaskFeedback("none");
-                    minecraftVersions.add(information);
-                    RikaishiNikuiMinecraftTask minecraftTask = new RikaishiNikuiMinecraftTask(new MinecraftLauncher(new MinecraftLaunchInformation(mainVersionList.getSelectedValue(), os, usedJava, new Account("zhuaidadaya", UUID.randomUUID().toString()))));
-                    information.setTaskId(minecraftTask.getId().toString());
-                    RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, UUID.randomUUID(), true);
-                    minecraftTask.setParentTask(downloadTask);
-                    taskManager.join(minecraftTask);
-                    taskManager.submitter(logFrame, minecraftTask.getId());
+                    minecraftVersions.update(information);
+                    try {
+                        RikaishiNikuiMinecraftTask minecraftTask = new RikaishiNikuiMinecraftTask(new MinecraftLauncher(new MinecraftLaunchInformation(mainVersionList.getSelectedValue(), os, usedJava, new Account("zhuaidadaya", UUID.randomUUID().toString()))));
+                        information.setTaskId(minecraftTask.getId().toString());
+                        RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, UUID.randomUUID(), MinecraftDownloadEntrustType.LAUNCH);
+                        minecraftTask.setParentTask(downloadTask);
+                        taskManager.join(minecraftTask);
+                        taskManager.submitter(logFrame, minecraftTask.getId());
+                    } catch (Exception ex) {
+                        RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, UUID.randomUUID(), MinecraftDownloadEntrustType.FIX);
+
+                        information.setTaskId(downloadTask.getId().toString());
+                        information.setLockStatus("lock.fixing");
+                        minecraftVersions.update(information);
+
+                        taskManager.join(downloadTask);
+                    }
                     //                    subTask = minecraftTask.getId();
                 }
             } catch (Exception ex) {
                 information.setStatus("status.destroyed");
-                minecraftVersions.add(information);
+                minecraftVersions.update(information);
             }
         });
 
@@ -1528,13 +1540,13 @@ public class RikaishiNikuiLauncher {
                 if (taskManager.hasTask(UUID.fromString(information.getTaskId()))) {
                     information.setLockStatus("lock.canceling");
                     information.setStatus("status.canceling");
-                    minecraftVersions.add(information);
+                    minecraftVersions.update(information);
                     try {
                         taskManager.quit(UUID.fromString(information.getTaskId()));
                     } catch (Exception ex) {
                         information.setLockStatus("lock.not");
                         information.setStatus("status.undefined");
-                        minecraftVersions.add(information);
+                        minecraftVersions.update(information);
                     }
                 }
             } catch (Exception ex) {
@@ -1598,7 +1610,7 @@ public class RikaishiNikuiLauncher {
             information.setVersion(version);
             information.setTaskId(taskId.toString());
             information.setArea(area);
-            RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, taskId, false);
+            RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, taskId, MinecraftDownloadEntrustType.DOWNLOAD);
             taskManager.join(downloadTask);
         });
 

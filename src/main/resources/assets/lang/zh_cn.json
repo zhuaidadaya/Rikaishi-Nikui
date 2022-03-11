@@ -122,6 +122,14 @@
       "b": 65
     }
   },
+  "lock.fixing": {
+    "text": "修复中",
+    "color": {
+      "r": 246,
+      "g": 55,
+      "b": 65
+    }
+  },
   "download.vanilla.button": {
     "text": "Vanilla"
   },

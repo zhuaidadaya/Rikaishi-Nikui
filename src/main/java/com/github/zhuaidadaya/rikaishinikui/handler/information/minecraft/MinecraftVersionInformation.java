@@ -2,6 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -13,7 +14,7 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.taskManager
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class MinecraftVersionInformation {
-    private final LinkedHashMap<String, String> vmOptionsName = new LinkedHashMap<>();
+    private final Object2ObjectLinkedOpenHashMap<String, String> vmOptionsName = new Object2ObjectLinkedOpenHashMap<>();
     private String name = "unknown";
     private String id = UUID.randomUUID().toString();
     private String status = "unknown";
@@ -32,7 +33,7 @@ public class MinecraftVersionInformation {
     private String releaseType = "unknown";
     private int javaRequires = 17;
     private boolean javaSatisfy = true;
-    private LinkedHashMap<String, VmOption> vmOptions = new LinkedHashMap<>();
+    private Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions = new Object2ObjectLinkedOpenHashMap<>();
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
         this.id = id;
@@ -73,7 +74,7 @@ public class MinecraftVersionInformation {
         apply(json);
     }
 
-    public LinkedHashMap<String, String> getVmOptionsName() {
+    public Object2ObjectLinkedOpenHashMap<String, String> getVmOptionsName() {
         return vmOptionsName;
     }
 
@@ -111,17 +112,17 @@ public class MinecraftVersionInformation {
         this.vmOptions.remove(id);
     }
 
-    public LinkedHashMap<String, VmOption> getVmOptions() {
+    public Object2ObjectLinkedOpenHashMap<String, VmOption> getVmOptions() {
         return vmOptions;
     }
 
-    public void setVmOptions(LinkedHashMap<String, VmOption> vmOptions) {
+    public void setVmOptions(Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions) {
         this.vmOptions = vmOptions;
     }
 
-    public LinkedHashMap<String, VmOption> getVmOptions(String search) {
+    public Object2ObjectLinkedOpenHashMap<String, VmOption> getVmOptions(String search) {
         String filter = search.toLowerCase();
-        LinkedHashMap<String, VmOption> options = new LinkedHashMap<>();
+        Object2ObjectLinkedOpenHashMap<String, VmOption> options = new Object2ObjectLinkedOpenHashMap<>();
         for (VmOption option : vmOptions.values()) {
             if (option.getDetail().equals("")) {
                 continue;
@@ -238,7 +239,7 @@ public class MinecraftVersionInformation {
         this.taskFeedback = json.getString("task-feedback");
         this.releaseTime = json.getString("release-time");
         this.releaseType = json.getString("release-type");
-        this.vmOptions = new LinkedHashMap<>();
+        this.vmOptions = new Object2ObjectLinkedOpenHashMap<>();
         this.javaRequires = json.getInt("java-requires");
         this.javaSatisfy = json.getBoolean("java-satisfy");
 

@@ -3,23 +3,23 @@ package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher;
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftLaunchInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftClassifierParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftClassifiersParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibraryParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftLaunchInformation;
-import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
 import com.github.zhuaidadaya.utils.times.TimeType;
 import com.github.zhuaidadaya.utils.times.Times;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -27,7 +27,7 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class MinecraftLauncher {
     private boolean failed = false;
-    private LinkedHashMap<String, VmOption> vmOptions;
+    private Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions;
     private StringBuilder vmOptionString = new StringBuilder();
     private StringBuilder classPathString = new StringBuilder();
     private MinecraftVersionInformation versionInformation;
@@ -53,7 +53,7 @@ public class MinecraftLauncher {
         this.versionInformation = versionInformation;
     }
 
-    public void setVmOptions(LinkedHashMap<String, VmOption> vmOptions) {
+    public void setVmOptions(Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions) {
         this.vmOptions = vmOptions;
     }
 
@@ -86,13 +86,13 @@ public class MinecraftLauncher {
         return vmOptionString;
     }
 
-    public void setVmOptionString(LinkedHashMap<String, VmOption> options) {
+    public void setVmOptionString(Object2ObjectLinkedOpenHashMap<String, VmOption> options) {
         vmOptionString = new StringBuilder();
         int last = options.size();
-        if(last > 0) {
-            for(VmOption option : options.values()) {
+        if (last > 0) {
+            for (VmOption option : options.values()) {
                 last--;
-                if(last > 0) {
+                if (last > 0) {
                     appendVmOption(option.getDetail(), null);
                 } else {
                     appendVmOption(option.getDetail(), "");
@@ -107,7 +107,7 @@ public class MinecraftLauncher {
 
     public void setClassPathString(VanillaMinecraftLibrariesParser libraries) {
         classPathString = new StringBuilder();
-        for(VanillaMinecraftLibraryParser lib : libraries.getLibraries().values()) {
+        for (VanillaMinecraftLibraryParser lib : libraries.getLibraries().values()) {
             lib.setArea(area);
             classPathString.append(lib.getAbsolutePath()).append(os.equals("windows") ? ";" : ":");
 //            classPathString.append(area).append("/").append("libraries").append("/").append(lib.getPath()).append(os.equals("windows") ? ";" : ":");
@@ -212,7 +212,7 @@ public class MinecraftLauncher {
         } catch (Exception e) {
 
         }
-        for(VanillaMinecraftClassifierParser classifier : classifiers.getClassifiers().values()) {
+        for (VanillaMinecraftClassifierParser classifier : classifiers.getClassifiers().values()) {
             try {
                 FileUtil.unzip(area + "/libraries/" + classifier.getNative().getPath(), nativePath);
             } catch (Exception e) {
@@ -221,7 +221,7 @@ public class MinecraftLauncher {
         }
 
         String arg = "";
-        if(account.getType().equals("offline")) {
+        if (account.getType().equals("offline")) {
             arg = formatArg();
         }
 
@@ -236,7 +236,7 @@ public class MinecraftLauncher {
             versionInformation.setLockStatus("lock.not");
             versionInformation.setStatus("status.ready");
 
-            minecraftVersions.add(versionInformation);
+            minecraftVersions.update(versionInformation);
 
             AtomicInteger logLines = new AtomicInteger();
             AtomicBoolean unknownError = new AtomicBoolean(true);
@@ -244,10 +244,10 @@ public class MinecraftLauncher {
             Thread logThread = new Thread(() -> {
                 String readLog;
                 try {
-                    while((readLog = minecraftLog.readLine()) != null) {
+                    while ((readLog = minecraftLog.readLine()) != null) {
                         logLines.getAndIncrement();
                         taskManager.log(taskId, readLog);
-                        if(failed) {
+                        if (failed) {
                             break;
                         }
                     }
@@ -259,15 +259,15 @@ public class MinecraftLauncher {
             Thread errThread = new Thread(() -> {
                 String readErr;
                 try {
-                    while((readErr = minecraftError.readLine()) != null) {
+                    while ((readErr = minecraftError.readLine()) != null) {
                         logLines.getAndIncrement();
                         taskManager.log(taskId, readErr);
-                        if(readErr.contains("java.lang.UnsupportedClassVersionError:")) {
+                        if (readErr.contains("java.lang.UnsupportedClassVersionError:")) {
                             setTaskFeedback("task.feedback.java.version.error");
                             fail();
                             unknownError.set(false);
                         }
-                        if(failed) {
+                        if (failed) {
                             break;
                         }
                     }
@@ -282,7 +282,7 @@ public class MinecraftLauncher {
             ThreadsConcurrentWaiting waiting = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE, logThread, errThread);
             waiting.start();
 
-            if(logLines.get() < 5 & unknownError.get() || minecraft.exitValue() != 0) {
+            if (logLines.get() < 5 & unknownError.get() || minecraft.exitValue() != 0) {
                 logger.warn("minecraft " + versionInformation.getTaskId() + " exit with unknown error");
                 setTaskFeedback("task.feedback.unknown.error");
                 fail();
@@ -296,7 +296,7 @@ public class MinecraftLauncher {
         versionInformation.setLockStatus("lock.not");
         versionInformation.setStatus("status.ready");
 
-        minecraftVersions.add(versionInformation);
+        minecraftVersions.update(versionInformation);
 
         this.failed = true;
     }
@@ -307,7 +307,7 @@ public class MinecraftLauncher {
 
     public void setTaskFeedback(String feedback) {
         versionInformation.setTaskFeedback(feedback);
-        minecraftVersions.add(versionInformation);
+        minecraftVersions.update(versionInformation);
     }
 
     public void stop() {
@@ -315,6 +315,6 @@ public class MinecraftLauncher {
         versionInformation.setLockStatus("lock.not");
         versionInformation.setStatus("status.ready");
 
-        minecraftVersions.add(versionInformation);
+        minecraftVersions.update(versionInformation);
     }
 }

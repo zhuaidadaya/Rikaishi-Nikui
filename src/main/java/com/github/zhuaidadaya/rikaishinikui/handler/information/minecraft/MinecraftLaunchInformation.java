@@ -3,16 +3,15 @@ package com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft;
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
-
-import java.util.LinkedHashMap;
 
 public class MinecraftLaunchInformation {
     private MinecraftVersionInformation versionInformation;
     private String os;
     private JavaVersionInformation java = new JavaVersionInformation("java","",true);
     private Account account = new Account();
-    private LinkedHashMap<String,VmOption>vmOptions;
+    private Object2ObjectLinkedOpenHashMap<String,VmOption> vmOptions;
 
     public MinecraftLaunchInformation(MinecraftVersionInformation information, String os, JavaVersionInformation java, Account account) {
         versionInformation = information;
@@ -30,11 +29,11 @@ public class MinecraftLaunchInformation {
         return account;
     }
 
-    public LinkedHashMap<String,VmOption> getVmOptions() {
+    public Object2ObjectLinkedOpenHashMap<String,VmOption> getVmOptions() {
         return vmOptions;
     }
 
-    public void setVmOptions(LinkedHashMap<String,VmOption> vmOptions) {
+    public void setVmOptions(Object2ObjectLinkedOpenHashMap<String,VmOption> vmOptions) {
         this.vmOptions = vmOptions;
     }
 

@@ -26,7 +26,7 @@ public class MinecraftVersionsRecorder {
         }
     }
 
-    public synchronized void add(MinecraftVersionInformation information) {
+    public synchronized void update(MinecraftVersionInformation information) {
         versions.put(information.getId(), information);
         versionNames.put(information.getId(), information.getName());
         config.set("minecraft-versions", toJSONObject());
