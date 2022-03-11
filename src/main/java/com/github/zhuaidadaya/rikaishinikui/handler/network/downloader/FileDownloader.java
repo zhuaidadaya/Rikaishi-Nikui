@@ -2,11 +2,14 @@ package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.file.checker.FileCheckUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
+import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
 import com.github.zhuaidadaya.utils.resource.Resources;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,31 +26,29 @@ public class FileDownloader {
         return NetworkUtil.downloadToStringBuilder(url);
     }
 
+    public String getProgress() {
+        return files + "/" + (files - lastFiles);
+    }
+
     public void downloadFiles(Set<NetworkFileInformation> files) {
-        ExecutorService threadPool = Executors.newCachedThreadPool();
+        ThreadsConcurrentWaiting threads = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE);
+        threads.limit(384);
 
         this.files = files.size();
         this.lastFiles = files.size();
 
-        for(NetworkFileInformation information : files) {
+        for (NetworkFileInformation information : files) {
             downloadingFiles++;
-            if(! running) {
+            if (!running) {
                 doneFile();
                 continue;
             }
-            if(! FileCheckUtil.sha1(information.getPath()).equals(information.getSha1())) {
-                while(downloadingFiles > 512) {
-                    try {
-                        Thread.sleep(1);
-                    } catch (InterruptedException e) {
-
-                    }
-                }
+            if (!FileCheckUtil.sha1(information.getPath()).equals(information.getSha1())) {
                 Thread thread = new Thread(() -> {
                     try {
                         int tryCount = 0;
-                        while(true) {
-                            if(!running) {
+                        while (true) {
+                            if (!running) {
                                 doneFile();
                                 break;
                             }
@@ -55,7 +56,7 @@ public class FileDownloader {
                             try {
                                 String url = information.getUrl();
                                 String path = information.getPath();
-                                if(information.getSize() > 1024 * 16)
+                                if (information.getSize() > 1024 * 16)
                                     downloadWithThreadPool(url, path, -1);
                                 else
                                     downloadWithBuf(url, path);
@@ -65,29 +66,96 @@ public class FileDownloader {
 
                             }
 
-                            if(tryCount == 5) {
+                            if (tryCount == 5) {
                                 failFile();
                                 break;
                             }
+
+                            Thread.sleep(1);
                         }
                     } catch (Exception e) {
                         failFile();
                     }
                 });
-                threadPool.execute(thread);
+
+                threads.add(thread);
             } else {
                 doneFile();
             }
         }
 
-        threadPool.shutdown();
-        while(lastFiles != 0) {
-            try {
-                Thread.sleep(25);
-            } catch (InterruptedException e) {
+        threads.start();
+//        while (lastFiles != 0) {
+//            try {
+//                Thread.sleep(25);
+//            } catch (InterruptedException e) {
+//
+//            }
+//        }
+    }
 
+    public void downloadFiles(List<NetworkFileInformation> files) {
+        ThreadsConcurrentWaiting threads = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE);
+        threads.limit(384);
+
+        this.files = files.size();
+        this.lastFiles = files.size();
+
+        for (NetworkFileInformation information : files) {
+            downloadingFiles++;
+            if (!running) {
+                doneFile();
+                continue;
+            }
+            if (!FileCheckUtil.sha1(information.getPath()).equals(information.getSha1())) {
+                Thread thread = new Thread(() -> {
+                    try {
+                        int tryCount = 0;
+                        while (true) {
+                            if (!running) {
+                                doneFile();
+                                break;
+                            }
+                            tryCount++;
+                            try {
+                                String url = information.getUrl();
+                                String path = information.getPath();
+                                if (information.getSize() > 1024 * 16)
+                                    downloadWithThreadPool(url, path, -1);
+                                else
+                                    downloadWithBuf(url, path);
+                                doneFile();
+                                break;
+                            } catch (Exception e) {
+
+                            }
+
+                            if (tryCount == 5) {
+                                failFile();
+                                break;
+                            }
+
+                            Thread.sleep(1);
+                        }
+                    } catch (Exception e) {
+                        failFile();
+                    }
+                });
+
+                threads.add(thread);
+            } else {
+                doneFile();
             }
         }
+
+        threads.start();
+//        while (lastFiles != 0) {
+//            try {
+//                Thread.sleep(25);
+//            } catch (InterruptedException e) {
+//
+//            }
+//        }
     }
 
     public void downloadWithBuf(String url, String filePath) throws IOException {
@@ -100,7 +168,7 @@ public class FileDownloader {
         }
 
         BufferedInputStream br;
-        if(connection != null) {
+        if (connection != null) {
             br = new BufferedInputStream(connection.getInputStream());
         } else {
             br = new BufferedInputStream(new FileInputStream(url));
@@ -109,14 +177,13 @@ public class FileDownloader {
         File file = new File(filePath);
 
         Resources.createParent(filePath);
-        if(! file.exists())
-            file.createNewFile();
+        if (!file.exists()) file.createNewFile();
 
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
         byte[] buf = new byte[8192];
         int length;
-        while((length = br.read(buf)) >= 0) {
-            if(running) {
+        while ((length = br.read(buf)) >= 0) {
+            if (running) {
                 out.write(buf, 0, length);
             } else {
                 break;
@@ -132,8 +199,8 @@ public class FileDownloader {
 
         long length = getContentLength(url);
 
-        if(threads == - 1) {
-            if(length / 1024 / 1024 > 3) {
+        if (threads == -1) {
+            if (length / 1024 / 1024 > 3) {
                 threads = (int) (length / 1024 / 1024 / 3);
             } else {
                 threads = 3;
@@ -145,14 +212,17 @@ public class FileDownloader {
         this.threads = threads;
         this.lastThreads = threads;
 
-        for(int i = 0; i < threads; i++) {
-            if(!running) {
+        files = 1;
+        lastFiles = 1;
+
+        for (int i = 0; i < threads; i++) {
+            if (!running) {
                 done();
                 continue;
             }
             long start = i * length / threads;
             long end = (i + 1) * length / threads - 1;
-            if(i == threads - 1) {
+            if (i == threads - 1) {
                 end = length;
             }
             DownloadWithRange download = new DownloadWithRange(url, filePath, start, end, this);
@@ -160,13 +230,15 @@ public class FileDownloader {
         }
         threadPool.shutdown();
 
-        while(lastThreads != 0) {
+        while (lastThreads != 0) {
             try {
                 Thread.sleep(25);
             } catch (InterruptedException e) {
 
             }
         }
+
+        lastFiles = 0;
     }
 
     public void cancel() {
@@ -174,26 +246,26 @@ public class FileDownloader {
     }
 
     public void done() {
-        synchronized(this) {
+        synchronized (this) {
             lastThreads--;
         }
     }
 
     public void fail() {
-        synchronized(this) {
+        synchronized (this) {
             lastThreads--;
         }
     }
 
     public void doneFile() {
-        synchronized(this) {
+        synchronized (this) {
             lastFiles--;
             downloadingFiles--;
         }
     }
 
     public void failFile() {
-        synchronized(this) {
+        synchronized (this) {
             lastFiles--;
             downloadingFiles--;
         }
@@ -205,7 +277,7 @@ public class FileDownloader {
 
     public long getContentLength(String urlLocation) throws IOException {
         URL url = null;
-        if(urlLocation != null) {
+        if (urlLocation != null) {
             url = new URL(urlLocation);
         }
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -232,7 +304,7 @@ public class FileDownloader {
 
         public void run() {
             int tryCount = 0;
-            while(true) {
+            while (true) {
                 tryCount++;
                 try {
                     HttpURLConnection conn = NetworkUtil.getHttp(url);
@@ -249,8 +321,8 @@ public class FileDownloader {
                     BufferedInputStream br = new BufferedInputStream(conn.getInputStream());
                     byte[] buf = new byte[8192];
                     int length;
-                    while((length = br.read(buf)) >= 0) {
-                        if(parent.isRunning()) {
+                    while ((length = br.read(buf)) >= 0) {
+                        if (parent.isRunning()) {
                             out.write(buf, 0, length);
                         } else {
                             break;
@@ -259,7 +331,7 @@ public class FileDownloader {
                     br.close();
                     out.close();
 
-                    if(parent.isRunning()) {
+                    if (parent.isRunning()) {
                         parent.done();
                     } else {
                         file.delete();
@@ -270,7 +342,7 @@ public class FileDownloader {
 
                 }
 
-                if(tryCount == 5) {
+                if (tryCount == 5) {
                     parent.fail();
                 }
             }

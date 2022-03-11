@@ -511,6 +511,14 @@
       "b": 89
     }
   },
+  "minecraft.information.progress": {
+    "text": "进度",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
   "save.name": {
     "text": "以\"%s\"保存此版本",
     "color": {

@@ -122,4 +122,8 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
     public StringBuilder getLog(int page) {
         return logs.readStringBuilder(page);
     }
+
+    public String getProgress() {
+        return parent.getProgress();
+    }
 }

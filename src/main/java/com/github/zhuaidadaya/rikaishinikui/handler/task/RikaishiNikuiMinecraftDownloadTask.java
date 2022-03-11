@@ -5,6 +5,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiN
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
 
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.config;
@@ -111,5 +112,18 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
 
     public StringBuilder getLog(int page) {
         return logs.readAsStringBuilder(page);
+    }
+
+    public String getProgress() {
+        LinkedHashMap<String,String> progresses = downloader.getProgress();
+        if (progresses.size() > 0) {
+            StringBuilder progress = new StringBuilder("[\n");
+            for (String s : progresses.keySet()) {
+                progress.append(s).append(": ").append(progresses.get(s)).append("\n");
+            }
+            progress.append("]");
+            return progress.toString();
+        }
+        return "1/1";
     }
 }

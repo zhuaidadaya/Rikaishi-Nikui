@@ -5,6 +5,7 @@ public class NetworkFileInformation {
     private String url = "";
     private String filePath = "";
     private int size = -1;
+    private String name = "";
 
     public NetworkFileInformation(String url, String filePath) {
         this.url = url;
@@ -15,6 +16,8 @@ public class NetworkFileInformation {
         this.url = url;
         if (filePath.startsWith("/") || filePath.startsWith("\\")) {
             this.filePath = filePath.substring(1);
+        } else {
+            this.filePath = filePath;
         }
         this.sha1 = sha1;
     }
@@ -24,6 +27,34 @@ public class NetworkFileInformation {
         this.filePath = filePath;
         this.sha1 = sha1;
         this.size = size;
+    }
+
+    public void setSha1(String sha1) {
+        this.sha1 = sha1;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUrl() {

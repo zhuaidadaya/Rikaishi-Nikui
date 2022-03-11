@@ -41,7 +41,7 @@ import java.util.UUID;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiLauncher {
-    private final int standardInterval = 50;
+    private final int standardInterval = 100;
     public RikaishiNikuiFrame mainFrame;
     public RikaishiNikuiLogFrame errorFrame;
     public RikaishiNikuiLogFrame logFrame;
@@ -425,7 +425,8 @@ public class RikaishiNikuiLauncher {
             Collection<MinecraftVersionInformation> names;
             if (buttons.getActiveButton().getId() == 0)
                 names = minecraftVersions.getVersions(searchLocalVersion.getText());
-            else names = minecraftVersions.getVersions(searchLocalMinecraftVmVersion.getText());
+            else
+                names = minecraftVersions.getVersions(searchLocalMinecraftVmVersion.getText());
 
             if (names.size() < 1) {
                 if (buttons.getActiveButton().getId() == 0) {
@@ -604,6 +605,7 @@ public class RikaishiNikuiLauncher {
             inf.remove("lock-status");
             inf.remove("options");
             inf.remove("java-satisfy");
+            inf.remove("java-requires");
             boolean canDownload = true;
             if (downloadSaveAs.getText().equals("")) {
                 inf.put("save-as", "save.auto");

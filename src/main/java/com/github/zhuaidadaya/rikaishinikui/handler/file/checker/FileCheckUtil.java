@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
-import java.util.UUID;
 
 public class FileCheckUtil {
     public static String sha1(String url) {
@@ -17,7 +16,7 @@ public class FileCheckUtil {
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
             MappedByteBuffer mappedByteBuffer;
-            long bufferSize = 1024 * 256;
+            long bufferSize = 1024 * 128;
             long fileLength = file.length();
             long lastBuffer = fileLength % bufferSize;
             long bufferCount = fileLength / bufferSize;
@@ -40,7 +39,7 @@ public class FileCheckUtil {
             }
             return builder.toString();
         } catch (Exception e) {
-            return UUID.randomUUID().toString();
+            return "-1";
         }
     }
 }

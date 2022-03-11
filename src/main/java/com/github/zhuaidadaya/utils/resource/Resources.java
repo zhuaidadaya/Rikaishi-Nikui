@@ -30,7 +30,8 @@ public class Resources extends Thread {
     }
 
     public static void createParent(String path) {
-        if(! new File(path).isDirectory())
+        if(! new File(path).isDirectory()) {
             new File(new File(path).getParent()).mkdirs();
+        }
     }
 }

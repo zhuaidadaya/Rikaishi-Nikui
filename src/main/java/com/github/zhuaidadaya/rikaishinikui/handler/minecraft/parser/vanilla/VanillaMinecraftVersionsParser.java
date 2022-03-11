@@ -1,13 +1,13 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
@@ -66,7 +66,7 @@ public class VanillaMinecraftVersionsParser extends Parser {
 
     public Collection<MinecraftVersionInformation> getVersionsInformation(String search) {
         String filter = search.toLowerCase();
-        Collection<MinecraftVersionInformation> versionsInformation = new LinkedHashSet<>();
+        Collection<MinecraftVersionInformation> versionsInformation = new ObjectArrayList<>();
         for(VanillaMinecraftVersionParser parser : versionsMap.values()) {
             if(parser.getId().toLowerCase().contains(filter) || parser.getReleaseTime().toLowerCase().contains(filter) || parser.getType().toLowerCase().contains(filter) || textFormatter.getText(parser.getType()).toLowerCase().contains(filter)) {
                 MinecraftVersionInformation information = new MinecraftVersionInformation(UUID.nameUUIDFromBytes(parser.getId().getBytes()).toString(), parser.getId());

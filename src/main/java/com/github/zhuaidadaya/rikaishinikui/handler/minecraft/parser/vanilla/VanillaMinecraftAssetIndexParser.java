@@ -6,7 +6,7 @@ import org.json.JSONObject;
 public class VanillaMinecraftAssetIndexParser extends Parser {
     private final JSONObject asset;
     private final String version;
-    private String area;
+    private final String area;
 
     public VanillaMinecraftAssetIndexParser(JSONObject json, String area) {
         this.version = json.getString("assets");

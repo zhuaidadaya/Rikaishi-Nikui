@@ -155,4 +155,8 @@ public abstract class RikaishiNikuiTask {
     protected String getTaskTypeName() {
         return taskTypeName;
     }
+
+    protected String getProgress() {
+        return "1/1";
+    }
 }

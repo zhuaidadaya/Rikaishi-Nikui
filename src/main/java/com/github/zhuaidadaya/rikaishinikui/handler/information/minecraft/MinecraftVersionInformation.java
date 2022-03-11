@@ -339,7 +339,7 @@ public class MinecraftVersionInformation {
         try {
             information.put("last-task-status", taskManager.getStatus(UUID.fromString(taskId)).toString());
         } catch (Exception e) {
-            information.put("last-task-status", "task.status.inactive");
+
         }
         information.put("task-feedback", taskFeedback);
 
@@ -352,6 +352,11 @@ public class MinecraftVersionInformation {
             }
         }
         information.put("options", String.valueOf(vmOptions));
+        try {
+            information.put("progress", taskManager.getProgress(UUID.fromString(taskId)));
+        } catch (Exception e) {
+
+        }
         return information;
     }
 

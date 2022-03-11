@@ -10,8 +10,8 @@ public class Fabric {
         String loader = "https://meta.fabricmc.net/v2/versions/loader";
         String test_loader = "https://meta.fabricmc.net/v2/versions/loader/1.18.2/0.13.3/profile/json";
         String parse = NetworkUtil.downloadToStringBuilder(test_loader).toString();
-        FabricMinecraftLibrariesParser parser = new FabricMinecraftLibrariesParser(new JSONObject(parse), "" ,"1.18.2", "0.13.3");
-            new FileDownloader().downloadFiles(parser.getLibrariesDownloads());
+        FabricMinecraftLibrariesParser parser = new FabricMinecraftLibrariesParser(new JSONObject(parse), "", "1.18.2", "0.13.3");
+        new FileDownloader().downloadFiles(parser.getLibrariesDownloads());
         System.out.println(parse);
     }
 }

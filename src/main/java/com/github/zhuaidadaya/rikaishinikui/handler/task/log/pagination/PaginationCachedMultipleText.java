@@ -5,16 +5,16 @@ import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
 import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.UUID;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class PaginationCachedMultipleText extends PaginationCachedText<Collection<MultipleText>, MultipleText> {
-    private Collection<MultipleText> texts = new LinkedHashSet<>();
+    private ObjectArrayList<MultipleText> texts = new ObjectArrayList<>();
     private int length = 0;
 
     public PaginationCachedMultipleText(UUID id) {
@@ -53,11 +53,11 @@ public class PaginationCachedMultipleText extends PaginationCachedText<Collectio
         String cache = (base == null ? "" : "/") + "logs/cached/" + cachedId.toString() + "/cached-" + (pages.size() + 1) + ".log";
         FileUtil.write(new File(cache), texts);
         pages.put(pages.size() + 1, cache);
-        texts = new LinkedHashSet<>();
+        texts = new ObjectArrayList<>();
     }
 
-    public Collection<MultipleText> read(int index) {
-        Collection<MultipleText> texts = new LinkedHashSet<>();
+    public ObjectArrayList<MultipleText> read(int index) {
+        ObjectArrayList<MultipleText> texts = new ObjectArrayList<>();
         try {
             if (index != -1) {
                 texts = textFormatter.formatMultipleTextsFromFile(new File(pages.get(Math.min(pages.size(), index))));
@@ -70,12 +70,12 @@ public class PaginationCachedMultipleText extends PaginationCachedText<Collectio
         return texts;
     }
 
-    public Collection<MultipleText> read() {
+    public ObjectArrayList<MultipleText> read() {
         return texts;
     }
 
     public StringBuilder readStringBuilder(int index) {
-        Collection<SingleText> texts = new LinkedHashSet<>();
+        ObjectArrayList<SingleText> texts = new ObjectArrayList<>();
         try {
             texts = textFormatter.formatSingTextsFromFile(new File(pages.get(Math.min(pages.size(), index))));
         } catch (Exception e) {
@@ -112,6 +112,6 @@ public class PaginationCachedMultipleText extends PaginationCachedText<Collectio
 
         }
         pages = new Int2ObjectRBTreeMap<>();
-        texts = new LinkedHashSet<>();
+        texts = new ObjectArrayList<>();
     }
 }

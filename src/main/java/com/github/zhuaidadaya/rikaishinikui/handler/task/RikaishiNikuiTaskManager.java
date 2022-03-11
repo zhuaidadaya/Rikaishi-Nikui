@@ -115,6 +115,22 @@ public class RikaishiNikuiTaskManager {
     }
 
     public RikaishiNikuiTaskStatus getStatus(UUID task) {
-        return tasks.get(task).getStatus();
+        try {
+            return tasks.get(task).getStatus();
+        } catch (Exception e) {
+            return RikaishiNikuiTaskStatus.INACTIVE;
+        }
+    }
+
+    public String getProgress(RikaishiNikuiTask task) {
+        return getProgress(task.getId());
+    }
+
+    public String getProgress(UUID id) {
+        try {
+            return tasks.get(id).getProgress();
+        } catch (Exception e) {
+            return "1/1";
+        }
     }
 }

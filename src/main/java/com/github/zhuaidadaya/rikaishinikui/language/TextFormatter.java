@@ -3,13 +3,12 @@ package com.github.zhuaidadaya.rikaishinikui.language;
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.utils.resource.Resources;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -125,8 +124,8 @@ public class TextFormatter {
         }
     }
 
-    public Collection<SingleText> formatSingTextsFromFile(File file) {
-        Collection<SingleText> texts = new LinkedHashSet<>();
+    public ObjectArrayList<SingleText> formatSingTextsFromFile(File file) {
+        ObjectArrayList<SingleText> texts = new ObjectArrayList<>();
         try {
             StringBuilder builder = FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(file)));
             BufferedReader reader = new BufferedReader(new StringReader(builder.toString()));
@@ -141,8 +140,8 @@ public class TextFormatter {
         return texts;
     }
 
-    public Collection<MultipleText> formatMultipleTextsFromFile(File file) {
-        Collection<MultipleText> texts = new LinkedHashSet<>();
+    public ObjectArrayList<MultipleText> formatMultipleTextsFromFile(File file) {
+        ObjectArrayList<MultipleText> texts = new ObjectArrayList<>();
         try {
             StringBuilder builder = FileUtil.readAsStringBuilder(new BufferedReader(new FileReader(file)));
             BufferedReader reader = new BufferedReader(new StringReader(builder.toString()));
