@@ -8,11 +8,11 @@ import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.Minecr
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftClassifierParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftClassifiersParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibraryParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
+import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
 import com.github.zhuaidadaya.utils.times.TimeType;
 import com.github.zhuaidadaya.utils.times.Times;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -28,8 +28,6 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 public class MinecraftLauncher {
     private boolean failed = false;
     private Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions;
-    private StringBuilder vmOptionString = new StringBuilder();
-    private StringBuilder classPathString = new StringBuilder();
     private MinecraftVersionInformation versionInformation;
     private String nativePath;
     private String os;
@@ -40,6 +38,7 @@ public class MinecraftLauncher {
     private VanillaMinecraftClassifiersParser classifiers;
     private JavaVersionInformation java = new JavaVersionInformation("java", "", true);
     private Process minecraft;
+    private VanillaMinecraftLibrariesParser libraries;
 
     public MinecraftLauncher(MinecraftLaunchInformation information) {
         apply(information);
@@ -71,47 +70,13 @@ public class MinecraftLauncher {
         setClassifiers(new VanillaMinecraftClassifiersParser(gameSource, area, os));
 
         setVmOptions(information.getVmOptions());
-        setVmOptionString(vmOptions);
 
         VanillaMinecraftLibrariesParser librariesParser = new VanillaMinecraftLibrariesParser(gameSource, area, os);
-        setClassPathString(librariesParser);
-        appendClassPath(versionInformation.formatAbsoluteClientPath() + (os.equals("windows") ? ";" : ":"));
+        setLibraries(librariesParser);
     }
 
-    public void appendClassPath(String path) {
-        this.classPathString.append(path);
-    }
-
-    public StringBuilder getVmOptionString() {
-        return vmOptionString;
-    }
-
-    public void setVmOptionString(Object2ObjectLinkedOpenHashMap<String, VmOption> options) {
-        vmOptionString = new StringBuilder();
-        int last = options.size();
-        if (last > 0) {
-            for (VmOption option : options.values()) {
-                last--;
-                if (last > 0) {
-                    appendVmOption(option.getDetail(), null);
-                } else {
-                    appendVmOption(option.getDetail(), "");
-                }
-            }
-        }
-    }
-
-    public StringBuilder getClassPathString() {
-        return classPathString;
-    }
-
-    public void setClassPathString(VanillaMinecraftLibrariesParser libraries) {
-        classPathString = new StringBuilder();
-        for (VanillaMinecraftLibraryParser lib : libraries.getLibraries().values()) {
-            lib.setArea(area);
-            classPathString.append(lib.getAbsolutePath()).append(os.equals("windows") ? ";" : ":");
-//            classPathString.append(area).append("/").append("libraries").append("/").append(lib.getPath()).append(os.equals("windows") ? ";" : ":");
-        }
+    public void setLibraries(VanillaMinecraftLibrariesParser libraries) {
+        this.libraries = libraries;
     }
 
     public String getNativePath() {
@@ -178,34 +143,23 @@ public class MinecraftLauncher {
         this.java = java;
     }
 
-    public void appendVmOption(String option, String suffix) {
-        vmOptionString.append(option).append(suffix == null ? " " : suffix);
-    }
-
-    public String formatArg() {
-        return String.format("\"%s\" %s -Djava.library.path=\"%s\" -cp \"%s\" %s --username %s --version \"%s\" --gameDir \"%s\" --assetsDir \"%s\" --assetIndex %s --uuid %s --accessToken %s --userProperties {%s} --userType %s --width %s --height %s", //stu
-                java.getPath(), //java
-                vmOptionString, //java vm options
-                nativePath, //game native path
-                classPathString, //game libraries
-                gameSource.getString("mainClass"), //main
-                account.getName(), //account name
-                gameSource.getString("id"), //game version
-                gamePath, //game path
-                area + "/assets", //asset path
-                gameSource.getString("assets"), //asset id
-                account.getUuid(), //account uuid
-                account.getUuid(), //token
-                "", //user properties
-                "Legacy", //uer type
-                854, //frame width
-                480 //frame height
-        );
+    public MinecraftLaunchArg formatArg() {
+        MinecraftLaunchArg arg = new MinecraftLaunchArg();
+        arg.setJava(java.getPath());
+        arg.setVmOptions(vmOptions);
+        arg.setNativePath(nativePath);
+        arg.setLibraries(libraries);
+        arg.setGameSource(gameSource);
+        arg.setAccount(account);
+        arg.setArea(area);
+        arg.setGamePath(gamePath);
+        arg.setVersionInformation(versionInformation);
+        return arg;
     }
 
     public void launch(String taskId) {
-        versionInformation = minecraftVersions.getVersionAsId(versionInformation.getId());
         versionInformation.setTaskId(taskId);
+        minecraftVersions.update(versionInformation);
 
         try {
             FileUtil.deleteFiles(nativePath + "/");
@@ -220,15 +174,16 @@ public class MinecraftLauncher {
             }
         }
 
-        String arg = "";
+        MinecraftLaunchArg arg = new MinecraftLaunchArg();
         if (account.getType().equals("offline")) {
             arg = formatArg();
         }
 
         try {
-            logger.info("launching minecraft " + versionInformation.getTaskId() + " with arg: " + arg);
+            System.out.println(arg.formatRuntime());
+            logger.info("launching minecraft " + versionInformation.getTaskId() + " with args: " + arg.formatVisual());
 
-            minecraft = Runtime.getRuntime().exec(arg);
+            minecraft = Runtime.getRuntime().exec(arg.formatRuntime());
             BufferedReader minecraftLog = new BufferedReader(new InputStreamReader(minecraft.getInputStream(), "GBK"));
             BufferedReader minecraftError = new BufferedReader(new InputStreamReader(minecraft.getErrorStream(), "GBK"));
 
@@ -267,6 +222,15 @@ public class MinecraftLauncher {
                             fail();
                             unknownError.set(false);
                         }
+                        if (readErr.contains("java.lang.ClassNotFoundException")) {
+                            if (readErr.contains(gameSource.getString("mainClass"))) {
+                                setTaskFeedback("task.feedback.main.class.not.found");
+                            } else {
+                                setTaskFeedback("task.feedback.class.not.found");
+                            }
+                            fail();
+                            unknownError.set(false);
+                        }
                         if (failed) {
                             break;
                         }
@@ -282,7 +246,7 @@ public class MinecraftLauncher {
             ThreadsConcurrentWaiting waiting = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE, logThread, errThread);
             waiting.start();
 
-            if (logLines.get() < 5 & unknownError.get() || minecraft.exitValue() != 0) {
+            if (logLines.get() < 5 & unknownError.get() || minecraft.exitValue() != 0 & versionInformation.getTaskFeedback().getText().equals("none")) {
                 logger.warn("minecraft " + versionInformation.getTaskId() + " exit with unknown error");
                 setTaskFeedback("task.feedback.unknown.error");
                 fail();
@@ -303,6 +267,11 @@ public class MinecraftLauncher {
 
     public boolean isFailed() {
         return failed;
+    }
+
+    public void setTaskFeedback(MultipleText feedback) {
+        versionInformation.setTaskFeedback(feedback);
+        minecraftVersions.update(versionInformation);
     }
 
     public void setTaskFeedback(String feedback) {

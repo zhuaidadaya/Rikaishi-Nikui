@@ -6,6 +6,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.file.IllegalFileName;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftLaunchInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.MinecraftLoaderType;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftVersionsParser;
@@ -348,7 +349,7 @@ public class RikaishiNikuiLauncher {
                     if (minecraftVersions.getVersionAsName(f.getName()) == null) {
                         String name = f.getName();
                         String id = name;
-                        MinecraftVersionInformation information = new MinecraftVersionInformation(id, name, "status.undefined");
+                        MinecraftVersionInformation information = new MinecraftVersionInformation(id, "unknown", "status.undefined");
                         try {
                             UUID.fromString(id.substring(id.length() - 36));
                             information.setIdFormatted(true);
@@ -363,16 +364,22 @@ public class RikaishiNikuiLauncher {
                         }
                         information.setName(name);
                         information.setArea(area);
-                        information.setType("minecraft.type.vanilla");
                         minecraftVersions.update(information);
                         logger.info("minecraft information " + information.getName() + " found");
                         logger.info("added " + information.getName());
                         String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
                         try {
-                            new VanillaMinecraftLibrariesParser(new JSONObject(inf), area, os);
+                            JSONObject manifest = new JSONObject(inf);
+                            new VanillaMinecraftLibrariesParser(manifest, area, os);
+                            try {
+                                information.setVersion(manifest.getString("clientVersion"));
+                            } catch (Exception e) {
+                                information.setVersion(manifest.getString("id"));
+                            }
                         } catch (Exception e) {
                             logger.error("unusable minecraft: " + information.getName());
                         }
+                        minecraftVersions.update(information);
                     }
                 }
             }
@@ -385,7 +392,33 @@ public class RikaishiNikuiLauncher {
                     logger.info("removed " + information.getName());
                 }
 
+                String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
+                JSONObject manifest = new JSONObject(inf);
+
+                String mainClass =manifest.getString("mainClass");
+                switch (mainClass) {
+                    case "net.minecraft.client.main.Main" -> {
+                        information.setLoaderType(MinecraftLoaderType.VANILLA);
+                        information.setType("minecraft.type.vanilla");
+                    }
+                    case "net.fabricmc.loader.impl.launch.knot.KnotClient" -> {
+                        information.setLoaderType(MinecraftLoaderType.FABRIC);
+                        information.setType("minecraft.type.fabric.impl");
+                    }
+                    case "net.fabricmc.loader.launch.knot.KnotClient" -> {
+                        information.setLoaderType(MinecraftLoaderType.FABRIC);
+                        information.setType("minecraft.type.fabric");
+                    }
+                }
+
+                try {
+                    information.setVersion(manifest.getString("clientVersion"));
+                } catch (Exception e) {
+                    information.setVersion(manifest.getString("id"));
+                }
                 information.setJavaSatisfy(usedJava.getVersion() >= information.getJavaRequires());
+
+                minecraftVersions.update(information);
             }
         } catch (Exception e) {
 
@@ -528,7 +561,7 @@ public class RikaishiNikuiLauncher {
 
                     try {
                         JSONObject gameSource = new JSONObject(NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString());
-                        information.setVersion(gameSource.getString("id"));
+                        information.setVersion(gameSource.getString("clientVersion"));
                         information.setReleaseTime(gameSource.getString("releaseTime"));
                         information.setReleaseType(gameSource.getString("type"));
                         information.setUrl(information.formatManifest());
@@ -555,10 +588,14 @@ public class RikaishiNikuiLauncher {
 
             LinkedHashMap<String, String> inf = information.getInformation();
             inf.remove("options");
+            inf.remove("loader-type");
             MultipleText texts = new MultipleText();
             for (String s : inf.keySet()) {
                 try {
-                    new JSONObject(inf.get(s));
+                    MultipleText text = new MultipleText(new JSONObject(inf.get(s)));
+                    mainVersionDetailsPanel.appendText(textFormatter.format("minecraft.information." + s));
+                    mainVersionDetailsPanel.appendText(": ");
+                    mainVersionDetailsPanel.appendText(text);
                 } catch (Exception e) {
                     mainVersionDetailsPanel.appendText(new PairText(textFormatter.format("minecraft.information." + s), ((SingleText) textFormatter.format(inf.get(s))).append("\n"), new SingleText(": ")));
                 }
@@ -608,6 +645,7 @@ public class RikaishiNikuiLauncher {
             inf.remove("options");
             inf.remove("java-satisfy");
             inf.remove("java-requires");
+            inf.remove("loader-type");
             boolean canDownload = true;
             if (downloadSaveAs.getText().equals("")) {
                 inf.put("save-as", "save.auto");
@@ -1579,7 +1617,16 @@ public class RikaishiNikuiLauncher {
 
         RikaishiNikuiButton importMinecraft = new RikaishiNikuiButton(100, 40, "import", "import.button", true).disableBorderPainted().setColor(new RikaishiNikuiColor(60, 63, 65), new RikaishiNikuiColor(214, 214, 214)).setActiveColor(new RikaishiNikuiColor(43, 43, 43), new RikaishiNikuiColor(214, 214, 214), false).setId(4);
         importMinecraft.addActionListener(e -> {
+            try {
+                String versionPath = config.getConfigString("area") + "/versions/";
+                if (os.equals("windows")) {
+                    FileUtil.openInExplorer(versionPath);
+                } else if (os.equals("linux")) {
+                    FileUtil.openInNautilus(versionPath);
+                }
+            } catch (Exception ex) {
 
+            }
         });
 
         mainOperationButtons.applyButtons(importMinecraft);

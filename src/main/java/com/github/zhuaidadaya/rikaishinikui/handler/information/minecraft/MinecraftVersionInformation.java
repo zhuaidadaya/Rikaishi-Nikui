@@ -1,7 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.MinecraftLoaderType;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;
+import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
+import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.language.Text;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
 
@@ -28,12 +32,13 @@ public class MinecraftVersionInformation {
     private boolean idFormatted = true;
     private String taskId = "unknown";
     private RikaishiNikuiTaskStatus lastTaskStatus = RikaishiNikuiTaskStatus.INACTIVE;
-    private String taskFeedback = "none";
+    private MultipleText taskFeedback = new MultipleText(new SingleText("none"));
     private String releaseTime = "unknown";
     private String releaseType = "unknown";
     private int javaRequires = 17;
     private boolean javaSatisfy = true;
     private Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions = new Object2ObjectLinkedOpenHashMap<>();
+    private MinecraftLoaderType loaderType = MinecraftLoaderType.VANILLA;
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
         this.id = id;
@@ -72,6 +77,14 @@ public class MinecraftVersionInformation {
 
     public MinecraftVersionInformation(JSONObject json) {
         apply(json);
+    }
+
+    public MinecraftLoaderType getLoaderType() {
+        return loaderType;
+    }
+
+    public void setLoaderType(MinecraftLoaderType loaderType) {
+        this.loaderType = loaderType;
     }
 
     public Object2ObjectLinkedOpenHashMap<String, String> getVmOptionsName() {
@@ -150,12 +163,23 @@ public class MinecraftVersionInformation {
         this.releaseTime = releaseTime;
     }
 
-    public String getTaskFeedback() {
+    public MultipleText getTaskFeedback() {
         return taskFeedback;
     }
 
-    public void setTaskFeedback(String taskFeedback) {
+    public void setTaskFeedback(MultipleText taskFeedback) {
         this.taskFeedback = taskFeedback;
+    }
+
+    public void setTaskFeedback(String source, Object... args) {
+        Text text = textFormatter.format(source, args);
+        if (text instanceof MultipleText) {
+            setTaskFeedback((MultipleText) text);
+        } else if (text instanceof SingleText) {
+            setTaskFeedback(new MultipleText((SingleText) text));
+        } else {
+            setTaskFeedback(new MultipleText(new SingleText(text.getText())));
+        }
     }
 
     public RikaishiNikuiTaskStatus getLastTaskStatus() {
@@ -236,12 +260,13 @@ public class MinecraftVersionInformation {
         this.lockStatus = json.getString("lock-status");
         this.taskId = json.getString("task-id");
         this.lastTaskStatus = RikaishiNikuiTaskStatus.of(json.getString("last-task-status"));
-        this.taskFeedback = json.getString("task-feedback");
+        this.taskFeedback = new MultipleText(json.getJSONObject("task-feedback"));
         this.releaseTime = json.getString("release-time");
         this.releaseType = json.getString("release-type");
         this.vmOptions = new Object2ObjectLinkedOpenHashMap<>();
         this.javaRequires = json.getInt("java-requires");
         this.javaSatisfy = json.getBoolean("java-satisfy");
+        this.loaderType = MinecraftLoaderType.of(json.getString("loader-type"));
 
         JSONObject options = json.getJSONObject("options");
         for (String o : options.keySet()) {
@@ -300,11 +325,12 @@ public class MinecraftVersionInformation {
         } catch (Exception e) {
             json.put("last-task-status", "task.status.inactive");
         }
-        json.put("task-feedback", taskFeedback);
+        json.put("task-feedback", taskFeedback.toJSONObject());
         json.put("release-time", releaseTime);
         json.put("release-type", releaseType);
         json.put("java-requires", javaRequires);
         json.put("java-satisfy", javaSatisfy);
+        json.put("loader-type", loaderType.toString());
 
         JSONObject vmOptions = new JSONObject();
         for (VmOption option : this.vmOptions.values()) {
@@ -342,7 +368,7 @@ public class MinecraftVersionInformation {
         } catch (Exception e) {
 
         }
-        information.put("task-feedback", taskFeedback);
+        information.put("task-feedback", taskFeedback.toJSONObject().toString());
 
         JSONObject vmOptions = new JSONObject();
         for (VmOption option : this.vmOptions.values()) {

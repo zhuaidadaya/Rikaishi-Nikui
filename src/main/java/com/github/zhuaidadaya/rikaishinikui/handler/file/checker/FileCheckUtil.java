@@ -1,5 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.file.checker;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.identifier.RandomIdentifier;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.MappedByteBuffer;
@@ -39,7 +41,7 @@ public class FileCheckUtil {
             }
             return builder.toString();
         } catch (Exception e) {
-            return "-1";
+            return RandomIdentifier.randomIdentifier();
         }
     }
 }

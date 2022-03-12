@@ -20,6 +20,13 @@ public class PairText extends Text {
 
     }
 
+    public PairText(SingleText head, SingleText end) {
+        this.head = head.getText();
+        this.end = end.getText();
+        this.headColor = head.getColor();
+        this.endColor = end.getColor();
+    }
+
     public PairText(String head, String end) {
         this.head = head;
         this.end = end;

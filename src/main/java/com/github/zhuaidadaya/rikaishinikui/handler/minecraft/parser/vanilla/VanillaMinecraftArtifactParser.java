@@ -26,7 +26,7 @@ public class VanillaMinecraftArtifactParser extends Parser {
     }
 
     public String getAbsolutePath() {
-        return String.format("%s/libraries/%s", new File(area).getAbsolutePath(),  artifact.getString("path"));
+        return String.format("%s/libraries/%s", new File(area).getAbsolutePath(),  artifact.getString("path")).replace("\\", "/");
     }
 
     public String getSha1() {

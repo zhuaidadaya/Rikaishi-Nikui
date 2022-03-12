@@ -250,6 +250,30 @@
       "b": 89
     }
   },
+  "minecraft.type.fabric.impl": {
+    "text": "Fabric Minecraft",
+    "color": {
+      "r": 198,
+      "g": 188,
+      "b": 165
+    }
+  },
+  "minecraft.type.fabric": {
+    "text": "Fabric Minecraft",
+    "color": {
+      "r": 198,
+      "g": 188,
+      "b": 165
+    }
+  },
+  "minecraft.type.forge": {
+    "text": "Forge Minecraft",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
   "task.status.inactive": {
     "text": "不活跃",
     "color": {
@@ -280,6 +304,22 @@
       "r": 106,
       "g": 169,
       "b": 89
+    }
+  },
+  "task.feedback.class.not.found": {
+    "text": "无法找到需要的类",
+    "color": {
+      "r": 246,
+      "g": 55,
+      "b": 65
+    }
+  },
+  "task.feedback.main.class.not.found": {
+    "text": "无法找到主类",
+    "color": {
+      "r": 246,
+      "g": 55,
+      "b": 65
     }
   },
   "task.feedback.java.version.error": {
@@ -356,7 +396,7 @@
       }
     },
     "3": {
-      "text": "或者通过\"导入\"将minecraft导入到rikaishi nikui中\n",
+      "text": "或者通过\"导入\"打开游戏文件夹, 将minecraft移动或复制到rikaishi nikui中\n",
       "color": {
         "r": 106,
         "g": 135,

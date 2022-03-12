@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class FabricMinecraftLibrariesParser extends Parser {
         Set<NetworkFileInformation> downloads = new LinkedHashSet<>();
         for (String s : libs.keySet()) {
             FabricMinecraftLibraryParser lib = libs.get(s);
-            downloads.add(new NetworkFileInformation(s, String.format("%s/libraries/%s", area, lib.getPath()), "-1"));
+            downloads.add(new NetworkFileInformation(s, new File(String.format("%s/libraries/%s", area, lib.getPath())).getAbsolutePath(), "-1"));
         }
         return downloads;
     }

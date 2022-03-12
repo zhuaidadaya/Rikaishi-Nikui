@@ -2,7 +2,9 @@ package com.github.zhuaidadaya.rikaishinikui.handler.file;
 
 import com.github.zhuaidadaya.utils.resource.Resources;
 
+import java.awt.*;
 import java.io.*;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -106,15 +108,31 @@ public class FileUtil {
     public static void write(File file, Collection<?> information) {
         try {
             Resources.createParent(file.getPath());
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file,true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
 
             for (Object o : information) {
                 writer.write(o.toString() + "\n");
             }
 
             writer.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void openInBrowse(String url) throws IOException {
+        URI uri = URI.create(url);
+        Desktop dp = Desktop.getDesktop();
+        if (dp.isSupported(Desktop.Action.BROWSE)) {
+            dp.browse(uri);
+        }
+    }
+
+    public static void openInExplorer(String s) throws IOException {
+        Runtime.getRuntime().exec("explorer.exe \"" + s.replace("/", "\\") + "\"");
+    }
+
+    public static void openInNautilus(String s) throws IOException {
+        Runtime.getRuntime().exec("nautilus " + s);
     }
 }
