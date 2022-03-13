@@ -1,6 +1,7 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.fabric;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.loader.FabricLoaderInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.NetworkFileInformation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.json.JSONArray;
@@ -11,24 +12,40 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class FabricMinecraftLibrariesParser extends Parser {
+public class FabricMinecraftLibrariesParser extends LibrariesParser {
     private final JSONArray libraries;
     private final String area;
     private final String gameVersion;
     private final String loaderVersion;
+    private FabricLoaderInformation fabricLoader = new FabricLoaderInformation();
 
-    public FabricMinecraftLibrariesParser(JSONObject json, String area, String gameVersion, String loaderVersion) {
+    public FabricMinecraftLibrariesParser(JSONObject json, String area, String gameVersion) {
         libraries = json.getJSONArray("libraries");
         this.area = area;
         this.gameVersion = gameVersion;
-        this.loaderVersion = loaderVersion;
+        detectFabricVersion();
+        this.loaderVersion = fabricLoader.getVersion();
     }
 
-    public FabricMinecraftLibrariesParser(JSONArray json, String area, String gameVersion, String loaderVersion) {
+    public FabricMinecraftLibrariesParser(JSONArray json, String area, String gameVersion) {
         libraries = json;
         this.area = area;
         this.gameVersion = gameVersion;
-        this.loaderVersion = loaderVersion;
+        detectFabricVersion();
+        this.loaderVersion = fabricLoader.getVersion();
+    }
+
+    public FabricLoaderInformation getFabricLoader() {
+        return fabricLoader;
+    }
+
+    public void detectFabricVersion() {
+        for (FabricMinecraftLibraryParser parser : getLibraries().values()) {
+            String name = parser.getName();
+            if (name.contains("net.fabricmc:fabric-loader:")) {
+                this.fabricLoader = new FabricLoaderInformation().setVersion(name.substring(27)).setFabric(true);
+            }
+        }
     }
 
     public Map<String, FabricMinecraftLibraryParser> getLibraries() {

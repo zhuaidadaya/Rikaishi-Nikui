@@ -15,13 +15,13 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.logger;
 
 public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     private final RikaishiNikuiMinecraftDownloader downloader = new RikaishiNikuiMinecraftDownloader();
+    private final MinecraftLoaderType loaderType;
     private String gameId;
     private String name;
     private String versionId;
     private String area;
     private MinecraftDownloadEntrustType entrustType;
     private MinecraftVersionInformation information;
-    private final MinecraftLoaderType loaderType;
 
     public RikaishiNikuiMinecraftDownloadTask(MinecraftVersionInformation information, UUID id, MinecraftDownloadEntrustType entrustType) {
         super(id, "DownloadTask(TS)");
@@ -30,7 +30,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
         this.loaderType = information.getLoaderType();
     }
 
-    public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area, MinecraftDownloadEntrustType entrustType,MinecraftLoaderType type) {
+    public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area, MinecraftDownloadEntrustType entrustType, MinecraftLoaderType type) {
         super(id, "DownloadTask(TS)");
         this.gameId = gameId;
         this.name = name;
@@ -40,7 +40,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
         this.loaderType = type;
     }
 
-    public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area,MinecraftLoaderType type) {
+    public RikaishiNikuiMinecraftDownloadTask(String gameId, String name, UUID id, String versionId, String area, MinecraftLoaderType type) {
         super(id, "DownloadTask(TS)");
         this.gameId = gameId;
         this.name = name;
@@ -121,11 +121,11 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     }
 
     public String getProgress() {
-        LinkedHashMap<String,String> progresses = downloader.getProgress();
+        LinkedHashMap<String, String> progresses = downloader.getProgress();
         if (progresses.size() > 0) {
             StringBuilder progress = new StringBuilder("[\n");
             for (String s : progresses.keySet()) {
-                progress.append(s).append(": ").append(progresses.get(s)).append("\n");
+                progress.append("    ").append(s).append(": ").append(progresses.get(s)).append("\n");
             }
             progress.append("]");
             return progress.toString();

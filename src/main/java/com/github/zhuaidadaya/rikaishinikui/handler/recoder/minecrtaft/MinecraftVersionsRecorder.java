@@ -28,8 +28,7 @@ public class MinecraftVersionsRecorder {
 
     public synchronized void update(MinecraftVersionInformation information) {
         if (versionNames.containsValue(information.getName()) & !versionNames.containsKey(information.getId())) {
-            versions.remove(information.getId());
-            versionNames.remove(information.getId());
+            return;
         }
         versions.put(information.getId(), information);
         versionNames.put(information.getId(), information.getName());

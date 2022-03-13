@@ -1,7 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.checker.FileCheckUtil;
-import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
@@ -27,8 +26,7 @@ public class ResourceDownloader {
             progresses.put(threadName, downloader);
             activeDownloads.add(downloader);
             try {
-                NetworkUtil.downloadToFile(file.getUrl(), file.getPath());
-//                downloader.downloadWithThreadPool(file.getUrl(), file.getPath(), threads);
+                downloader.downloadWithThreadPool(file.getUrl(), file.getPath(), threads);
             } catch (Exception e) {
                 e.printStackTrace();
             }

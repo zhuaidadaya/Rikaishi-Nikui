@@ -96,7 +96,7 @@ public class FileDownloader {
 
     public void downloadFiles(List<NetworkFileInformation> files) {
         ThreadsConcurrentWaiting threads = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE);
-        threads.limit(384);
+        threads.limit(32);
 
         this.files = files.size();
         this.lastFiles = files.size();

@@ -1,11 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.ArtifactParser;
 import org.json.JSONObject;
 
 import java.io.File;
 
-public class VanillaMinecraftArtifactParser extends Parser {
+public class VanillaMinecraftArtifactParser extends ArtifactParser {
     private final JSONObject artifact;
     private String area = "";
 
@@ -27,6 +27,10 @@ public class VanillaMinecraftArtifactParser extends Parser {
 
     public String getAbsolutePath() {
         return String.format("%s/libraries/%s", new File(area).getAbsolutePath(),  artifact.getString("path")).replace("\\", "/");
+    }
+
+    public String getName() {
+        return getUrl();
     }
 
     public String getSha1() {

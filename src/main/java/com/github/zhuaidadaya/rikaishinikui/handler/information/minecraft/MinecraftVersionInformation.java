@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.loader.FabricLoaderInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.MinecraftLoaderType;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;
@@ -39,6 +40,7 @@ public class MinecraftVersionInformation {
     private boolean javaSatisfy = true;
     private Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions = new Object2ObjectLinkedOpenHashMap<>();
     private MinecraftLoaderType loaderType = MinecraftLoaderType.VANILLA;
+    private FabricLoaderInformation fabricLoader = new FabricLoaderInformation();
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
         this.id = id;
@@ -47,6 +49,14 @@ public class MinecraftVersionInformation {
         this.area = area;
         this.type = type;
         this.version = version;
+    }
+
+    public FabricLoaderInformation getFabricLoader() {
+        return fabricLoader;
+    }
+
+    public void setFabricLoader(FabricLoaderInformation fabricLoader) {
+        this.fabricLoader = fabricLoader;
     }
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status) {
@@ -99,8 +109,8 @@ public class MinecraftVersionInformation {
         this.javaRequires = javaRequires;
     }
 
-    public void addVmOptions(String... options) {
-        for (String details : options) {
+    public void addVmOptions(VmOption... options) {
+        for (VmOption details : options) {
             addVmOption(details);
         }
     }
@@ -267,6 +277,7 @@ public class MinecraftVersionInformation {
         this.javaRequires = json.getInt("java-requires");
         this.javaSatisfy = json.getBoolean("java-satisfy");
         this.loaderType = MinecraftLoaderType.of(json.getString("loader-type"));
+        this.fabricLoader = new FabricLoaderInformation(json.getJSONObject("fabric"));
 
         JSONObject options = json.getJSONObject("options");
         for (String o : options.keySet()) {
@@ -341,6 +352,7 @@ public class MinecraftVersionInformation {
             }
         }
         json.put("options", vmOptions);
+        json.put("fabric", fabricLoader.toJSONObject());
 
         return json;
     }
@@ -379,6 +391,10 @@ public class MinecraftVersionInformation {
             }
         }
         information.put("options", String.valueOf(vmOptions));
+        if (fabricLoader.isFabric()) {
+            information.put("fabric-version", fabricLoader.getVersion());
+            information.put("is-fabric", fabricLoader.isFabric() ? "true" : "false");
+        }
         try {
             information.put("progress", taskManager.getProgress(UUID.fromString(taskId)));
         } catch (Exception e) {

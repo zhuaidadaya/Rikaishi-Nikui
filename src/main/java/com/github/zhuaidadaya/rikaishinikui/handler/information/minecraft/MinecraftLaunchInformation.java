@@ -2,6 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.MinecraftLoaderType;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
@@ -12,13 +13,15 @@ public class MinecraftLaunchInformation {
     private JavaVersionInformation java = new JavaVersionInformation("java","",true);
     private Account account = new Account();
     private Object2ObjectLinkedOpenHashMap<String,VmOption> vmOptions;
+    private MinecraftLoaderType loaderType = MinecraftLoaderType.VANILLA;
 
-    public MinecraftLaunchInformation(MinecraftVersionInformation information, String os, JavaVersionInformation java, Account account) {
+    public MinecraftLaunchInformation(MinecraftVersionInformation information, String os, JavaVersionInformation java, Account account, MinecraftLoaderType type) {
         versionInformation = information;
         this.os = os;
         this.java = java;
         this.account = account;
         vmOptions = information.getVmOptions();
+        this.loaderType = type;
     }
 
     public String getOs() {

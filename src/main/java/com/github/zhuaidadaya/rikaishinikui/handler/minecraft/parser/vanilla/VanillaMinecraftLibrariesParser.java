@@ -1,16 +1,16 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.NetworkFileInformation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class VanillaMinecraftLibrariesParser extends Parser {
+public class VanillaMinecraftLibrariesParser extends LibrariesParser {
     private final JSONArray libraries;
-    private String area;
-    private String os;
+    private final String area;
+    private final String os;
 
     public VanillaMinecraftLibrariesParser(JSONObject json, String area, String os) {
         libraries = json.getJSONArray("libraries");
@@ -26,7 +26,7 @@ public class VanillaMinecraftLibrariesParser extends Parser {
 
     public Object2ObjectRBTreeMap<String, VanillaMinecraftLibraryParser> getLibraries() {
         Object2ObjectRBTreeMap<String, VanillaMinecraftLibraryParser> libs = new Object2ObjectRBTreeMap<>();
-        for(Object library : libraries) {
+        for (Object library : libraries) {
             JSONObject json = new JSONObject(library.toString());
             try {
                 json.getJSONObject("classifiers");
@@ -34,7 +34,7 @@ public class VanillaMinecraftLibrariesParser extends Parser {
                 try {
                     VanillaMinecraftLibraryParser libraryParser = new VanillaMinecraftLibraryParser(json, os);
 
-                    if(libraryParser.getLibrary() != null) {
+                    if (libraryParser.getLibrary() != null) {
                         libs.put(libraryParser.getUrl(), libraryParser);
                     }
                 } catch (Exception e2) {
@@ -48,7 +48,7 @@ public class VanillaMinecraftLibrariesParser extends Parser {
     public ObjectLinkedOpenHashSet<NetworkFileInformation> getLibrariesDownloads() {
         Object2ObjectRBTreeMap<String, VanillaMinecraftLibraryParser> libs = getLibraries();
         ObjectLinkedOpenHashSet<NetworkFileInformation> downloads = new ObjectLinkedOpenHashSet<>();
-        for(String s : libs.keySet()) {
+        for (String s : libs.keySet()) {
             VanillaMinecraftLibraryParser lib = libs.get(s);
             downloads.add(new NetworkFileInformation(s, String.format("%s/libraries/%s", area, lib.getPath()), lib.getSha1()));
         }

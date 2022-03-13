@@ -1,23 +1,26 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.account.Account;
+import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibraryParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibrariesParser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibraryParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Collection;
 
 public class MinecraftLaunchArg {
     private String username = "";
     private String uuid = "";
     private String version = "";
     private Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions = new Object2ObjectLinkedOpenHashMap<>();
-    private String java = "java";
+    private JavaVersionInformation java = JavaVersionInformation.unknownJava();
     private String nativePath = "native/";
-    private VanillaMinecraftLibrariesParser libraries;
+    private Collection<LibrariesParser> libraries = new ObjectArrayList<>();
     private String area = "";
     private int frameWidth = 854;
     private Object2ObjectLinkedOpenHashMap<String, String> userProperties = new Object2ObjectLinkedOpenHashMap<>();
@@ -104,12 +107,16 @@ public class MinecraftLaunchArg {
         this.nativePath = nativePath;
     }
 
-    public VanillaMinecraftLibrariesParser getLibraries() {
+    public Collection<LibrariesParser> getLibraries() {
         return libraries;
     }
 
-    public void setLibraries(VanillaMinecraftLibrariesParser libraries) {
+    public void setLibraries(Collection<LibrariesParser> libraries) {
         this.libraries = libraries;
+    }
+
+    public void addLibraries(LibrariesParser libraries) {
+        this.libraries.add(libraries);
     }
 
     public String getOs() {
@@ -128,11 +135,11 @@ public class MinecraftLaunchArg {
         this.username = username;
     }
 
-    public String getJava() {
+    public JavaVersionInformation getJava() {
         return java;
     }
 
-    public void setJava(String java) {
+    public void setJava(JavaVersionInformation java) {
         this.java = java;
     }
 
@@ -199,9 +206,11 @@ public class MinecraftLaunchArg {
 
     public String formatClassesPathRuntime() {
         StringBuilder classPathString = new StringBuilder();
-        for (VanillaMinecraftLibraryParser lib : libraries.getLibraries().values()) {
-            lib.setArea(area);
-            classPathString.append(lib.getAbsolutePath()).append(os.equals("windows") ? ";" : ":");
+        for (LibrariesParser parser : libraries) {
+            for (LibraryParser lib : parser.getLibraries().values()) {
+                lib.setArea(area);
+                classPathString.append(lib.getAbsolutePath()).append(os.equals("windows") ? ";" : ":");
+            }
         }
         classPathString.append(versionInformation.formatAbsoluteClientPath()).append(os.equals("windows") ? ";" : ":");
         return classPathString.toString();
@@ -210,9 +219,15 @@ public class MinecraftLaunchArg {
     public String formatVisual() {
         StringBuilder builder = new StringBuilder("\n");
         String baseSpc = "";
-        builder = appendSpc(builder, "\"" + java + "\"", baseSpc);
+        builder = appendSpc(builder, "(" + java.getName() + ") \"" + java.getPath() + "\"", baseSpc);
         baseSpc = "    ";
         for (VmOption vmOption : vmOptions.values()) {
+            if (vmOption.isPair()) {
+                builder = appendSpc(builder, vmOption.getPairHead(), baseSpc);
+                baseSpc = "        ";
+                builder = appendSpc(builder, vmOption.getPairEnd(), baseSpc);
+                baseSpc = "    ";
+            }
             builder = appendSpc(builder, vmOption.getDetail(), baseSpc);
         }
         builder = appendSpc(builder, "-Djava.library.path", baseSpc);
@@ -221,8 +236,11 @@ public class MinecraftLaunchArg {
         baseSpc = "    ";
         builder = appendSpc(builder, "-cp", baseSpc);
         baseSpc = "        ";
-        for (VanillaMinecraftLibraryParser lib : libraries.getLibraries().values()) {
-            builder = appendSpc(builder, lib.getAbsolutePath(), baseSpc);
+        for (LibrariesParser parser : libraries) {
+            for (LibraryParser lib : parser.getLibraries().values()) {
+                lib.setArea(area);
+                builder = appendSpc(builder, lib.getAbsolutePath(), baseSpc);
+            }
         }
         builder = appendSpc(builder,versionInformation.formatAbsoluteClientPath(), baseSpc);
         baseSpc = "    ";
@@ -288,7 +306,7 @@ public class MinecraftLaunchArg {
 
     public String formatRuntime() {
         return String.format("\"%s\" %s -Djava.library.path=\"%s\" -cp \"%s\" %s --username %s --version \"%s\" --gameDir \"%s\" --assetsDir \"%s\" --assetIndex %s --uuid %s --accessToken %s --userProperties %s --userType %s --width %s --height %s", //stu
-                java, //java
+                java.getPath(), //java
                 formatVmOptionsRuntime(), //java vm options
                 nativePath, //game native path
                 formatClassesPathRuntime(), //game libraries
@@ -305,5 +323,11 @@ public class MinecraftLaunchArg {
                 frameWidth, //frame width
                 frameHeight //frame height
         );
+    }
+
+    public void invalid() {
+        vmOptions = new Object2ObjectLinkedOpenHashMap<>();
+        versionInformation = new MinecraftVersionInformation("","");
+        libraries = new ObjectArrayList<>();
     }
 }

@@ -8,6 +8,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.Minecr
 import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.MinecraftVersionInformation;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.MinecraftLoaderType;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.launcher.MinecraftLauncher;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.fabric.FabricMinecraftLibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftLibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.VanillaMinecraftVersionsParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
@@ -345,42 +346,40 @@ public class RikaishiNikuiLauncher {
         try {
             String area = config.getConfigString("area");
             for (File f : new File(area + "/versions/").listFiles()) {
-                if (minecraftVersions.getVersionAsId(f.getName()) == null) {
-                    if (minecraftVersions.getVersionAsName(f.getName()) == null) {
-                        String name = f.getName();
-                        String id = name;
-                        MinecraftVersionInformation information = new MinecraftVersionInformation(id, "unknown", "status.undefined");
-                        try {
-                            UUID.fromString(id.substring(id.length() - 36));
-                            information.setIdFormatted(true);
-                        } catch (Exception ex) {
-                            id = UUID.randomUUID().toString();
-                            information.setIdFormatted(false);
-                        }
-                        if (information.isIdFormatted()) {
-                            information.setId(id.substring(id.length() - 36));
-                        } else {
-                            information.setId(id);
-                        }
-                        information.setName(name);
-                        information.setArea(area);
-                        minecraftVersions.update(information);
-                        logger.info("minecraft information " + information.getName() + " found");
-                        logger.info("added " + information.getName());
-                        String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
-                        try {
-                            JSONObject manifest = new JSONObject(inf);
-                            new VanillaMinecraftLibrariesParser(manifest, area, os);
-                            try {
-                                information.setVersion(manifest.getString("clientVersion"));
-                            } catch (Exception e) {
-                                information.setVersion(manifest.getString("id"));
-                            }
-                        } catch (Exception e) {
-                            logger.error("unusable minecraft: " + information.getName());
-                        }
-                        minecraftVersions.update(information);
+                if (minecraftVersions.getVersionAsId(f.getName()) == null & minecraftVersions.getVersionAsName(f.getName()) == null & !new File(f.getPath() + "/status.lock").isFile()) {
+                    String name = f.getName();
+                    String id = name;
+                    MinecraftVersionInformation information = new MinecraftVersionInformation(id, "unknown", "status.undefined");
+                    try {
+                        UUID.fromString(id.substring(id.length() - 36));
+                        information.setIdFormatted(true);
+                    } catch (Exception ex) {
+                        id = UUID.randomUUID().toString();
+                        information.setIdFormatted(false);
                     }
+                    if (information.isIdFormatted()) {
+                        information.setId(id.substring(id.length() - 36));
+                    } else {
+                        information.setId(id);
+                    }
+                    information.setName(name);
+                    information.setArea(area);
+                    minecraftVersions.update(information);
+                    logger.info("minecraft information " + information.getName() + " found");
+                    logger.info("added " + information.getName());
+                    String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
+                    try {
+                        JSONObject manifest = new JSONObject(inf);
+                        new VanillaMinecraftLibrariesParser(manifest, area, os);
+                        try {
+                            information.setVersion(manifest.getString("clientVersion"));
+                        } catch (Exception e) {
+                            information.setVersion(manifest.getString("id"));
+                        }
+                    } catch (Exception e) {
+                        logger.error("unusable minecraft: " + information.getName());
+                    }
+                    minecraftVersions.update(information);
                 }
             }
 
@@ -395,7 +394,7 @@ public class RikaishiNikuiLauncher {
                 String inf = NetworkUtil.downloadToStringBuilder(information.formatManifest()).toString();
                 JSONObject manifest = new JSONObject(inf);
 
-                String mainClass =manifest.getString("mainClass");
+                String mainClass = manifest.getString("mainClass");
                 switch (mainClass) {
                     case "net.minecraft.client.main.Main" -> {
                         information.setLoaderType(MinecraftLoaderType.VANILLA);
@@ -417,6 +416,11 @@ public class RikaishiNikuiLauncher {
                     information.setVersion(manifest.getString("id"));
                 }
                 information.setJavaSatisfy(usedJava.getVersion() >= information.getJavaRequires());
+
+                if (information.getLoaderType() == MinecraftLoaderType.FABRIC) {
+                    FabricMinecraftLibrariesParser parser = new FabricMinecraftLibrariesParser(manifest, area, information.getVersion());
+                    information.setFabricLoader(parser.getFabricLoader());
+                }
 
                 minecraftVersions.update(information);
             }
@@ -460,8 +464,7 @@ public class RikaishiNikuiLauncher {
             Collection<MinecraftVersionInformation> names;
             if (buttons.getActiveButton().getId() == 0)
                 names = minecraftVersions.getVersions(searchLocalVersion.getText());
-            else
-                names = minecraftVersions.getVersions(searchLocalMinecraftVmVersion.getText());
+            else names = minecraftVersions.getVersions(searchLocalMinecraftVmVersion.getText());
 
             if (names.size() < 1) {
                 if (buttons.getActiveButton().getId() == 0) {
@@ -835,7 +838,8 @@ public class RikaishiNikuiLauncher {
                                 value = "vm.option." + information.getName().substring(0, 4);
                             } else {
                                 value = "vm.option." + information.getName() + (information.getName().equals("-client") ? (usedJava.isIs64Bit() ? ".64" : ".32") : "");
-                            } if (textFormatter.hasFormat(value)) {
+                            }
+                            if (textFormatter.hasFormat(value)) {
                                 vmOptionDetailsPanel.appendText(textFormatter.format(value), false);
                             } else {
                                 vmOptionDetailsPanel.appendText(new SingleText(value.substring(10)), false);
@@ -850,7 +854,8 @@ public class RikaishiNikuiLauncher {
 
                     vmOptionDetailsPanel.appendText("\n");
                 }
-            } vmOptionDetailsPanel.updateText();
+            }
+            vmOptionDetailsPanel.updateText();
         } catch (Exception ex) {
 
         }
@@ -1546,13 +1551,14 @@ public class RikaishiNikuiLauncher {
                     information.setTaskFeedback("none");
                     minecraftVersions.update(information);
                     try {
-                        RikaishiNikuiMinecraftTask minecraftTask = new RikaishiNikuiMinecraftTask(new MinecraftLauncher(new MinecraftLaunchInformation(mainVersionList.getSelectedValue(), os, usedJava, new Account("zhuaidadaya", UUID.randomUUID().toString()))));
+                        RikaishiNikuiMinecraftTask minecraftTask = new RikaishiNikuiMinecraftTask(new MinecraftLauncher(new MinecraftLaunchInformation(mainVersionList.getSelectedValue(), os, usedJava, new Account("zhuaidadaya", UUID.randomUUID().toString()), information.getLoaderType())));
                         information.setTaskId(minecraftTask.getId().toString());
                         RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, UUID.randomUUID(), MinecraftDownloadEntrustType.LAUNCH);
                         minecraftTask.setParentTask(downloadTask);
                         taskManager.join(minecraftTask);
                         taskManager.submitter(logFrame, minecraftTask.getId());
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                         RikaishiNikuiMinecraftDownloadTask downloadTask = new RikaishiNikuiMinecraftDownloadTask(information, UUID.randomUUID(), MinecraftDownloadEntrustType.FIX);
 
                         information.setTaskId(downloadTask.getId().toString());

@@ -1,16 +1,16 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.Parser;
+import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibraryParser;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class VanillaMinecraftLibraryParser extends Parser {
+public class VanillaMinecraftLibraryParser extends LibraryParser {
     private final JSONObject library;
     private final VanillaMinecraftDownloadParser downloadParser;
+    private final String os;
     private Object2ObjectRBTreeMap<String, Boolean> rulesAllow = new Object2ObjectRBTreeMap<>();
     private JSONArray rules;
-    private final String os;
 
     public VanillaMinecraftLibraryParser(JSONObject json, String os) {
         this.library = json;
@@ -44,16 +44,18 @@ public class VanillaMinecraftLibraryParser extends Parser {
         if (rules != null) {
             for (Object o : rules) {
                 JSONObject rule = new JSONObject(o.toString());
+                if (rule.toString().equals("{\"action\":\"allow\"}")) {
+                    rulesAllow.put("windows", true);
+                    rulesAllow.put("linux", true);
+                    rulesAllow.put("macos", true);
+                }
+
                 try {
                     String action = rule.getString("action");
                     String os = rule.getJSONObject("os").getString("name");
 
                     if (os.equals("osx")) {
                         rulesAllow.put("macos", action.equals("allow"));
-                        if (rulesAllow.get("macos")) {
-                            rulesAllow.put("windows", false);
-                            rulesAllow.put("linux", false);
-                        }
                     } else {
                         rulesAllow.put(os, true);
                     }

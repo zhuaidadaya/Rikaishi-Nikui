@@ -130,6 +130,14 @@
       "b": 65
     }
   },
+  "status.fixing": {
+    "text": "修复中",
+    "color": {
+      "r": 246,
+      "g": 55,
+      "b": 65
+    }
+  },
   "download.vanilla.button": {
     "text": "Vanilla"
   },
@@ -567,6 +575,22 @@
       "b": 89
     }
   },
+  "minecraft.information.fabric-version": {
+    "text": "Fabric版本",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
+  "minecraft.information.is-fabric": {
+    "text": "使用Fabric加载器",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
   "save.name": {
     "text": "以\"%s\"保存此版本",
     "color": {
@@ -779,6 +803,14 @@
       "b": 89
     }
   },
+  "vm.options.information.note": {
+    "text": "注释",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
   "vm.option.-version": {
     "auto-line": false,
     "1": {
@@ -866,6 +898,22 @@
   },
   "vm.option.-XX:UseG1GC": {
     "text": "G1垃圾回收器",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
+  "note.default.jndi.bug": {
+    "text": "(默认) 解决log4j在旧版本的jndi注入问题, 可删除",
+    "color": {
+      "r": 106,
+      "g": 169,
+      "b": 89
+    }
+  },
+  "note.default": {
+    "text": "(默认) 此选项为默认添加, 可删除",
     "color": {
       "r": 106,
       "g": 169,

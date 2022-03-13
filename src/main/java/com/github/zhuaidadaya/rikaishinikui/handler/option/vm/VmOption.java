@@ -9,6 +9,7 @@ public class VmOption {
     private String description = "";
     private String pairHead = "";
     private String pairEnd = "";
+    private String note = "";
     private boolean isEnable = false;
     private boolean isOption = false;
     private boolean isPair = true;
@@ -51,6 +52,15 @@ public class VmOption {
         this.description = description;
     }
 
+    public String getNote() {
+        return note;
+    }
+
+    public VmOption setNote(String note) {
+        this.note = note;
+        return this;
+    }
+
     public void apply(JSONObject json) {
         this.isPair = json.getBoolean("pair");
         this.isOption = json.getBoolean("opt");
@@ -66,6 +76,7 @@ public class VmOption {
         }
         this.description = json.getString("description");
         this.id = json.getString("id");
+        this.note = json.getString("note");
     }
 
     public String getId() {
@@ -82,6 +93,7 @@ public class VmOption {
         json.put("pair", isPair);
         json.put("pair-head", pairHead);
         json.put("pair-end", pairEnd);
+        json.put("note", note);
 
         if (isOption) {
             json.put("enable", isEnable);

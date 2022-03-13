@@ -34,4 +34,17 @@ public class Resources extends Thread {
             new File(new File(path).getParent()).mkdirs();
         }
     }
+
+    public static void createFile(String path) {
+        createParent(path);
+        try {
+            new File(path).createNewFile();
+        } catch (IOException e) {
+
+        }
+    }
+
+    public static void deleteFile(String path) {
+        new File(path).delete();
+    }
 }
