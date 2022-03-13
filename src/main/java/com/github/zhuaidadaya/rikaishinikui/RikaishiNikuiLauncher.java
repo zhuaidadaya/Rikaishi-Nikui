@@ -379,6 +379,10 @@ public class RikaishiNikuiLauncher {
                     } catch (Exception e) {
                         logger.error("unusable minecraft: " + information.getName());
                     }
+                    information.addVmOptions(new VmOption("-server").setNote("note.default"));
+                    // log4j2 - jndi inject bug
+                    information.addVmOptions(new VmOption("-Dlog4j2.formatMsgNoLookups=true").setNote("note.default.jndi.bug"), new VmOption("-Dcom.sun.jndi.ldap.object.trustURLCodebase=false").setNote("note.default.jndi.bug"));
+                    information.addVmOption("-Duser.dir=\"" + f.getAbsolutePath() + "\"");
                     minecraftVersions.update(information);
                 }
             }
@@ -741,8 +745,8 @@ public class RikaishiNikuiLauncher {
             VmOption information = vmOptionsList.getSelectedValue();
             vmOptionsOperationButtons2.setButtonVisible(0, !addVmOptions.getText().equals(""));
             if (information == null) {
-                addVmOptionsTip.setVisible(false);
-                addVmOptions.setVisible(false);
+                addVmOptionsTip.setVisible(true);
+                addVmOptions.setVisible(true);
                 editVmOptionsKey.setVisible(false);
                 editVmOptionsValue.setVisible(false);
                 editVmOptionsTip.setVisible(false);
