@@ -227,8 +227,9 @@ public class MinecraftLaunchArg {
                 baseSpc = "        ";
                 builder = appendSpc(builder, vmOption.getPairEnd(), baseSpc);
                 baseSpc = "    ";
+            } else {
+                builder = appendSpc(builder, vmOption.getDetail(), baseSpc);
             }
-            builder = appendSpc(builder, vmOption.getDetail(), baseSpc);
         }
         builder = appendSpc(builder, "-Djava.library.path", baseSpc);
         baseSpc = "        ";
@@ -323,11 +324,5 @@ public class MinecraftLaunchArg {
                 frameWidth, //frame width
                 frameHeight //frame height
         );
-    }
-
-    public void invalid() {
-        vmOptions = new Object2ObjectLinkedOpenHashMap<>();
-        versionInformation = new MinecraftVersionInformation("","");
-        libraries = new ObjectArrayList<>();
     }
 }

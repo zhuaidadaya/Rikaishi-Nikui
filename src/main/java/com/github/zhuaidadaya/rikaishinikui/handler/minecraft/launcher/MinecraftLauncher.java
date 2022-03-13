@@ -228,7 +228,7 @@ public class MinecraftLauncher {
                     while ((readErr = minecraftError.readLine()) != null) {
                         logLines.getAndIncrement();
                         taskManager.log(taskId, readErr);
-                        if (readErr.contains("java.lang.UnsupportedClassVersionError:")) {
+                        if (readErr.contains("java.lang.UnsupportedClassVersionError")) {
                             setTaskFeedback("task.feedback.java.version.error");
                             fail();
                             unknownError.set(false);

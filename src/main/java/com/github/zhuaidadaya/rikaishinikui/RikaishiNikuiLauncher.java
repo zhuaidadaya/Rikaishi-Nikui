@@ -412,6 +412,10 @@ public class RikaishiNikuiLauncher {
                         information.setLoaderType(MinecraftLoaderType.FABRIC);
                         information.setType("minecraft.type.fabric");
                     }
+                    case "cpw.mods.modlauncher.Launcher" -> {
+                        information.setLoaderType(MinecraftLoaderType.FORGE);
+                        information.setType("minecraft.type.forge");
+                    }
                 }
 
                 try {

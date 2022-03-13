@@ -275,11 +275,11 @@
     }
   },
   "minecraft.type.forge": {
-    "text": "Forge Minecraft",
+    "text": "Forge Minecraft(暂不支持)",
     "color": {
-      "r": 106,
-      "g": 169,
-      "b": 89
+      "r": 246,
+      "g": 55,
+      "b": 65
     }
   },
   "task.status.inactive": {

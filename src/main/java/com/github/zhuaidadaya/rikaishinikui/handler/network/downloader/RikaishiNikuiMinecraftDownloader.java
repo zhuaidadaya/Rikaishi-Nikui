@@ -81,7 +81,7 @@ public class RikaishiNikuiMinecraftDownloader {
         boolean result = switch (type) {
             case VANILLA -> downloadVanilla(information, entrustType);
             case FABRIC -> downloadFabric(information, entrustType);
-            default -> throw new IllegalStateException("Unexpected value: " + type);
+            case FORGE -> downloadVanilla(information, entrustType);
         };
 
         information.setLockStatus("lock.not");
