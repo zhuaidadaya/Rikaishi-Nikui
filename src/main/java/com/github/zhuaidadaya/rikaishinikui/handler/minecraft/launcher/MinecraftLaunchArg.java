@@ -6,12 +6,15 @@ import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.Minecr
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibraryParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
+import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Collection;
+
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.minecraftVersions;
 
 public class MinecraftLaunchArg {
     private String username = "";
@@ -35,6 +38,54 @@ public class MinecraftLaunchArg {
 
     public Object2ObjectLinkedOpenHashMap<String, String> getUserProperties() {
         return userProperties;
+    }
+
+    public String getLockStatus() {
+        return versionInformation.getLockStatus();
+    }
+
+    public void setLockStatus(String lockStatus) {
+        versionInformation.setLockStatus(lockStatus);
+    }
+
+    public String getLastLaunch() {
+        return versionInformation.getLastLaunch();
+    }
+
+    public void setLastLaunch(String lastLaunch) {
+        versionInformation.setLastLaunch(lastLaunch);
+    }
+
+    public MultipleText getTaskFeedback() {
+        return versionInformation.getTaskFeedback();
+    }
+
+    public void setTaskFeedback(MultipleText taskFeedback) {
+        versionInformation.setTaskFeedback(taskFeedback);
+    }
+
+    public void setTaskFeedback(String source,Object... args) {
+        versionInformation.setTaskFeedback(source, args);
+    }
+
+    public String getId() {
+        return versionInformation.getId();
+    }
+
+    public void setId(String id) {
+        versionInformation.setId(id);
+    }
+
+    public String getStatus() {
+        return versionInformation.getStatus();
+    }
+
+    public void setStatus(String status) {
+        versionInformation.setStatus(status);
+    }
+
+    public void update() {
+        minecraftVersions.update(versionInformation);
     }
 
     public void setUserProperties(Object2ObjectLinkedOpenHashMap<String, String> userProperties) {
@@ -89,6 +140,14 @@ public class MinecraftLaunchArg {
         this.account = account;
         this.username = account.getName();
         this.uuid = account.getUuid();
+    }
+
+    public void setTaskId(String id) {
+        versionInformation.setTaskId(id);
+    }
+
+    public String getTaskId() {
+        return versionInformation.getTaskId();
     }
 
     public String getArea() {
@@ -175,14 +234,6 @@ public class MinecraftLaunchArg {
         this.offline = offline;
     }
 
-    public MinecraftVersionInformation getVersionInformation() {
-        return versionInformation;
-    }
-
-    public void setVersionInformation(MinecraftVersionInformation versionInformation) {
-        this.versionInformation = versionInformation;
-    }
-
     public String formatVmOptionsRuntime() {
         StringBuilder vmOptionString = new StringBuilder();
         int last = vmOptions.size();
@@ -197,6 +248,14 @@ public class MinecraftLaunchArg {
             }
         }
         return vmOptionString.toString();
+    }
+
+    public MinecraftVersionInformation getVersionInformation() {
+        return versionInformation;
+    }
+
+    public void setVersionInformation(MinecraftVersionInformation versionInformation) {
+        this.versionInformation = versionInformation;
     }
 
     public StringBuilder appendVmOption(StringBuilder source, String option, String suffix) {

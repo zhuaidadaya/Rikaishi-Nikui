@@ -30,15 +30,12 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class MinecraftLauncher {
     private boolean failed = false;
-    private MinecraftVersionInformation versionInformation;
     private String os;
     private Account account;
-    private JSONObject gameSource;
-    private String area;
-    private String gamePath;
     private VanillaMinecraftClassifiersParser classifiers;
     private Process minecraft;
     private MinecraftLaunchArg arg = new MinecraftLaunchArg();
+    private MinecraftVersionInformation versionInformation;
 
     public MinecraftLauncher(MinecraftLaunchInformation information) {
         apply(information);
@@ -54,6 +51,7 @@ public class MinecraftLauncher {
 
     public void setVersionInformation(MinecraftVersionInformation versionInformation) {
         this.versionInformation = versionInformation;
+        arg.setVersionInformation(versionInformation);
     }
 
     public void setVmOptions(Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions) {
@@ -61,7 +59,7 @@ public class MinecraftLauncher {
     }
 
     public void apply(MinecraftLaunchInformation information) {
-        versionInformation = information.getVersionInformation();
+        setVersionInformation(information.getVersionInformation());
         String name = versionInformation.getName();
         setArea(versionInformation.getArea());
         setOs(information.getOs());
@@ -71,11 +69,11 @@ public class MinecraftLauncher {
         setGamePath(gamePath);
         setNativePath(gamePath + "/natives/");
         setGameSource(new JSONObject(NetworkUtil.downloadToStringBuilder(versionInformation.formatManifest()).toString()));
-        setClassifiers(new VanillaMinecraftClassifiersParser(gameSource, area, os));
+        setClassifiers(new VanillaMinecraftClassifiersParser(getGameSource(), getArea(), os));
 
         setVmOptions(information.getVmOptions());
 
-        VanillaMinecraftLibrariesParser librariesParser = new VanillaMinecraftLibrariesParser(gameSource, area, os);
+        VanillaMinecraftLibrariesParser librariesParser = new VanillaMinecraftLibrariesParser(getGameSource(), getArea(), os);
         addLibraries(librariesParser);
     }
 
@@ -104,27 +102,27 @@ public class MinecraftLauncher {
     }
 
     public JSONObject getGameSource() {
-        return gameSource;
+        return arg.getGameSource();
     }
 
     public void setGameSource(JSONObject gameSource) {
-        this.gameSource = gameSource;
+        arg.setGameSource(gameSource);
     }
 
     public String getArea() {
-        return area;
+        return arg.getArea();
     }
 
     public void setArea(String area) {
-        this.area = area;
+        arg.setArea(area);
     }
 
     public String getGamePath() {
-        return gamePath;
+        return arg.getGamePath();
     }
 
     public void setGamePath(String gamePath) {
-        this.gamePath = gamePath;
+        arg.setGamePath(gamePath);
     }
 
     public VanillaMinecraftClassifiersParser getClassifiers() {
@@ -143,14 +141,6 @@ public class MinecraftLauncher {
         arg.setJava(java);
     }
 
-    public MinecraftLaunchArg formatArg() {
-        arg.setGameSource(gameSource);
-        arg.setArea(area);
-        arg.setGamePath(gamePath);
-        arg.setVersionInformation(versionInformation);
-        return arg;
-    }
-
     public void launch(String taskId) {
         if (getLoaderType() == MinecraftLoaderType.FABRIC) {
             String parse = NetworkUtil.downloadToStringBuilder(versionInformation.formatManifest()).toString();
@@ -159,10 +149,8 @@ public class MinecraftLauncher {
             addLibraries(parser);
         }
 
-        versionInformation.setTaskId(taskId);
+        arg.setTaskId(taskId);
         minecraftVersions.update(versionInformation);
-
-        formatArg();
 
         try {
             FileUtil.deleteFiles(arg.getNativePath() + "/");
@@ -171,7 +159,7 @@ public class MinecraftLauncher {
         }
         for (VanillaMinecraftClassifierParser classifier : classifiers.getClassifiers().values()) {
             try {
-                FileUtil.unzip(area + "/libraries/" + classifier.getNative().getPath(), arg.getNativePath());
+                FileUtil.unzip(arg.getArea() + "/libraries/" + classifier.getNative().getPath(), arg.getNativePath());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -234,7 +222,7 @@ public class MinecraftLauncher {
                             unknownError.set(false);
                         }
                         if (readErr.contains("java.lang.ClassNotFoundException")) {
-                            if (readErr.contains(gameSource.getString("mainClass"))) {
+                            if (readErr.contains(arg.getGameSource().getString("mainClass"))) {
                                 setTaskFeedback("task.feedback.main.class.not.found");
                             } else {
                                 setTaskFeedback("task.feedback.class.not.found");
@@ -270,6 +258,10 @@ public class MinecraftLauncher {
         } catch (Exception e) {
             fail();
         }
+
+        versionInformation = new MinecraftVersionInformation("","");
+
+        System.gc();
     }
 
     public void fail() {
