@@ -74,7 +74,8 @@ public class MinecraftLauncher {
         setVmOptions(information.getVmOptions());
 
         VanillaMinecraftLibrariesParser librariesParser = new VanillaMinecraftLibrariesParser(getGameSource(), getArea(), os);
-        addLibraries(librariesParser);
+        if (!information.getVersionInformation().getFabricLoader().isFabric())
+            addLibraries(librariesParser);
     }
 
     public void addLibraries(LibrariesParser libraries) {
@@ -165,9 +166,7 @@ public class MinecraftLauncher {
             }
         }
 
-        if (account.getType().equals("offline")) {
-            arg.setAccount(new Account(account.getName()));
-        }
+        arg.setAccount(account);
 
         try {
             logger.info("launching minecraft " + versionInformation.getTaskId() + " with args: " + arg.formatVisual());
@@ -259,7 +258,7 @@ public class MinecraftLauncher {
             fail();
         }
 
-        versionInformation = new MinecraftVersionInformation("","");
+        versionInformation = new MinecraftVersionInformation("", "");
 
         System.gc();
     }

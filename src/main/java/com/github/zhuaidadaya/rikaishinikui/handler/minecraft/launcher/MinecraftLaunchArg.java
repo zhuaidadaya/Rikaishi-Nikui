@@ -272,6 +272,7 @@ public class MinecraftLaunchArg {
             }
         }
         classPathString.append(versionInformation.formatAbsoluteClientPath()).append(os.equals("windows") ? ";" : ":");
+//        System.out.println(classPathString);
         return classPathString.toString();
     }
 

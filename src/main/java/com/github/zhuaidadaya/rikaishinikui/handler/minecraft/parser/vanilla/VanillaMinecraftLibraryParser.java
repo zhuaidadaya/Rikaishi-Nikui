@@ -57,7 +57,7 @@ public class VanillaMinecraftLibraryParser extends LibraryParser {
                     if (os.equals("osx")) {
                         rulesAllow.put("macos", action.equals("allow"));
                     } else {
-                        rulesAllow.put(os, true);
+                        rulesAllow.put(os, action.equals("allow"));
                     }
                 } catch (Exception ex) {
                     rulesAllow.put("windows", true);
