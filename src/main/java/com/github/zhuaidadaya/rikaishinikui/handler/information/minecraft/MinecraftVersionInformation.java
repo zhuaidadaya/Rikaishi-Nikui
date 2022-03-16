@@ -41,6 +41,7 @@ public class MinecraftVersionInformation {
     private Object2ObjectLinkedOpenHashMap<String, VmOption> vmOptions = new Object2ObjectLinkedOpenHashMap<>();
     private MinecraftLoaderType loaderType = MinecraftLoaderType.VANILLA;
     private FabricLoaderInformation fabricLoader = new FabricLoaderInformation();
+    private String belong = "unknown";
 
     public MinecraftVersionInformation(String id, String name, String area, String type, String status, String version) {
         this.id = id;
@@ -303,6 +304,15 @@ public class MinecraftVersionInformation {
         for (VmOption option : removes) {
             vmOptions.remove(option.getId());
         }
+
+        this.belong = getBelong();
+    }
+
+    public String getBelong() {
+//        if (version.contains()) {
+//
+//        }
+        return "-1";
     }
 
     public String getAbsolutePath() {
@@ -352,6 +362,7 @@ public class MinecraftVersionInformation {
             }
         }
         json.put("options", vmOptions);
+        json.put("belong", belong);
         json.put("fabric", fabricLoader.toJSONObject());
 
         return json;
@@ -400,6 +411,9 @@ public class MinecraftVersionInformation {
         } catch (Exception e) {
 
         }
+        this.belong = getBelong();
+        information.put("belong", belong);
+
         return information;
     }
 

@@ -134,8 +134,6 @@ public class FileDownloader {
                                 failFile();
                                 break;
                             }
-
-                            Thread.sleep(1);
                         }
                     } catch (Exception e) {
                         failFile();

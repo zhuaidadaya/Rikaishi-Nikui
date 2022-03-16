@@ -6,20 +6,12 @@ public enum Language {
     private final int value;
     private final String name;
 
-    /**
-     * init, set language
-     *
-     * @param value
-     *         value(ID) of language
-     * @param name
-     *         name of Language
-     */
     Language(int value, String name) {
         this.value = value;
         this.name = name;
     }
 
-    public static Language getLanguageForName(String name) {
+    public static Language of(String name) {
         Language language = null;
         switch(name.toLowerCase()) {
             case "chinese" -> language = CHINESE;
@@ -30,7 +22,7 @@ public enum Language {
         return language;
     }
 
-    public static String getNameForLanguage(Language language) {
+    public static String getName(Language language) {
         String name = "";
         switch(language) {
             case CHINESE -> name = "Chinese";
@@ -41,16 +33,10 @@ public enum Language {
         return name;
     }
 
-    /**
-     * get language value(ID)
-     */
     public int getValue() {
         return value;
     }
 
-    /**
-     * get language name
-     */
     public String getName() {
         return name;
     }

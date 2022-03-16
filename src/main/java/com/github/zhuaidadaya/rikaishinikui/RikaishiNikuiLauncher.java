@@ -116,8 +116,8 @@ public class RikaishiNikuiLauncher {
             this.options.addAll(Arrays.asList(options));
 
             LanguageResource resource = new LanguageResource();
-            resource.set(Language.CHINESE, "/assets/lang/zh_cn.json");
-            resource.set(Language.ENGLISH, "/assets/lang/en_us.json");
+            resource.set("/assets/lang/zh_cn.json");
+            resource.set("/assets/lang/en_us.json");
             textFormatter = new TextFormatter(resource);
 
             initConfig();

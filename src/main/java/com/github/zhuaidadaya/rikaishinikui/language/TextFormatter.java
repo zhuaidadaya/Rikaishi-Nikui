@@ -2,33 +2,23 @@ package com.github.zhuaidadaya.rikaishinikui.language;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
-import com.github.zhuaidadaya.utils.resource.Resources;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.json.JSONObject;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.StringReader;
 import java.util.regex.Matcher;
 
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.language;
 import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.textFormatter;
 
 public class TextFormatter {
-    private final Map<Language, JSONObject> format = new HashMap<>();
+    private final LanguageResource format;
 
     public TextFormatter(LanguageResource languageResource) {
-        for (Language lang : languageResource.getNames()) {
-            String resource = languageResource.get(lang);
-
-            try {
-                JSONObject json = new JSONObject(FileUtil.read(new BufferedReader(new InputStreamReader(Resources.getResource(resource, getClass()), StandardCharsets.UTF_8))));
-                format.put(lang, json);
-            } catch (Exception e) {
-
-            }
-        }
+        this.format = languageResource;
     }
 
     public String getText(String source, Object... args) {
@@ -96,8 +86,11 @@ public class TextFormatter {
 
     public SingleText formatSingleText(String source, JSONObject json, Object... args) {
         SingleText formatReturn;
-        if (json == null) formatReturn = new SingleText(format.get(language).getString(source));
-        else formatReturn = new SingleText(json);
+        if (json == null) {
+            formatReturn = new SingleText(format.get(language).get(source));
+        } else {
+            formatReturn = new SingleText(json);
+        }
 
         for (Object o : args) {
             try {

@@ -25,7 +25,8 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class RikaishiNikuiMinecraftDownloader {
     private final ResourceDownloader downloader = new ResourceDownloader();
-    private final String DEFAULT_MANIFEST = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
+    private final String DEFAULT_MANIFEST = "https://launchermeta.mojang.com/mc/game_v2/version_manifest.json";
+    private final String DEFAULT_MANIFEST_V2 = "https://launchermeta.mojang.com/mc/game_v2/version_manifest_v2.json";
     private final String DEFAULT_RESOURCE = "http://resources.download.minecraft.net";
     private int lastTaskThreads = 0;
     private int threads = -1;
