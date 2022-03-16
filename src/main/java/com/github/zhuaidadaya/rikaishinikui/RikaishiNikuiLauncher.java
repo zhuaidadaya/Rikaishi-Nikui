@@ -344,8 +344,8 @@ public class RikaishiNikuiLauncher {
     }
 
     public void detectAreaVersions() {
+        String area = config.getConfigString("area");
         try {
-            String area = config.getConfigString("area");
             for (File f : new File(area + "/versions/").listFiles()) {
                 if (minecraftVersions.getVersionAsId(f.getName()) == null & minecraftVersions.getVersionAsName(f.getName()) == null & !new File(f.getPath() + "/status.lock").isFile()) {
                     String name = f.getName();
@@ -387,7 +387,11 @@ public class RikaishiNikuiLauncher {
                     minecraftVersions.update(information);
                 }
             }
+        } catch (Exception e) {
 
+        }
+
+        try {
             for (MinecraftVersionInformation information : minecraftVersions.getVersions()) {
                 if (!new File(information.getPath()).exists()) {
                     minecraftVersions.remove(information);
