@@ -35,9 +35,6 @@ public class DiskObjectConfigUtil {
     private boolean shutdown = false;
     private boolean encryptionHead = false;
     private boolean encryption = false;
-    private boolean saving = false;
-    private boolean forceSaving = false;
-    private boolean backgroundSave = false;
     private int inseparableLevel = 3;
 
     private Thread saveThread;

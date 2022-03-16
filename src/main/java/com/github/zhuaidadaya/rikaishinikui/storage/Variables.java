@@ -2,15 +2,15 @@ package com.github.zhuaidadaya.rikaishinikui.storage;
 
 import com.github.zhuaidadaya.rikaishinikui.RikaishiNikuiLauncher;
 import com.github.zhuaidadaya.rikaishinikui.handler.information.java.JavaVersionInformation;
+import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
 import com.github.zhuaidadaya.rikaishinikui.handler.recoder.java.JavaVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.recoder.minecrtaft.MinecraftVersionsRecorder;
-import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskManager;
 import com.github.zhuaidadaya.rikaishinikui.language.Language;
 import com.github.zhuaidadaya.rikaishinikui.language.TextFormatter;
 import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
-import com.github.zhuaidadaya.utils.config.DiskObjectConfigUtil;
+import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.apache.logging.log4j.LogManager;
 
@@ -23,8 +23,8 @@ public class Variables {
     public static RikaishiNikuiLauncher launcher = new RikaishiNikuiLauncher();
     public static TextFormatter textFormatter;
     public static Language language = Language.CHINESE;
-    public static DiskObjectConfigUtil configUi;
-    public static DiskObjectConfigUtil config;
+    public static ObjectConfigUtil configUi;
+    public static ObjectConfigUtil config;
     public static Object2ObjectRBTreeMap<String, RikaishiNikuiFrame> frames = new Object2ObjectRBTreeMap<>();
     public static RikaishiNikuiMinecraftDownloader minecraftDownloader = new RikaishiNikuiMinecraftDownloader();
     public static MinecraftVersionsRecorder minecraftVersions = new MinecraftVersionsRecorder();

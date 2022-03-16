@@ -28,7 +28,8 @@ import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiLogFrame;
 import com.github.zhuaidadaya.rikaishinikui.ui.list.*;
 import com.github.zhuaidadaya.rikaishinikui.ui.panel.*;
-import com.github.zhuaidadaya.utils.config.DiskObjectConfigUtil;
+import com.github.zhuaidadaya.utils.config.EncryptionType;
+import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import org.json.JSONObject;
@@ -291,10 +292,10 @@ public class RikaishiNikuiLauncher {
     }
 
     public void initConfig() {
-//        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/", "rikaishi_nikui_ui.mhf").setNote(textFormat.getText("config.note.ui")).setEncryption(true).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(50);
-//        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/", "rikaishi_nikui.mhf").setNote(textFormat.getText("config.note")).setEncryption(true);
-        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/");
-        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/");
+        configUi = new ObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/", "rikaishi_nikui_ui.mhf").setNote(textFormatter.getText("config.note.ui")).setEncryption(false).setEncryptionHead(false).setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE).setLibraryOffset(50);
+        config = new ObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/", "rikaishi_nikui.mhf").setNote(textFormatter.getText("config.note")).setEncryption(false);
+//        configUi = new DiskObjectConfigUtil(entrust + "UI", System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/ui/");
+//        config = new DiskObjectConfigUtil(entrust, System.getProperty("user.dir") + "/rikaishi_nikui/config/launcher/");
     }
 
     public void tickUI() {
@@ -308,7 +309,7 @@ public class RikaishiNikuiLauncher {
         parseError(throwable, source, true, configUi);
     }
 
-    public void parseError(Throwable throwable, String source, boolean shutdownCU, DiskObjectConfigUtil configUtil) {
+    public void parseError(Throwable throwable, String source, boolean shutdownCU, ObjectConfigUtil configUtil) {
         logger.error(source, throwable);
 
         mainFrame.setVisible(false);
