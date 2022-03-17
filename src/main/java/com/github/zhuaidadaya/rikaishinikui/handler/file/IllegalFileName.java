@@ -1,10 +1,11 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.file;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import java.util.Collection;
-import java.util.LinkedHashSet;
 
 public class IllegalFileName {
-    private final Collection<String> illegals = new LinkedHashSet<>();
+    private final Collection<String> illegals = new ObjectArrayList<>();
     private boolean illegal = false;
 
     public IllegalFileName(String name) {

@@ -293,7 +293,7 @@ public class MinecraftLaunchArg {
         }
         builder = appendSpc(builder, "-Djava.library.path", baseSpc);
         baseSpc = "        ";
-        builder = appendSpc(builder, nativePath, baseSpc);
+        builder = appendSpc(builder, "\"" + nativePath + "\"", baseSpc);
         baseSpc = "    ";
         builder = appendSpc(builder, "-cp", baseSpc);
         baseSpc = "        ";
@@ -311,7 +311,7 @@ public class MinecraftLaunchArg {
         baseSpc = "    ";
         builder = appendSpc(builder, "--gameDir", baseSpc);
         baseSpc = "        ";
-        builder = appendSpc(builder, gamePath, baseSpc);
+        builder = appendSpc(builder, "\"" + gamePath + "\"", baseSpc);
         baseSpc = "    ";
         builder = appendSpc(builder, "--version", baseSpc);
         baseSpc = "        ";
@@ -319,7 +319,7 @@ public class MinecraftLaunchArg {
         baseSpc = "    ";
         builder = appendSpc(builder, "--assetsDir", baseSpc);
         baseSpc = "        ";
-        builder = appendSpc(builder, new File(area + "/assets").getAbsolutePath(), baseSpc);
+        builder = appendSpc(builder, "\"" + new File(area + "/assets").getAbsolutePath() + "\"", baseSpc);
         baseSpc = "    ";
         builder = appendSpc(builder, "--assetIndex", baseSpc);
         baseSpc = "        ";

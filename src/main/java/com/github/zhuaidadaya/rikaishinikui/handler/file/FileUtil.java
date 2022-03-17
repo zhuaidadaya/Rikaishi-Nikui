@@ -1,6 +1,8 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.file;
 
 import com.github.zhuaidadaya.utils.resource.Resources;
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
 import java.awt.*;
 import java.io.*;
@@ -44,8 +46,8 @@ public class FileUtil {
                         targetFile.getParentFile().mkdirs();
                     }
                     targetFile.createNewFile();
-                    InputStream is = zipFile.getInputStream(entry);
-                    FileOutputStream fos = new FileOutputStream(targetFile);
+                    FastBufferedInputStream is = new FastBufferedInputStream(zipFile.getInputStream(entry));
+                    FastBufferedOutputStream fos = new FastBufferedOutputStream(new FileOutputStream(targetFile));
                     int len;
                     byte[] buf = new byte[1024 * 1024];
                     while ((len = is.read(buf)) != -1) {
@@ -97,8 +99,8 @@ public class FileUtil {
     public static void write(File file, String information) {
         try {
             Resources.createParent(file.getPath());
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(information);
+            FastBufferedOutputStream writer = new FastBufferedOutputStream(new FileOutputStream(file));
+            writer.write(information.getBytes());
             writer.close();
         } catch (Exception e) {
 
@@ -108,10 +110,10 @@ public class FileUtil {
     public static void write(File file, Collection<?> information) {
         try {
             Resources.createParent(file.getPath());
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+            FastBufferedOutputStream writer = new FastBufferedOutputStream(new FileOutputStream(file, true));
 
             for (Object o : information) {
-                writer.write(o.toString() + "\n");
+                writer.write((o.toString() + "\n").getBytes());
             }
 
             writer.close();

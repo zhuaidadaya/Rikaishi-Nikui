@@ -30,7 +30,7 @@ public class PaginationCachedMultipleText extends PaginationCachedText<Collectio
     }
 
     public void spawnTextManager(RikaishiNikuiLogComponent component) {
-        setTextManager(new PaginationMultipleTextManager(this,component));
+        setTextManager(new PaginationMultipleTextManager(this, component));
     }
 
     public String getBase() {
@@ -49,7 +49,7 @@ public class PaginationCachedMultipleText extends PaginationCachedText<Collectio
         this.texts.add(text);
     }
 
-        public void cache() {
+    public void cache() {
         String cache = (base == null ? "" : "/") + "rikaishi_nikui/logs/cached/" + cachedId.toString() + "/cached-" + (pages.size() + 1) + ".log";
         FileUtil.write(new File(cache), texts);
         pages.put(pages.size() + 1, cache);
