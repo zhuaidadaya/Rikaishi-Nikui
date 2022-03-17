@@ -383,8 +383,9 @@ public class RikaishiNikuiLauncher {
                     information.addVmOptions(new VmOption("-server").setNote("note.default"));
                     // log4j2 - jndi inject bug
                     information.addVmOptions(new VmOption("-Dlog4j2.formatMsgNoLookups=true").setNote("note.default.jndi.bug"), new VmOption("-Dcom.sun.jndi.ldap.object.trustURLCodebase=false").setNote("note.default.jndi.bug"));
-                    information.addVmOption("-Duser.dir=\"" + f.getAbsolutePath() + "\"");
+                    information.addVmOption(new VmOption("-Duser.dir=\"" + f.getAbsolutePath() + "\"").setNote("note.default.user.dir"));
                     minecraftVersions.update(information);
+                    logger.info("settings default vm options for " + information.getName());
                 }
             }
         } catch (Exception e) {

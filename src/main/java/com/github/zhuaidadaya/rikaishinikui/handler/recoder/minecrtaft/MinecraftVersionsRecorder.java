@@ -33,8 +33,8 @@ public class MinecraftVersionsRecorder {
         if (versions.get(information.getId()) == null || !information.toJSONObject().toString().equals(versions.get(information.getId()).toJSONObject().toString())) {
             versions.put(information.getId(), information);
             versionNames.put(information.getId(), information.getName());
-            config.set("minecraft-versions", toJSONObject());
         }
+        config.set("minecraft-versions", toJSONObject());
     }
 
     public synchronized void remove(MinecraftVersionInformation information) {

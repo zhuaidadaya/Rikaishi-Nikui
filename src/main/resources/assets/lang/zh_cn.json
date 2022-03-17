@@ -1,5 +1,6 @@
 {
   "language": "Chinese",
+  "visual": "中文",
   "format": {
     "config.note.ui": "this is ui database of rikaishi nikui launcher\n -这是rikaishi nikui启动器的ui数据库\ndo not modify this database\n -不要修改此数据库",
     "config.note": "this is database of rikaishi nikui launcher\n -这是rikaishi nikui启动器的数据库\nyou can modify this database information if you understand how to modify\n -你可以在清楚如何修改的情况下修改此数据库内容\n\ndocument: https://github.com/zhuaidadaya/Rikaishi-Nikui/wiki\n -参考文档: https://github.com/zhuaidadaya/Rikaishi-Nikui/wiki\n",
@@ -928,6 +929,14 @@
         "r": 106,
         "g": 169,
         "b": 89
+      }
+    },
+    "note.default.user.dir": {
+      "text": "(默认) 不要修改此选项, 否则可能让一些文件生成在不正确的地方",
+      "color": {
+        "r": 217,
+        "g": 163,
+        "b": 67
       }
     }
   }
