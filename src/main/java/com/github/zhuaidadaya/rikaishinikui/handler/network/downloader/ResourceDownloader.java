@@ -12,7 +12,6 @@ import java.util.Set;
 public class ResourceDownloader {
     private final Object2ObjectRBTreeMap<String, FileDownloader> progresses = new Object2ObjectRBTreeMap<>();
     private ObjectArrayList<FileDownloader> activeDownloads = new ObjectArrayList<>();
-    private boolean running = true;
 
     public void downloadFile(NetworkFileInformation file, int threads) {
         downloadFile(file, threads, Thread.currentThread().getName());
@@ -101,7 +100,6 @@ public class ResourceDownloader {
     }
 
     public void stop() {
-        running = false;
         for (FileDownloader downloader : activeDownloads) {
             downloader.cancel();
         }

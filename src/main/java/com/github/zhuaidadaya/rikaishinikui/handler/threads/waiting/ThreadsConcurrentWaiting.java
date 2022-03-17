@@ -1,14 +1,13 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting;
 
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 public class ThreadsConcurrentWaiting {
-    private final Collection<Thread> threads = new ObjectArraySet<>();
-    private final Collection<Thread> threadsTg = new ObjectArraySet<>();
+    private final Collection<Thread> threads = new ObjectArrayList<>();
     private final ThreadsDoneCondition condition;
     private int alive = 0;
     private boolean running = false;
@@ -27,7 +26,6 @@ public class ThreadsConcurrentWaiting {
         running = true;
         synchronized (this) {
             try {
-                threadsTg.addAll(threads);
                 Iterator<Thread> iterator = threads.iterator();
                 while (alive < limit) {
                     if (iterator.hasNext()) {
@@ -38,11 +36,11 @@ public class ThreadsConcurrentWaiting {
                     }
                 }
 
-                while (threadsTg.size() > 0) {
+                while (threads.size() > 0) {
                     if (condition == ThreadsDoneCondition.ALIVE & alive > limit) {
-                        Thread.currentThread().join(10);
+                        Thread.currentThread().join(2);
                     }
-                    threadsTg.removeIf(t -> {
+                    threads.removeIf(t -> {
                         if (!t.isAlive()) {
                             alive--;
                             return true;
@@ -50,9 +48,11 @@ public class ThreadsConcurrentWaiting {
                         return false;
                     });
 
-                    if (iterator.hasNext() & alive < limit) {
-                        iterator.next().start();
-                        alive++;
+                    synchronized (threads) {
+                        if (iterator.hasNext() & alive < limit) {
+                            iterator.next().start();
+                            alive++;
+                        }
                     }
                 }
             } catch (Exception e) {

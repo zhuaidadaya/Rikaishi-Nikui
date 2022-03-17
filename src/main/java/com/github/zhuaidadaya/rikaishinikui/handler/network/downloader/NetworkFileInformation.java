@@ -2,8 +2,8 @@ package com.github.zhuaidadaya.rikaishinikui.handler.network.downloader;
 
 public class NetworkFileInformation {
     private String sha1 = "";
-    private String url = "";
-    private String filePath = "";
+    private String url;
+    private String filePath;
     private int size = -1;
     private String name = "";
 
