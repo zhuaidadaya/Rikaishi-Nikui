@@ -8,16 +8,15 @@ import org.json.JSONObject;
 public class VanillaMinecraftLibraryParser extends LibraryParser {
     private final JSONObject library;
     private final VanillaMinecraftDownloadParser downloadParser;
-    private final String os;
     private Object2ObjectRBTreeMap<String, Boolean> rulesAllow = new Object2ObjectRBTreeMap<>();
     private JSONArray rules;
+    private final String os;
 
     public VanillaMinecraftLibraryParser(JSONObject json, String os) {
         this.library = json;
         this.downloadParser = new VanillaMinecraftDownloadParser(json.getJSONObject("downloads"));
         try {
             this.rules = json.getJSONArray("rules");
-            initRulesAllow();
         } catch (Exception ex) {
 
         }
@@ -44,20 +43,19 @@ public class VanillaMinecraftLibraryParser extends LibraryParser {
         if (rules != null) {
             for (Object o : rules) {
                 JSONObject rule = new JSONObject(o.toString());
-                if (rule.toString().equals("{\"action\":\"allow\"}")) {
-                    rulesAllow.put("windows", true);
-                    rulesAllow.put("linux", true);
-                    rulesAllow.put("macos", true);
-                }
-
                 try {
                     String action = rule.getString("action");
                     String os = rule.getJSONObject("os").getString("name");
 
                     if (os.equals("osx")) {
                         rulesAllow.put("macos", action.equals("allow"));
+                        if (rulesAllow.get("macos")) {
+                            rulesAllow.put("windows", false);
+                            rulesAllow.put("linux", false);
+                            break;
+                        }
                     } else {
-                        rulesAllow.put(os, action.equals("allow"));
+                        rulesAllow.put(os,  action.equals("allow"));
                     }
                 } catch (Exception ex) {
                     rulesAllow.put("windows", true);

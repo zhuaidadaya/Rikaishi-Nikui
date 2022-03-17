@@ -50,7 +50,7 @@ public class PaginationCachedMultipleText extends PaginationCachedText<Collectio
     }
 
         public void cache() {
-        String cache = (base == null ? "" : "/") + "logs/cached/" + cachedId.toString() + "/cached-" + (pages.size() + 1) + ".log";
+        String cache = (base == null ? "" : "/") + "rikaishi_nikui/logs/cached/" + cachedId.toString() + "/cached-" + (pages.size() + 1) + ".log";
         FileUtil.write(new File(cache), texts);
         pages.put(pages.size() + 1, cache);
         texts = new ObjectArrayList<>();

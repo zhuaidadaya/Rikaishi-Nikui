@@ -12,6 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.os;
+
 public class FabricMinecraftLibrariesParser extends LibrariesParser {
     private final JSONArray libraries;
     private final String area;
@@ -53,7 +55,7 @@ public class FabricMinecraftLibrariesParser extends LibrariesParser {
         for (Object library : libraries) {
             JSONObject json = new JSONObject(library.toString());
             try {
-                FabricMinecraftLibraryParser libraryParser = new FabricMinecraftLibraryParser(json, gameVersion, loaderVersion);
+                FabricMinecraftLibraryParser libraryParser = new FabricMinecraftLibraryParser(json, gameVersion, loaderVersion, os);
 
                 if (libraryParser.getLibrary() != null) {
                     libs.put(libraryParser.getUrl(), libraryParser);

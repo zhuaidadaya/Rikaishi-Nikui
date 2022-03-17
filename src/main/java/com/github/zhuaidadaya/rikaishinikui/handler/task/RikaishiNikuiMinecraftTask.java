@@ -85,6 +85,7 @@ public class RikaishiNikuiMinecraftTask extends RikaishiNikuiTask {
 
     public void log(String log, LogLevel level) {
         logs.append(RikaishiNikuiColorStyle.formatBlackLog(log, level));
+        System.out.println(log);
         submit();
     }
 
