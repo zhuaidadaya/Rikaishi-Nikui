@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -136,5 +137,38 @@ public class FileUtil {
 
     public static void openInNautilus(String s) throws IOException {
         Runtime.getRuntime().exec("nautilus " + s);
+    }
+
+    public static String absPath(String path) {
+        return new File(path).getAbsolutePath();
+    }
+
+    public static void clone(String from,String to) {
+        for (File f : Objects.requireNonNull(new File(from).listFiles())) {
+            try {
+                if (f.isDirectory()) {
+                    if (Objects.requireNonNull(f.listFiles()).length > 0) {
+                        clone(from + "/" + f.getName(), to + "/" + f.getName());
+                    }
+                } else if (f.isFile()) {
+                    copy(f.getAbsolutePath(), to + "/" + f.getName());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void copy(String from,String to) throws Exception{
+        Resources.createFile(to);
+        FastBufferedInputStream input = new FastBufferedInputStream(new FileInputStream(from));
+        FastBufferedOutputStream output = new FastBufferedOutputStream(new FileOutputStream(to));
+        byte[] buff = new byte[8192];
+        int length;
+        while ((length = input.read(buff,0,buff.length)) != -1) {
+            output.write(buff, 0,length);
+        }
+        input.close();
+        output.close();
     }
 }

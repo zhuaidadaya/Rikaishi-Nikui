@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.utils.times;
+package com.github.zhuaidadaya.rikaishinikui.handler.times;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

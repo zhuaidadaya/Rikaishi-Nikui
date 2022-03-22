@@ -2,8 +2,8 @@ package com.github.zhuaidadaya.rikaishinikui.logger;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskManager;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
-import com.github.zhuaidadaya.utils.times.TimeType;
-import com.github.zhuaidadaya.utils.times.Times;
+import com.github.zhuaidadaya.rikaishinikui.handler.times.TimeType;
+import com.github.zhuaidadaya.rikaishinikui.handler.times.Times;
 import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;

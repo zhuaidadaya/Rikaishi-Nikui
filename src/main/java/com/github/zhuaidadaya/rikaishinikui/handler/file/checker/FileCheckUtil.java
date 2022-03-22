@@ -30,10 +30,9 @@ public class FileCheckUtil {
                 mappedByteBuffer = fileInputStream.getChannel().map(FileChannel.MapMode.READ_ONLY, bufferCount * bufferSize, lastBuffer);
                 messageDigest.update(mappedByteBuffer);
             }
-            byte[] digest = messageDigest.digest();
             String hexString;
-            for(byte b : digest) {
-                hexString = Integer.toHexString(b & 0xFF);
+            for(byte b : messageDigest.digest()) {
+                hexString = Integer.toHexString(b & 255);
                 if(hexString.length() < 2) {
                     builder.append(0);
                 }
