@@ -1,8 +1,8 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.frame;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationTextManager;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
-import com.github.zhuaidadaya.rikaishinikui.language.Text;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.Text;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiComponent;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;

@@ -1,7 +1,7 @@
-package com.github.zhuaidadaya.rikaishinikui.language;
+package com.github.zhuaidadaya.rikaishinikui.handler.language;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
-import com.github.zhuaidadaya.utils.resource.Resources;
+import com.github.zhuaidadaya.rikaishinikui.handler.resource.Resources;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;

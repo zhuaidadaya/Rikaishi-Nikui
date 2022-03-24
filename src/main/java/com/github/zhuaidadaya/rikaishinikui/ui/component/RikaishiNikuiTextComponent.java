@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.component;
 
-import com.github.zhuaidadaya.rikaishinikui.language.Text;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.Text;
 
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;

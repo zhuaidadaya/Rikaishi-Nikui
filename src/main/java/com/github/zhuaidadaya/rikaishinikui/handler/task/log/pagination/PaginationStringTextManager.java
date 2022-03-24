@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination;
 
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 
 public class PaginationStringTextManager extends PaginationTextManager<String> {

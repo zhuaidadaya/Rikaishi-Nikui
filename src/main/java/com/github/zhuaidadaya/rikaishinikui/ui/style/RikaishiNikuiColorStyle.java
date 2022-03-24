@@ -1,8 +1,8 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.style;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
-import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.MultipleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.SingleText;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 
 public class RikaishiNikuiColorStyle {

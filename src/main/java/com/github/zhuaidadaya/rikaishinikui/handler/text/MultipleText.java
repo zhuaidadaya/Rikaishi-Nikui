@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.language;
+package com.github.zhuaidadaya.rikaishinikui.handler.text;
 
 import org.json.JSONObject;
 

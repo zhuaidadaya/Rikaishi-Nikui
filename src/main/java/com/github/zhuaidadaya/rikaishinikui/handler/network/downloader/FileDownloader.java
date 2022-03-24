@@ -4,7 +4,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.file.checker.FileCheckUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
-import com.github.zhuaidadaya.utils.resource.Resources;
+import com.github.zhuaidadaya.rikaishinikui.handler.resource.Resources;
 
 import java.io.*;
 import java.net.HttpURLConnection;

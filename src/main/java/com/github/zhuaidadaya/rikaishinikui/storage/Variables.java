@@ -6,11 +6,11 @@ import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiN
 import com.github.zhuaidadaya.rikaishinikui.handler.recoder.java.JavaVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.recoder.minecrtaft.MinecraftVersionsRecorder;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskManager;
-import com.github.zhuaidadaya.rikaishinikui.language.Language;
-import com.github.zhuaidadaya.rikaishinikui.language.TextFormatter;
+import com.github.zhuaidadaya.rikaishinikui.handler.language.Language;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.formatter.TextFormatter;
 import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
 import com.github.zhuaidadaya.rikaishinikui.ui.frame.RikaishiNikuiFrame;
-import com.github.zhuaidadaya.utils.config.ObjectConfigUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.config.ObjectConfigUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.apache.logging.log4j.LogManager;
 

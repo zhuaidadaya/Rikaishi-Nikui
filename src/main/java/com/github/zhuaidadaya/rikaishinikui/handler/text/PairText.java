@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.language;
+package com.github.zhuaidadaya.rikaishinikui.handler.text;
 
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import org.json.JSONObject;

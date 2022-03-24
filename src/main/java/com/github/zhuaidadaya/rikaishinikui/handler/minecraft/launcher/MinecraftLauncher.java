@@ -15,7 +15,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
-import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.MultipleText;
 import com.github.zhuaidadaya.rikaishinikui.handler.times.TimeType;
 import com.github.zhuaidadaya.rikaishinikui.handler.times.Times;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;

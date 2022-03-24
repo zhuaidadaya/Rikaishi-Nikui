@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.utils.string.checker;
+package com.github.zhuaidadaya.rikaishinikui.handler.string.checker;
 
 public class StringCheckUtil {
     public static String getNotNull(String getReturn, String defaultReturn) {

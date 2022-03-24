@@ -1,6 +1,10 @@
-package com.github.zhuaidadaya.rikaishinikui.language;
+package com.github.zhuaidadaya.rikaishinikui.handler.text.formatter;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.file.FileUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.language.LanguageResource;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.MultipleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.Text;
 import com.github.zhuaidadaya.rikaishinikui.ui.color.RikaishiNikuiColor;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.json.JSONObject;
@@ -26,12 +30,7 @@ public class TextFormatter {
     }
 
     public boolean hasFormat(String source) {
-        try {
-            format.get(language).get(source).toString();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return format.get(language).get(source).equals(source);
     }
 
 //    public Texts formatTexts(String source, Object... args) {
@@ -149,7 +148,7 @@ public class TextFormatter {
         return texts;
     }
 
-        public SingleText formatTrace(Throwable t) {
+    public SingleText formatTrace(Throwable t) {
         StringBuilder builder = new StringBuilder();
         builder.append(t.toString()).append("\n");
         for (StackTraceElement s : t.getStackTrace()) {

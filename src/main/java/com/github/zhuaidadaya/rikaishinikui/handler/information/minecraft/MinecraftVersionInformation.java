@@ -4,9 +4,9 @@ import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.loader
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.MinecraftLoaderType;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.RikaishiNikuiTaskStatus;
-import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
-import com.github.zhuaidadaya.rikaishinikui.language.SingleText;
-import com.github.zhuaidadaya.rikaishinikui.language.Text;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.MultipleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.SingleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.Text;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import org.json.JSONObject;
 

@@ -1,11 +1,9 @@
-package com.github.zhuaidadaya.utils.config;
+package com.github.zhuaidadaya.rikaishinikui.handler.config;
 
-import com.github.zhuaidadaya.utils.config.AbstractConfig;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

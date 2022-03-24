@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.utils.integer;
+package com.github.zhuaidadaya.rikaishinikui.handler.integer;
 
 import org.json.JSONObject;
 

@@ -10,9 +10,9 @@ import com.github.zhuaidadaya.rikaishinikui.handler.task.download.MinecraftDownl
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
 import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
-import com.github.zhuaidadaya.utils.integer.IntegerUtil;
-import com.github.zhuaidadaya.utils.resource.Resources;
-import com.github.zhuaidadaya.utils.string.checker.StringCheckUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.integer.IntegerUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.resource.Resources;
+import com.github.zhuaidadaya.rikaishinikui.handler.string.checker.StringCheckUtil;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
 

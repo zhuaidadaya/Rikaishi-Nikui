@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.utils.config;
+package com.github.zhuaidadaya.rikaishinikui.handler.config;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

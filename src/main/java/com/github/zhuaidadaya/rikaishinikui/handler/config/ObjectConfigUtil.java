@@ -1,10 +1,9 @@
-package com.github.zhuaidadaya.utils.config;
+package com.github.zhuaidadaya.rikaishinikui.handler.config;
 
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -13,11 +12,17 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
-public class DiskObjectConfigUtil {
+public class ObjectConfigUtil implements AbstractConfigUtil {
     private boolean loadManifest = true;
+    /**
+     *
+     */
+    private Object2ObjectLinkedOpenHashMap<Object, Object> configs = new Object2ObjectLinkedOpenHashMap<>();
     private EncryptionType encryptionType = EncryptionType.COMPOSITE_SEQUENCE;
     /**
      *
@@ -33,8 +38,12 @@ public class DiskObjectConfigUtil {
     private boolean canShutdown = true;
     private boolean shuttingDown = false;
     private boolean shutdown = false;
+    private boolean autoWrite = true;
     private boolean encryptionHead = false;
     private boolean encryption = false;
+    private boolean saving = false;
+    private boolean forceSaving = false;
+    private boolean backgroundSave = false;
     private int inseparableLevel = 3;
 
     private Thread saveThread;
@@ -45,53 +54,36 @@ public class DiskObjectConfigUtil {
     private String name;
     private String note;
 
-    public DiskObjectConfigUtil() {
+    public ObjectConfigUtil() {
         build(null, null, null, null, false, false);
     }
 
-    public DiskObjectConfigUtil(String entrust) {
+    public ObjectConfigUtil(String entrust) {
         build(entrust, null, null, null, false, false);
     }
 
-    public DiskObjectConfigUtil(String entrust, String configPath) {
+    public ObjectConfigUtil(String entrust, String configPath) {
         build(entrust, configPath, null, null, false, false);
     }
 
-    public DiskObjectConfigUtil(String entrust, String configPath, String configName) {
+    public ObjectConfigUtil(String entrust, String configPath, String configName) {
         build(entrust, configPath, configName, null, false, false);
     }
 
-    public DiskObjectConfigUtil(String entrust, String configPath, String configName, String configVersion) {
+    public ObjectConfigUtil(String entrust, String configPath, String configName, String configVersion) {
         build(entrust, configPath, configName, configVersion, false, false);
     }
 
-    public DiskObjectConfigUtil(String entrust, String configPath, String configName, String configVersion, boolean empty) {
+    public ObjectConfigUtil(String entrust, String configPath, String configName, String configVersion, boolean empty) {
         build(entrust, configPath, configName, configVersion, empty, false);
     }
 
-    public DiskObjectConfigUtil(String entrust, String configPath, String configName, String configVersion, boolean empty, boolean loadManifest) {
+    public ObjectConfigUtil(String entrust, String configPath, String configName, String configVersion, boolean empty, boolean loadManifest) {
         build(entrust, configPath, configName, configVersion, empty, loadManifest);
     }
 
     public static void main(String[] args) {
-        test2();
-    }
-
-    public static void test1() {
-        DiskObjectConfigUtil config = new DiskObjectConfigUtil("CU", "config/", "test_obj_pure.mhf", "1.1") //
-                //                .setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE) //
-                //                .setLibraryOffset(100) //
-                //                .setSplitRange(5000) //
-                //                .setEncryption(true) //
-                //                .setEncryptionHead(true) //
-                //                .setInseparableLevel(3); //
-                ;
-        config.set("test", "test1");
-        System.out.println(config.getConfigString("test"));
-    }
-
-    public static void test2() {
-        DiskObjectConfigUtil config = new DiskObjectConfigUtil("CU", "config/", "test_obj_pure.mhf", "1.1") //
+        ObjectConfigUtil config = new ObjectConfigUtil("CU", "config/", "test_obj_pure.mhf", "1.1") //
                 //                .setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE) //
                 //                .setLibraryOffset(100) //
                 //                .setSplitRange(5000) //
@@ -104,12 +96,14 @@ public class DiskObjectConfigUtil {
 
         config.setAutoWrite(false);
 
-        int limit = 100000;
         Random r = new Random();
+        int limit = config.getConfigTotal();
+        System.out.println(limit);
 
         //        int count = config.getConfigTotal() - 100;
         //        System.out.println(config.get("test"));
 
+        config.setList("test", "teeeeeeeeeeeeeeeeeeeeeeeeest");
         while (true) {
             int count = 0;
             Scanner sc = new Scanner(System.in);
@@ -124,15 +118,17 @@ public class DiskObjectConfigUtil {
                             config.set("test" + count, "teeeeeeeeeeeeeeeeeeeeeeeeest" + count);
                             //                                                config.set("test" + 1500, "teeeeeeeeeeeeeeeeeeeeeeeeest" + 1500);
 
-                            if (count > 100000000) {
+                            if (count > 100000) {
+                                config.writeConfig();
+
                                 break;
                             }
                         } catch (Exception e) {
-                            logger.info("test failed after " + count);
+                            logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
                             break;
                         }
                     }
-                    logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, try " + count + "times");
+                    logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, load " + config.getConfigTotal() + " configs, try " + count + "times");
                 }
                 case "query" -> {
                     long startTime = System.nanoTime();
@@ -143,37 +139,44 @@ public class DiskObjectConfigUtil {
                             config.getConfigString("test" + 13652);
 
                             if (count > 10000000) {
+                                config.writeConfig();
+
                                 break;
                             }
-
                         } catch (Exception e) {
                             e.printStackTrace();
-                            logger.info("test failed after " + count);
+                            logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
                             break;
                         }
                     }
 
-                    logger.info("query done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, try " + count + "times");
+                    config.invalid();
+                    //                    config.rebuild();
+
+                    //                    logger.info("query done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, load " + config.getConfigTotal() + " configs, try " + count + "times");
                 }
                 case "mixin" -> {
                     long startTime = System.nanoTime();
                     try {
+                        config.enableBackgroundSave();
                         while (true) {
                             try {
                                 count++;
                                 config.set("test" + count, "teeeeeeeeeeeeeeeeeeeeeeeeest" + count);
                                 //                        config.getConfigString("test" + count);
-                                config.getConfigString("test" + count);
+                                config.getConfigString("test" + r.nextInt(limit));
 
-                                if (count > 100000000) {
+                                if (count > 200000) {
 //                                config.save();
+                                    config.writeConfig();
+
                                     break;
                                 }
 
 //                            logger.info("sus: " + count);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                logger.info("test failed after " + count);
+                                logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
                                 break;
                             }
 
@@ -183,40 +186,24 @@ public class DiskObjectConfigUtil {
 //
 //                        }
                         }
-                        logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, try " + count + "times");
+                        logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, load " + config.getConfigTotal() + " configs, try " + count + "times");
                     } catch (Error error) {
+                        logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
                         logger.info("in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms");
                     }
-                }
-                case "get" -> {
-                    long startTime = System.nanoTime();
-
-                    System.out.println(config.getConfigString("test" + r.nextInt(limit)));
-
-                    logger.info("get sus in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms");
-                }
-                case "set1" -> {
-                    long startTime = System.nanoTime();
-
-                    int num = r.nextInt(limit);
-                    config.set("test" + num, "teeeeeeeeeeeeeeeeeeeeeeeeest" + num);
-
-                    logger.info("get sus in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms");
-                }
-                case "clear" -> {
-
                 }
                 default -> System.exit(-1);
             }
         }
     }
 
-    public static DiskObjectConfigUtil emptyConfigUtil() {
-        return new DiskObjectConfigUtil(null, null, null, null, true);
+    public static ObjectConfigUtil emptyConfigUtil() {
+        return new ObjectConfigUtil(null, null, null, null, true);
     }
 
     private void build(@Nullable String entrust, @Nullable String configPath, @Nullable String configName, @Nullable String configVersion, boolean empty, boolean loadManifest) {
         defaultUtilConfigs();
+        configs = new Object2ObjectLinkedOpenHashMap<>();
         if (configPath != null)
             setPath(configPath);
         if (configName != null)
@@ -228,23 +215,29 @@ public class DiskObjectConfigUtil {
         logger = LogManager.getLogger("ConfigUtil-" + entrust);
         this.empty = empty;
         this.loadManifest = loadManifest;
+        try {
+            if (!empty)
+                readConfig(true, false, loadManifest);
+        } catch (Exception e) {
+
+        }
     }
 
-    public DiskObjectConfigUtil setPath(String path) {
+    public ObjectConfigUtil setPath(String path) {
         checkShutdown();
 
         this.path = path;
         return this;
     }
 
-    public DiskObjectConfigUtil setVersion(String version) {
+    public ObjectConfigUtil setVersion(String version) {
         checkShutdown();
 
         this.version = version;
         return this;
     }
 
-    public DiskObjectConfigUtil setName(String name) {
+    public ObjectConfigUtil setName(String name) {
         checkShutdown();
 
         try {
@@ -256,7 +249,7 @@ public class DiskObjectConfigUtil {
         return this;
     }
 
-    public DiskObjectConfigUtil setPath(File path) {
+    public ObjectConfigUtil setPath(File path) {
         return setPath(path.getPath());
     }
 
@@ -266,19 +259,20 @@ public class DiskObjectConfigUtil {
         this.path = System.getProperty("user.dir");
         this.name = "config.mhf";
         this.version = "1.2";
+        this.autoWrite = true;
         this.inseparableLevel = 3;
         this.encryptionHead = false;
         this.encryption = false;
     }
 
-    public DiskObjectConfigUtil setInseparableLevel(int inseparableLevel) {
+    public ObjectConfigUtil setInseparableLevel(int inseparableLevel) {
         checkShutdown();
 
         this.inseparableLevel = inseparableLevel > -1 ? inseparableLevel < 4 ? inseparableLevel : 3 : 0;
         return this;
     }
 
-    public DiskObjectConfigUtil setLibraryOffset(int offset) {
+    public ObjectConfigUtil setLibraryOffset(int offset) {
         checkShutdown();
 
         if (offset != -1)
@@ -288,28 +282,28 @@ public class DiskObjectConfigUtil {
         return this;
     }
 
-    public DiskObjectConfigUtil setSplitRange(int range) {
+    public ObjectConfigUtil setSplitRange(int range) {
         checkShutdown();
 
         splitRange = range;
         return this;
     }
 
-    public DiskObjectConfigUtil setEncryptionType(EncryptionType type) {
+    public ObjectConfigUtil setEncryptionType(EncryptionType type) {
         checkShutdown();
 
         this.encryptionType = type;
         return this;
     }
 
-    public DiskObjectConfigUtil setEmpty(boolean empty) {
+    public ObjectConfigUtil setEmpty(boolean empty) {
         checkShutdown();
 
         this.empty = empty;
         return this;
     }
 
-    public DiskObjectConfigUtil setEntrust(String entrust) {
+    public ObjectConfigUtil setEntrust(String entrust) {
         checkShutdown();
 
         this.entrust = entrust;
@@ -317,52 +311,202 @@ public class DiskObjectConfigUtil {
         return this;
     }
 
-    public DiskObjectConfigUtil setEncryptionHead(boolean encryptionHead) {
+    public ObjectConfigUtil setEncryptionHead(boolean encryptionHead) {
         checkShutdown();
 
         this.encryptionHead = encryptionHead;
         return this;
     }
 
-    public DiskObjectConfigUtil setAutoWrite(boolean autoWrite) {
+    public ObjectConfigUtil setAutoWrite(boolean autoWrite) {
         checkShutdown();
 
+        this.autoWrite = autoWrite;
         return this;
     }
 
-    public DiskObjectConfigUtil setNote(String note) {
+    public ObjectConfigUtil setNote(String note) {
         checkShutdown();
 
         this.note = note;
         return this;
     }
 
-    public DiskObjectConfigUtil setEncryption(boolean encryption) {
+    public ObjectConfigUtil fuse(ObjectConfigUtil parent) {
         checkShutdown();
 
-        this.encryption = encryption;
+        for (Object o : parent.configs.keySet())
+            this.setConf(true, o.toString(), parent.configs.get(o.toString()));
         return this;
     }
 
-    public String getConfig(Object conf) {
+    public ObjectConfigUtil setEncryption(boolean encryption) {
         checkShutdown();
 
-        return get(conf);
+        this.encryption = encryption;
+        if (autoWrite) {
+            try {
+                writeConfig();
+            } catch (Exception e) {
+
+            }
+        }
+        return this;
     }
 
-    public String get(Object conf) {
-        File configFile = getConfigFile(conf);
+    public Map<Object, Object> getConfigs() {
+        checkShutdown();
 
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(configFile, Charset.forName("unicode")));
-            StringBuilder builder = decryption(br, false);
+        return configs;
+    }
 
-            return builder.toString();
-        } catch (Exception e) {
+    public Object getConfig(Object conf) {
+        checkShutdown();
 
+        return configs.get(conf);
+    }
+
+    public boolean readConfig() throws IOException {
+        return readConfig(false);
+    }
+
+    public boolean readConfig(boolean log) throws IOException {
+        return readConfig(log, false, false);
+    }
+
+    public boolean readConfig(boolean log, boolean forceLoad, boolean init) throws IOException {
+        checkShutdown();
+
+        if (shuttingDown) {
+            return false;
         }
+        canShutdown = false;
 
-        return null;
+        if (empty) {
+            canShutdown = true;
+
+            return false;
+        }
+        int configSize = 0;
+        try {
+            if (log)
+                logger.info("loading config from: " + name);
+
+            File configFile = new File(path + "/" + name);
+
+            BufferedReader br = new BufferedReader(new FileReader(configFile, Charset.forName("unicode")));
+            StringBuilder builder = decryption(br, forceLoad);
+
+            br.close();
+
+            JSONObject source;
+            try {
+                source = new JSONObject(builder.toString());
+            } catch (Exception e) {
+                canShutdown = true;
+
+                return false;
+            }
+            JSONArray configs = source.getJSONArray("configs");
+            configSize = builder.length();
+
+            if (log)
+                logger.info("loading configs");
+
+            long start = System.nanoTime();
+
+            for (Object o : configs) {
+                JSONObject config = new JSONObject(o.toString());
+                String configKey = config.keySet().toArray()[0].toString();
+                JSONObject configDetailed = config.getJSONObject(configKey);
+                if (configDetailed.getBoolean("listTag")) {
+                    JSONArray array = configDetailed.getJSONArray("values");
+                    ObjectOpenHashSet<Object> addToConfig = new ObjectOpenHashSet<>();
+                    for (Object inArray : array)
+                        addToConfig.add(inArray);
+                    setListConf(true, configKey, addToConfig);
+                } else {
+                    setConf(true, configKey, configDetailed.get("value"));
+                }
+            }
+
+            if (log)
+                logger.info("configs parse done, in " + (float) (System.nanoTime() - start) / 1000000f + "ms");
+
+            if (init) {
+                if (log)
+                    logger.info("loading manifest");
+
+                JSONObject manifest = source.getJSONObject("manifest");
+                for (String s : manifest.keySet()) {
+                    manifestLoading(s, manifest.get(s));
+                }
+            }
+
+            if (log)
+                logger.info("load config done");
+
+            canShutdown = true;
+
+            return true;
+        } catch (IllegalArgumentException e) {
+            canShutdown = true;
+
+            throw e;
+        } catch (Exception e) {
+            if (!shuttingDown) {
+                logger.error(empty ? ("failed to load config") : ("failed to load config: " + name));
+                if (!empty) {
+                    File configFile = new File(path + "/" + name);
+                    if (!configFile.isFile() || configFile.length() == 0 || configSize == 0) {
+                        try {
+                            configFile.getParentFile().mkdirs();
+                            configFile.createNewFile();
+                            writeConfig();
+                            logger.info("created new config file for " + entrust);
+                        } catch (Exception ex) {
+                            logger.error("failed to create new config file for " + entrust);
+                        }
+                    }
+                }
+                throw e;
+            }
+
+            canShutdown = true;
+
+            return false;
+        }
+    }
+
+    private void manifestLoading(String key, Object value) {
+        switch (key) {
+            case "config" -> {
+                String c = value.toString().replace("\\", "/");
+                this.name = c.substring(c.indexOf("/") + 1);
+                this.path = c.substring(0, c.indexOf("/"));
+            }
+            case "entrust" -> {
+                this.entrust = value.toString();
+            }
+            case "autoWrite" -> {
+                this.autoWrite = Boolean.parseBoolean(value.toString());
+            }
+            case "configVersion" -> {
+                this.version = value.toString();
+            }
+            case "inseparableLevel" -> {
+                this.inseparableLevel = Integer.parseInt(value.toString());
+            }
+            case "encryptionType" -> {
+                this.encryptionType = EncryptionType.parseEncryptionType(value.toString());
+            }
+            case "encryption" -> {
+                this.encryption = Boolean.parseBoolean(value.toString());
+            }
+            case "encryptionHead" -> {
+                this.encryptionHead = Boolean.parseBoolean(value.toString());
+            }
+        }
     }
 
     public StringBuilder decryption() {
@@ -508,7 +652,13 @@ public class DiskObjectConfigUtil {
                 }
 
             } else {
-                builder.append(cache);
+                while (true) {
+                    String startWith = reader.readLine();
+                    if (startWith.replace(" ", "").startsWith("{")) {
+                        builder.append(startWith);
+                        break;
+                    }
+                }
                 while ((cache = reader.readLine()) != null) {
                     if (!cache.startsWith("/**") || cache.startsWith(" *") || cache.startsWith(" */"))
                         builder.append(cache);
@@ -517,16 +667,55 @@ public class DiskObjectConfigUtil {
                 return builder;
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            reader.close();
-        } catch (Exception e) {
 
         }
 
         return null;
+    }
+
+    public void writeConfig() {
+        if (backgroundSave & saving) {
+            logger.warn("background save are enabled, call write maybe suspend threads");
+        }
+        synchronized (this) {
+            checkShutdown();
+
+            try {
+                if (shuttingDown) {
+                    return;
+                }
+
+                canShutdown = false;
+
+                StringBuilder write = new StringBuilder(this.toJSONObject().toString());
+
+                StringBuilder builder = new StringBuilder();
+
+                Random r = new Random();
+
+                if (encryption) {
+                    switch (encryptionType.getId()) {
+                        case 0 -> {
+                            builder = encryptionByRandomSequence(write, r);
+                        }
+                        case 1 -> {
+                            builder = encryptionByCompositeSequence(write);
+                        }
+                    }
+                } else {
+                    builder = new StringBuilder();
+                    builder.append("no encryption config: [config_size=").append(write.length()).append(", config_version=").append(version).append("]").append("\n").append(formatNote()).append("\n\n").append(write);
+                }
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter(path + "/" + name, Charset.forName("unicode"), false));
+                write(writer, builder.toString());
+                writer.close();
+
+                canShutdown = true;
+            } catch (Exception e) {
+                canShutdown = true;
+            }
+        }
     }
 
     public void write(Writer writer, StringBuffer information) throws IOException {
@@ -539,12 +728,14 @@ public class DiskObjectConfigUtil {
         write(writer, new StringBuffer(information));
     }
 
-    public void write(String information, String path) throws IOException {
+    public void write(StringBuffer information) throws IOException {
+        write(information.toString());
+    }
+
+    public void write(String information) throws IOException {
         checkShutdown();
 
-        File f = new File(path);
-        f.getParentFile().mkdirs();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(f, Charset.forName("unicode"), false));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path + "/" + name, Charset.forName("unicode"), false));
         write(writer, new StringBuffer(information));
         writer.close();
     }
@@ -881,56 +1072,84 @@ public class DiskObjectConfigUtil {
         write2RandomByte(writer, new Random().nextInt(25565));
     }
 
-    public String getConfigPath(Object conf) {
-        return path + "/configs/" + conf + ".mhf";
-    }
-
-    public File getConfigFile(Object conf) {
-        File result = new File(getConfigPath(conf));
-        return result.exists() ? result : null;
-    }
-
     public void remove(Object key) {
         checkShutdown();
 
-        getConfigFile(key).delete();
+        configs.remove(key);
+    }
+
+    public void remove(Object key, Object... configValues) {
+        checkShutdown();
+
+        configs.remove(key, configValues);
     }
 
     public void setIfNoExist(Object key, Object configKeyValues) {
-        if (getConfigFile(key) == null) {
+        if (!configs.containsKey(key)) {
             set(key, configKeyValues);
         }
     }
 
-    public void set(Object key, Object configKeysValues) throws IllegalArgumentException {
-        checkShutdown();
-
-        setConf(key, configKeysValues);
-    }
-
-    private void setConf(Object key, Object configKeysValues) throws IllegalArgumentException {
-        try {
-            if (encryption) {
-                switch (encryptionType.getId()) {
-                    case 0 -> {
-                        write(encryptionByRandomSequence(new StringBuilder(configKeysValues.toString()), new Random()).toString(), getConfigPath(key));
-                    }
-                    case 1 -> {
-                        write(encryptionByCompositeSequence(new StringBuilder(configKeysValues.toString())).toString(), getConfigPath(key));
-                    }
-                }
-            } else {
-                write(configKeysValues.toString(), getConfigPath(key));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void setListIfNoExist(Object key, Object configKeyValues) {
+        if (!configs.containsKey(key)) {
+            setList(key, configKeyValues);
         }
     }
+
+    public void set(Object key, Object... configKeysValues) throws IllegalArgumentException {
+        checkShutdown();
+
+        setConf(false, key, configKeysValues);
+    }
+
+    private void setConf(boolean init, Object key, Object... configKeysValues) throws IllegalArgumentException {
+        if (init) {
+            configs.put(key, configKeysValues[0]);
+        } else {
+            if (configKeysValues.length > 1) {
+                if (configKeysValues.length % 2 != 0)
+                    throw new IllegalArgumentException("values argument size need Integral multiple of 2, but argument size " + configKeysValues.length + " not Integral multiple of 2");
+                configs.put(key, configKeysValues);
+            } else {
+                configs.put(key, configKeysValues[0]);
+            }
+        }
+        if (autoWrite) {
+            if (!init)
+                writeConfig();
+        }
+    }
+
+    public void setList(Object key, Object... configValues) {
+        checkShutdown();
+
+        setListConf(false, key, configValues);
+    }
+
+    private void setListConf(boolean init, Object key, Object... configValues) {
+        configs.put(key, configValues);
+        if (autoWrite) {
+            if (!init)
+                writeConfig();
+        }
+    }
+
 
     public String toString() {
         checkShutdown();
 
-        return "ConfigUtil(" + this + ")";
+        StringBuilder builder = new StringBuilder();
+        for (Object o : configs.keySet()) {
+            builder.append(o.toString()).append("=").append(configs.get(o).toString()).append(", ");
+        }
+
+        try {
+            builder.replace(builder.length() - 2, builder.length(), "");
+        } catch (Exception e) {
+
+        }
+
+        return "ConfigUtil(" + builder + ")";
     }
 
     public JSONObject toJSONObject() {
@@ -938,14 +1157,56 @@ public class DiskObjectConfigUtil {
 
         JSONObject json = new JSONObject();
         JSONArray addToConfig = new JSONArray();
+        for (Object configKey : configs.keySet()) {
+            Object config = configs.get(configKey);
+
+            JSONObject conf = new JSONObject();
+            JSONObject inJ = new JSONObject();
+
+            if (config instanceof Object[] | config instanceof List<?>) {
+                ObjectList<Object> list;
+                if (config instanceof Object[]) {
+                    list = ObjectList.of((Object[]) config);
+
+                    if (list.size() == 1)
+                        list = ObjectList.of(ObjectList.of((Object[]) config).get(0));
+
+                    inJ.put("values", list);
+                } else {
+                    list = ObjectList.of(config);
+
+                    inJ.put("values", (List<?>) config);
+                }
+
+                inJ.put("totalSize", list.size());
+
+                inJ.put("listTag", true);
+            } else {
+                if (config instanceof String)
+                    inJ.put("value", config.toString());
+                else if (config instanceof Boolean)
+                    inJ.put("value", Boolean.parseBoolean(config.toString()));
+                else if (config instanceof Integer)
+                    inJ.put("value", Integer.parseInt(config.toString()));
+                else
+                    inJ.put("value", config);
+
+                inJ.put("listTag", false);
+            }
+
+            conf.put(configKey.toString(), inJ);
+            addToConfig.put(conf);
+        }
 
         json.put("configs", addToConfig);
 
         JSONObject manifest = new JSONObject();
         manifest.put("configVersion", version);
+        manifest.put("configsTotal", configs.size());
         manifest.put("encryption", encryption);
         manifest.put("encryptionHead", encryptionHead);
         manifest.put("config", new File(path + "/" + name));
+        manifest.put("autoWrite", autoWrite);
         manifest.put("entrust", entrust);
         manifest.put("configName", name);
         manifest.put("inseparableLevel", inseparableLevel);
@@ -1000,6 +1261,8 @@ public class DiskObjectConfigUtil {
 
         logger.info("cleaning configs");
 
+        configs = null;
+
         System.gc();
     }
 
@@ -1016,6 +1279,8 @@ public class DiskObjectConfigUtil {
             }
 
             logger.info("saving configs");
+
+            writeConfig();
 
             logger.info("all config are saved, shutting down");
         } catch (Exception e) {
@@ -1037,6 +1302,11 @@ public class DiskObjectConfigUtil {
         if (shutdown) {
             throw new IllegalStateException("this ConfigUtil already shutdown, invoke rebuild() to build again");
         }
+    }
+
+    public int getConfigTotal() {
+        checkShutdown();
+        return configs.size();
     }
 
     public boolean isShutdown() {
@@ -1072,6 +1342,44 @@ public class DiskObjectConfigUtil {
 
     public JSONArray getConfigJSONArray(Object config) {
         return new JSONArray(getConfigString(config));
+    }
+
+    public void save() {
+        saving = true;
+        forceSaving = true;
+    }
+
+    public void enableBackgroundSave() {
+        Thread thread = new Thread(() -> {
+            while (!shutdown) {
+                if (saving & backgroundSave) {
+                    writeConfig();
+
+                    try {
+                        for (int i = 100; i > 0 & !forceSaving; i++) {
+                            Thread.sleep(10);
+                        }
+                        forceSaving = false;
+                    } catch (InterruptedException e) {
+
+                    }
+                } else {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+            }
+        });
+        backgroundSave = true;
+        if (saveThread == null) {
+            saveThread = thread;
+        } else {
+            if (!saveThread.isAlive()) {
+                saveThread = thread;
+            }
+        }
     }
 }
 

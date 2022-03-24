@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.rikaishinikui.language;
+package com.github.zhuaidadaya.rikaishinikui.handler.language;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
 import org.json.JSONObject;

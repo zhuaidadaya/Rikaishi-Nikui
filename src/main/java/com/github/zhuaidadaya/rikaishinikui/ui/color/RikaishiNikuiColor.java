@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.color;
 
-import com.github.zhuaidadaya.utils.integer.IntegerUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.integer.IntegerUtil;
 import org.json.JSONObject;
 
 import java.awt.*;

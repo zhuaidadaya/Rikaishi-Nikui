@@ -6,7 +6,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.information.minecraft.Minecr
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibrariesParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.LibraryParser;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
-import com.github.zhuaidadaya.rikaishinikui.language.MultipleText;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.MultipleText;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.json.JSONObject;

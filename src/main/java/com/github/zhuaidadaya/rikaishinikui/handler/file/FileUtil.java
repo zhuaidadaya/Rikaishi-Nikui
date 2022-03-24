@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.file;
 
-import com.github.zhuaidadaya.utils.resource.Resources;
+import com.github.zhuaidadaya.rikaishinikui.handler.resource.Resources;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 

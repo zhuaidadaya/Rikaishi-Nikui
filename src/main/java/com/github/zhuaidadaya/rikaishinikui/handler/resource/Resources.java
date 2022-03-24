@@ -1,4 +1,4 @@
-package com.github.zhuaidadaya.utils.resource;
+package com.github.zhuaidadaya.rikaishinikui.handler.resource;
 
 import java.io.*;
 import java.net.URL;
