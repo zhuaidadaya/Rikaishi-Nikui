@@ -17,7 +17,7 @@ import java.awt.*;
 public class RikaishiNikuiLogFrame extends JFrame implements RikaishiNikuiComponent, RikaishiNikuiLogComponent {
     private final RikaishiNikuiTextPanel textPane = new RikaishiNikuiTextPanel();
     private final RikaishiNikuiScrollPanel scrollPane = new RikaishiNikuiScrollPanel(textPane);
-    private PaginationTextManager<?> manager;
+    private PaginationTextManager<?, Text> manager;
 
     public RikaishiNikuiLogFrame() {
         init();
@@ -156,11 +156,11 @@ public class RikaishiNikuiLogFrame extends JFrame implements RikaishiNikuiCompon
         textPane.setSuperDoc(doc);
     }
 
-    public PaginationTextManager<?> getTextManager() {
+    public PaginationTextManager<?, Text> getTextManager() {
         return manager;
     }
 
-    public void setTextManager(PaginationTextManager<?> manager) {
+    public void setTextManager(PaginationTextManager<?, Text> manager) {
         this.manager = manager;
     }
 }

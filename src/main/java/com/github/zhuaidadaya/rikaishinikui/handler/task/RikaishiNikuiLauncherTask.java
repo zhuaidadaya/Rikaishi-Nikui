@@ -24,31 +24,35 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
     }
 
     @Override
-    protected void join() {
+    protected synchronized void join() {
         if (running) {
             logger.info(getTaskTypeName() + " " + getId() + " join to manager");
             synchronized (this) {
                 launcher.init(args);
             }
         }
-        done = true;
-        running = false;
     }
 
-    protected void stop() {
-        stop = true;
-        RikaishiNikuiTask parent = super.getParentTask();
-        if (parent != null) {
-            parent.stop();
-        }
-        logger.info("stopping " + getTaskTypeName() + " " + getId());
-        try {
-            launcher.shutdown();
-        } catch (Exception e) {
+    public synchronized void exit() {
+        if (running) {
+            stop = true;
+            RikaishiNikuiTask parent = super.getParentTask();
+            if (parent != null) {
+                parent.exit();
+            }
+            logger.info("stopping " + getTaskTypeName() + " " + getId());
+            try {
+                launcher.shutdown();
+            } catch (Exception e) {
 
+            }
+            running = false;
+            done = true;
         }
-        running = false;
-        done = true;
+    }
+
+    public boolean canExit() {
+        return launcher.isLoaded();
     }
 
     @Override
@@ -57,7 +61,7 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
         if (!running) {
             logger.warn(getTaskTypeName() + " " + getId() + " failed");
         } else {
-            stop();
+            exit();
         }
         try {
             launcher.shutdown();
@@ -78,7 +82,7 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
 
     public void log(String log, LogLevel level) {
         logs.append(RikaishiNikuiColorStyle.formatBlackLog(log, level));
-        submit();
+        submit(RikaishiNikuiColorStyle.formatBlackLog(log, level));
     }
 
     public void log(String log) {
@@ -116,6 +120,6 @@ public class RikaishiNikuiLauncherTask extends RikaishiNikuiTask {
 
     public void setSubmitter(RikaishiNikuiSubmitter submitter) {
         this.submitter = submitter;
-        submit();
+        cover();
     }
 }

@@ -6,25 +6,28 @@ import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogCompone
 
 import java.util.Collection;
 
-public class PaginationMultipleTextManager extends PaginationTextManager<Collection<MultipleText>> {
+public class PaginationMultipleTextManager extends PaginationTextManager<Collection<MultipleText>, MultipleText> {
     public PaginationMultipleTextManager(PaginationCachedText<Collection<MultipleText>, ?> cachedText, RikaishiNikuiLogComponent component) {
         super(cachedText, component);
     }
 
-    public void submit() {
+    public void submit(MultipleText submit) {
+        component.appendText(submit, false);
+        if (!submit.isAutoLine()) {
+            component.appendText(new SingleText("\n"), false);
+        }
+    }
+
+    public void cover() {
         Collection<MultipleText> logs = get();
-        int caret = 0;
         component.setText(new SingleText(""));
         for (MultipleText text : logs) {
             MultipleText text1 = new MultipleText(text.toJSONObject());
             component.appendText(text1, false);
             if (!text.isAutoLine()) {
                 component.appendText(new SingleText("\n"), false);
-                caret += 1;
             }
-            caret += text1.getLength();
         }
-        component.updateText();
-        component.setCaretPosition(caret);
+        update();
     }
 }

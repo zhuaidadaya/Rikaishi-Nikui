@@ -9,7 +9,8 @@ public class RandomIdentifier {
             "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
             "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-            ".", "_"
+            ".", "_", "[", "]", "/", "\\", "{", "}", "?", ",", ";", "'", "\"",
+            "!", "@", "#", "*", "(", ")", "&", "^", "$", "-", "=", "+", "`"
     };
     private static final Random random = new Random();
 
@@ -25,8 +26,12 @@ public class RandomIdentifier {
             if (i % 12 == 0 & i > 1) {
                 builder.append("-");
                 if (builder.length() > 0) {
-                    builder.insert(random.nextInt(builder.length()), nano.charAt(0));
-                    nano.delete(0, 1);
+                    try {
+                        builder.insert(random.nextInt(builder.length()), nano.charAt(0));
+                        nano.delete(0, 1);
+                    } catch (Exception e) {
+
+                    }
                 }
             } else {
                 builder.append(randomString());

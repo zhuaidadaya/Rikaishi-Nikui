@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.config;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust.EntrustParser;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -14,19 +15,11 @@ import org.json.JSONObject;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Random;
-import java.util.Scanner;
 
-public class DiskObjectConfigUtil {
+public class DiskObjectConfigUtil implements ConfigUtil {
     private boolean loadManifest = true;
     private EncryptionType encryptionType = EncryptionType.COMPOSITE_SEQUENCE;
-    /**
-     *
-     */
     private Logger logger = LogManager.getLogger("ConfigUtil");
-    /**
-     * if true<br>
-     * run <code>writeConfig()</code> when config has updated
-     */
     private boolean empty = false;
     private int splitRange = 20;
     private int libraryOffset = 5;
@@ -36,8 +29,6 @@ public class DiskObjectConfigUtil {
     private boolean encryptionHead = false;
     private boolean encryption = false;
     private int inseparableLevel = 3;
-
-    private Thread saveThread;
 
     private String entrust;
     private String version;
@@ -71,144 +62,6 @@ public class DiskObjectConfigUtil {
 
     public DiskObjectConfigUtil(String entrust, String configPath, String configName, String configVersion, boolean empty, boolean loadManifest) {
         build(entrust, configPath, configName, configVersion, empty, loadManifest);
-    }
-
-    public static void main(String[] args) {
-        test2();
-    }
-
-    public static void test1() {
-        DiskObjectConfigUtil config = new DiskObjectConfigUtil("CU", "config/", "test_obj_pure.mhf", "1.1") //
-                //                .setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE) //
-                //                .setLibraryOffset(100) //
-                //                .setSplitRange(5000) //
-                //                .setEncryption(true) //
-                //                .setEncryptionHead(true) //
-                //                .setInseparableLevel(3); //
-                ;
-        config.set("test", "test1");
-        System.out.println(config.getConfigString("test"));
-    }
-
-    public static void test2() {
-        DiskObjectConfigUtil config = new DiskObjectConfigUtil("CU", "config/", "test_obj_pure.mhf", "1.1") //
-                //                .setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE) //
-                //                .setLibraryOffset(100) //
-                //                .setSplitRange(5000) //
-                //                .setEncryption(true) //
-                //                .setEncryptionHead(true) //
-                //                .setInseparableLevel(3); //
-                ;
-
-        Logger logger = LogManager.getLogger("Teat");
-
-        config.setAutoWrite(false);
-
-        int limit = 100000;
-        Random r = new Random();
-
-        //        int count = config.getConfigTotal() - 100;
-        //        System.out.println(config.get("test"));
-
-        while (true) {
-            int count = 0;
-            Scanner sc = new Scanner(System.in);
-            String ope = sc.nextLine();
-
-            switch (ope) {
-                case "set" -> {
-                    long startTime = System.nanoTime();
-                    while (true) {
-                        try {
-                            count++;
-                            config.set("test" + count, "teeeeeeeeeeeeeeeeeeeeeeeeest" + count);
-                            //                                                config.set("test" + 1500, "teeeeeeeeeeeeeeeeeeeeeeeeest" + 1500);
-
-                            if (count > 100000000) {
-                                break;
-                            }
-                        } catch (Exception e) {
-                            logger.info("test failed after " + count);
-                            break;
-                        }
-                    }
-                    logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, try " + count + "times");
-                }
-                case "query" -> {
-                    long startTime = System.nanoTime();
-                    while (true) {
-                        try {
-                            count++;
-                            //                            config.getConfigString("test" + r.nextInt(limit));
-                            config.getConfigString("test" + 13652);
-
-                            if (count > 10000000) {
-                                break;
-                            }
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            logger.info("test failed after " + count);
-                            break;
-                        }
-                    }
-
-                    logger.info("query done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, try " + count + "times");
-                }
-                case "mixin" -> {
-                    long startTime = System.nanoTime();
-                    try {
-                        while (true) {
-                            try {
-                                count++;
-                                config.set("test" + count, "teeeeeeeeeeeeeeeeeeeeeeeeest" + count);
-                                //                        config.getConfigString("test" + count);
-                                config.getConfigString("test" + count);
-
-                                if (count > 100000000) {
-//                                config.save();
-                                    break;
-                                }
-
-//                            logger.info("sus: " + count);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                logger.info("test failed after " + count);
-                                break;
-                            }
-
-//                        try {
-//                            Thread.sleep(1);
-//                        } catch (InterruptedException e) {
-//
-//                        }
-                        }
-                        logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, try " + count + "times");
-                    } catch (Error error) {
-                        logger.info("in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms");
-                    }
-                }
-                case "get" -> {
-                    long startTime = System.nanoTime();
-
-                    System.out.println(config.getConfigString("test" + r.nextInt(limit)));
-
-                    logger.info("get sus in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms");
-                }
-                case "set1" -> {
-                    long startTime = System.nanoTime();
-
-                    int num = r.nextInt(limit);
-                    config.set("test" + num, "teeeeeeeeeeeeeeeeeeeeeeeeest" + num);
-
-                    logger.info("get sus in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms");
-                }
-                case "clear" -> {
-
-                }
-                default -> System.exit(-1);
-            }
-        }
     }
 
     public static DiskObjectConfigUtil emptyConfigUtil() {
@@ -344,13 +197,13 @@ public class DiskObjectConfigUtil {
         return this;
     }
 
-    public String getConfig(Object conf) {
+    public Object getConfig(String conf) {
         checkShutdown();
 
         return get(conf);
     }
 
-    public String get(Object conf) {
+    public String get(String conf) {
         File configFile = getConfigFile(conf);
 
         try {
@@ -890,25 +743,25 @@ public class DiskObjectConfigUtil {
         return result.exists() ? result : null;
     }
 
-    public void remove(Object key) {
+    public void remove(String key) {
         checkShutdown();
 
         getConfigFile(key).delete();
     }
 
-    public void setIfNoExist(Object key, Object configKeyValues) {
+    public void setIfNoExist(String key, Object configKeyValues) {
         if (getConfigFile(key) == null) {
             set(key, configKeyValues);
         }
     }
 
-    public void set(Object key, Object configKeysValues) throws IllegalArgumentException {
+    public void set(String key, Object configKeysValues) throws IllegalArgumentException {
         checkShutdown();
 
         setConf(key, configKeysValues);
     }
 
-    private void setConf(Object key, Object configKeysValues) throws IllegalArgumentException {
+    private void setConf(String key, Object configKeysValues) throws IllegalArgumentException {
         try {
             if (encryption) {
                 switch (encryptionType.getId()) {
@@ -931,28 +784,6 @@ public class DiskObjectConfigUtil {
         checkShutdown();
 
         return "ConfigUtil(" + this + ")";
-    }
-
-    public JSONObject toJSONObject() {
-        checkShutdown();
-
-        JSONObject json = new JSONObject();
-        JSONArray addToConfig = new JSONArray();
-
-        json.put("configs", addToConfig);
-
-        JSONObject manifest = new JSONObject();
-        manifest.put("configVersion", version);
-        manifest.put("encryption", encryption);
-        manifest.put("encryptionHead", encryptionHead);
-        manifest.put("config", new File(path + "/" + name));
-        manifest.put("entrust", entrust);
-        manifest.put("configName", name);
-        manifest.put("inseparableLevel", inseparableLevel);
-        manifest.put("encryptionType", encryptionType.getName());
-        json.put("manifest", manifest);
-
-        return json;
     }
 
     private String formatNote() {
@@ -1043,35 +874,31 @@ public class DiskObjectConfigUtil {
         return shutdown;
     }
 
-    public String getConfigString(Object config) {
+    public String getConfigString(String config) {
         checkShutdown();
-        try {
-            return getConfig(config).toString();
-        } catch (Exception e) {
-            return null;
-        }
+        return EntrustParser.getNotNull(EntrustParser.build(() -> getConfig(config).toString()), "");
     }
 
-    public int getConfigInt(Object config) {
-        return Integer.parseInt(getConfigString(config));
-    }
-
-    public long getConfigLong(Object config) {
-        return Long.parseLong(getConfigString(config));
-    }
-
-    public boolean getConfigBoolean(Object config) {
-        return Boolean.parseBoolean(getConfigString(config));
+    public Boolean getConfigBoolean(String config) {
+        return Boolean.parseBoolean(EntrustParser.getNotNull(getConfigString(config), "false"));
 
     }
 
-    public JSONObject getConfigJSONObject(Object config) {
-        return new JSONObject(getConfigString(config));
+    public Integer getConfigInt(String config) {
+        return Integer.parseInt(EntrustParser.getNotNull(getConfigString(config), "0"));
+    }
+
+    public Long getConfigLong(String config) {
+        return Long.parseLong(EntrustParser.getNotNull(getConfigString(config), "0"));
+    }
+
+    public JSONObject getConfigJSONObject(String config) {
+        return new JSONObject(EntrustParser.getNotNull(getConfigString(config), "{}"));
 
     }
 
-    public JSONArray getConfigJSONArray(Object config) {
-        return new JSONArray(getConfigString(config));
+    public JSONArray getConfigJSONArray(String config) {
+        return new JSONArray(EntrustParser.getNotNull(getConfigString(config), "[]"));
     }
 }
 

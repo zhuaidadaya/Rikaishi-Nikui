@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.text.Text;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 
@@ -10,7 +11,7 @@ public abstract class PaginationCachedText<T, L> {
     public Int2ObjectRBTreeMap<String> pages = new Int2ObjectRBTreeMap<>();
     public int pageSize = 1024 * 256;
     public String base;
-    private PaginationTextManager<?> textManager;
+    private PaginationTextManager<?, Text> textManager;
 
     public PaginationCachedText() {
         init(UUID.randomUUID(), pageSize, null);
@@ -43,11 +44,11 @@ public abstract class PaginationCachedText<T, L> {
         textManager.setComponent(component);
     }
 
-    public PaginationTextManager<?> getTextManager() {
+    public PaginationTextManager<?, Text> getTextManager() {
         return textManager;
     }
 
-    public void setTextManager(PaginationTextManager<?> textManager) {
+    public void setTextManager(PaginationTextManager textManager) {
         this.textManager = textManager;
     }
 

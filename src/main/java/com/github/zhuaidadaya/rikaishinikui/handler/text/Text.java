@@ -15,6 +15,14 @@ public abstract class Text {
         return toJSONObject().toString();
     }
 
+    public boolean equals(Object o) {
+        try {
+            return ((Text)o).toJSONObject().toString().equals(toJSONObject().toString());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public Color getAwtColor() {
         return null;
     }

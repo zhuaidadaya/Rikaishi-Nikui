@@ -2,7 +2,7 @@ package com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination;
 
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 
-public abstract class PaginationTextManager<T> {
+public abstract class PaginationTextManager<T, S> {
     private int page = -1;
     private final PaginationCachedText<T, ?> cachedText;
     protected RikaishiNikuiLogComponent component;
@@ -40,5 +40,15 @@ public abstract class PaginationTextManager<T> {
         return cachedText.read(page);
     }
 
-    public abstract void submit();
+    public void update() {
+        try {
+            component.setCaretPosition(Math.max(0, component.getDoc().getLength() - 1));
+        } catch (Exception e) {
+
+        }
+    }
+
+    public abstract void submit(S submit);
+
+    public abstract void cover();
 }

@@ -6,6 +6,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiN
 import com.github.zhuaidadaya.rikaishinikui.handler.task.download.MinecraftDownloadEntrustType;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.SingleText;
 
 import java.util.LinkedHashMap;
 import java.util.UUID;
@@ -50,7 +51,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
     }
 
     @Override
-    protected void join() {
+    protected synchronized void join() {
         if (running) {
             logger.info(getTaskTypeName() + " " + getId() + " join to manager");
             synchronized (this) {
@@ -74,19 +75,21 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
         done();
     }
 
-    public void stop() {
-        stop = true;
-        RikaishiNikuiTask parent = getParentTask();
-        if (parent != null) {
-            parent.stop();
-        }
-        logger.info("stopping " + getTaskTypeName() + " " + getId());
-        running = false;
-        done = true;
-        try {
-            downloader.stop();
-        } catch (Exception e) {
+    public synchronized void exit() {
+        if (running) {
+            stop = true;
+            RikaishiNikuiTask parent = getParentTask();
+            if (parent != null) {
+                parent.exit();
+            }
+            logger.info("stopping " + getTaskTypeName() + " " + getId());
+            running = false;
+            done = true;
+            try {
+                downloader.stop();
+            } catch (Exception e) {
 
+            }
         }
     }
 
@@ -105,7 +108,7 @@ public class RikaishiNikuiMinecraftDownloadTask extends RikaishiNikuiTask {
 
     public void log(String log, LogLevel level) {
         logs.append(log);
-        submit();
+        submit(new SingleText(log));
     }
 
     public PaginationCachedString getPaginateCachedLog() {

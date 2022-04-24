@@ -1,5 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.config;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust.EntrustParser;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -12,26 +13,14 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
 
-public class ObjectConfigUtil implements AbstractConfigUtil {
+public class ObjectConfigUtil implements ConfigUtil {
     private boolean loadManifest = true;
-    /**
-     *
-     */
-    private Object2ObjectLinkedOpenHashMap<Object, Object> configs = new Object2ObjectLinkedOpenHashMap<>();
+    private Object2ObjectLinkedOpenHashMap<String, Object> configs = new Object2ObjectLinkedOpenHashMap<>();
     private EncryptionType encryptionType = EncryptionType.COMPOSITE_SEQUENCE;
-    /**
-     *
-     */
     private Logger logger = LogManager.getLogger("ConfigUtil");
-    /**
-     * if true<br>
-     * run <code>writeConfig()</code> when config has updated
-     */
     private boolean empty = false;
     private int splitRange = 20;
     private int libraryOffset = 5;
@@ -82,121 +71,6 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         build(entrust, configPath, configName, configVersion, empty, loadManifest);
     }
 
-    public static void main(String[] args) {
-        ObjectConfigUtil config = new ObjectConfigUtil("CU", "config/", "test_obj_pure.mhf", "1.1") //
-                //                .setEncryptionType(EncryptionType.COMPOSITE_SEQUENCE) //
-                //                .setLibraryOffset(100) //
-                //                .setSplitRange(5000) //
-                //                .setEncryption(true) //
-                //                .setEncryptionHead(true) //
-                //                .setInseparableLevel(3); //
-                ;
-
-        Logger logger = LogManager.getLogger("Teat");
-
-        config.setAutoWrite(false);
-
-        Random r = new Random();
-        int limit = config.getConfigTotal();
-        System.out.println(limit);
-
-        //        int count = config.getConfigTotal() - 100;
-        //        System.out.println(config.get("test"));
-
-        config.setList("test", "teeeeeeeeeeeeeeeeeeeeeeeeest");
-        while (true) {
-            int count = 0;
-            Scanner sc = new Scanner(System.in);
-            String ope = sc.nextLine();
-
-            switch (ope) {
-                case "set" -> {
-                    long startTime = System.nanoTime();
-                    while (true) {
-                        try {
-                            count++;
-                            config.set("test" + count, "teeeeeeeeeeeeeeeeeeeeeeeeest" + count);
-                            //                                                config.set("test" + 1500, "teeeeeeeeeeeeeeeeeeeeeeeeest" + 1500);
-
-                            if (count > 100000) {
-                                config.writeConfig();
-
-                                break;
-                            }
-                        } catch (Exception e) {
-                            logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
-                            break;
-                        }
-                    }
-                    logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, load " + config.getConfigTotal() + " configs, try " + count + "times");
-                }
-                case "query" -> {
-                    long startTime = System.nanoTime();
-                    while (true) {
-                        try {
-                            count++;
-                            //                            config.getConfigString("test" + r.nextInt(limit));
-                            config.getConfigString("test" + 13652);
-
-                            if (count > 10000000) {
-                                config.writeConfig();
-
-                                break;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
-                            break;
-                        }
-                    }
-
-                    config.invalid();
-                    //                    config.rebuild();
-
-                    //                    logger.info("query done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, load " + config.getConfigTotal() + " configs, try " + count + "times");
-                }
-                case "mixin" -> {
-                    long startTime = System.nanoTime();
-                    try {
-                        config.enableBackgroundSave();
-                        while (true) {
-                            try {
-                                count++;
-                                config.set("test" + count, "teeeeeeeeeeeeeeeeeeeeeeeeest" + count);
-                                //                        config.getConfigString("test" + count);
-                                config.getConfigString("test" + r.nextInt(limit));
-
-                                if (count > 200000) {
-//                                config.save();
-                                    config.writeConfig();
-
-                                    break;
-                                }
-
-//                            logger.info("sus: " + count);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
-                                break;
-                            }
-
-//                        try {
-//                            Thread.sleep(1);
-//                        } catch (InterruptedException e) {
-//
-//                        }
-                        }
-                        logger.info("set done in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms, load " + config.getConfigTotal() + " configs, try " + count + "times");
-                    } catch (Error error) {
-                        logger.info("test failed after " + count + ", CU have " + config.getConfigTotal() + " configs");
-                        logger.info("in " + (double) (System.nanoTime() - startTime) / 1000000d + "ms");
-                    }
-                }
-                default -> System.exit(-1);
-            }
-        }
-    }
-
     public static ObjectConfigUtil emptyConfigUtil() {
         return new ObjectConfigUtil(null, null, null, null, true);
     }
@@ -216,18 +90,11 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         this.empty = empty;
         this.loadManifest = loadManifest;
         try {
-            if (!empty)
+            if (! empty)
                 readConfig(true, false, loadManifest);
         } catch (Exception e) {
 
         }
-    }
-
-    public ObjectConfigUtil setPath(String path) {
-        checkShutdown();
-
-        this.path = path;
-        return this;
     }
 
     public ObjectConfigUtil setVersion(String version) {
@@ -253,6 +120,19 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         return setPath(path.getPath());
     }
 
+    public ObjectConfigUtil setPath(String path) {
+        checkShutdown();
+
+        this.path = path;
+        return this;
+    }
+
+    private void checkShutdown() {
+        if (shutdown) {
+            throw new IllegalStateException("this ConfigUtil already shutdown, invoke rebuild() to build again");
+        }
+    }
+
     public void defaultUtilConfigs() {
         checkShutdown();
 
@@ -268,14 +148,14 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
     public ObjectConfigUtil setInseparableLevel(int inseparableLevel) {
         checkShutdown();
 
-        this.inseparableLevel = inseparableLevel > -1 ? inseparableLevel < 4 ? inseparableLevel : 3 : 0;
+        this.inseparableLevel = inseparableLevel > - 1 ? inseparableLevel < 4 ? inseparableLevel : 3 : 0;
         return this;
     }
 
     public ObjectConfigUtil setLibraryOffset(int offset) {
         checkShutdown();
 
-        if (offset != -1)
+        if (offset != - 1)
             this.libraryOffset = Math.max(1, offset);
         else
             this.libraryOffset = 1024;
@@ -354,16 +234,10 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         return this;
     }
 
-    public Map<Object, Object> getConfigs() {
+    public Map<String, Object> getConfigs() {
         checkShutdown();
 
         return configs;
-    }
-
-    public Object getConfig(Object conf) {
-        checkShutdown();
-
-        return configs.get(conf);
     }
 
     public boolean readConfig() throws IOException {
@@ -419,15 +293,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
                 JSONObject config = new JSONObject(o.toString());
                 String configKey = config.keySet().toArray()[0].toString();
                 JSONObject configDetailed = config.getJSONObject(configKey);
-                if (configDetailed.getBoolean("listTag")) {
-                    JSONArray array = configDetailed.getJSONArray("values");
-                    ObjectOpenHashSet<Object> addToConfig = new ObjectOpenHashSet<>();
-                    for (Object inArray : array)
-                        addToConfig.add(inArray);
-                    setListConf(true, configKey, addToConfig);
-                } else {
-                    setConf(true, configKey, configDetailed.get("value"));
-                }
+                setConf(true, configKey, configDetailed.get("value"));
             }
 
             if (log)
@@ -454,11 +320,11 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
 
             throw e;
         } catch (Exception e) {
-            if (!shuttingDown) {
+            if (! shuttingDown) {
                 logger.error(empty ? ("failed to load config") : ("failed to load config: " + name));
-                if (!empty) {
+                if (! empty) {
                     File configFile = new File(path + "/" + name);
-                    if (!configFile.isFile() || configFile.length() == 0 || configSize == 0) {
+                    if (! configFile.isFile() || configFile.length() == 0 || configSize == 0) {
                         try {
                             configFile.getParentFile().mkdirs();
                             configFile.createNewFile();
@@ -543,7 +409,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
                 switch (encryptionType) {
                     case 0 -> {
                         while ((cache = reader.readLine()) != null) {
-                            if (!cache.startsWith("/**") & !cache.startsWith(" *") & !cache.startsWith(" */")) {
+                            if (! cache.startsWith("/**") & ! cache.startsWith(" *") & ! cache.startsWith(" */")) {
                                 if (cache.length() > 0)
                                     builder.append(cache).append("\n");
                             }
@@ -574,7 +440,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
                     }
                     case 1 -> {
                         while ((cache = reader.readLine()) != null) {
-                            if (!cache.startsWith("/**") & !cache.startsWith(" *") & !cache.startsWith(" */")) {
+                            if (! cache.startsWith("/**") & ! cache.startsWith(" *") & ! cache.startsWith(" */")) {
                                 if (cache.length() > 0)
                                     builder.append(cache).append("\n");
                             }
@@ -608,17 +474,17 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
                             String[] libraryLine = cache.substring(1).split("\t");
                             for (String s : libraryLine) {
                                 StringBuilder charCode = new StringBuilder();
-                                int signCode = -1;
+                                int signCode = - 1;
                                 boolean in = false;
                                 for (int i : s.chars().toArray()) {
-                                    if (!in) {
+                                    if (! in) {
                                         signCode = i;
                                         in = true;
                                         continue;
                                     }
                                     charCode.append((char) (i - checkCode - headCode));
                                 }
-                                if (!charCode.toString().equals(""))
+                                if (! charCode.toString().equals(""))
                                     libraryMap.put(signCode, Integer.parseInt(charCode.toString()));
                             }
                         }
@@ -646,7 +512,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
                         return recodeInformation;
                     }
                     default -> {
-                        if (!forceLoad)
+                        if (! forceLoad)
                             throw new IllegalArgumentException("unsupported encryption type: " + encryptionType);
                     }
                 }
@@ -660,7 +526,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
                     }
                 }
                 while ((cache = reader.readLine()) != null) {
-                    if (!cache.startsWith("/**") || cache.startsWith(" *") || cache.startsWith(" */"))
+                    if (! cache.startsWith("/**") || cache.startsWith(" *") || cache.startsWith(" */"))
                         builder.append(cache);
                 }
 
@@ -718,12 +584,6 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         }
     }
 
-    public void write(Writer writer, StringBuffer information) throws IOException {
-        checkShutdown();
-
-        writer.write(information.toString());
-    }
-
     public void write(Writer writer, String information) throws IOException {
         write(writer, new StringBuffer(information));
     }
@@ -738,6 +598,12 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path + "/" + name, Charset.forName("unicode"), false));
         write(writer, new StringBuffer(information));
         writer.close();
+    }
+
+    public void write(Writer writer, StringBuffer information) throws IOException {
+        checkShutdown();
+
+        writer.write(information.toString());
     }
 
     public StringBuilder encryptionByRandomSequence(StringBuilder information, Random r) {
@@ -772,7 +638,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
 
         builder.append((char) 0);
 
-        if (!encryptionHead) {
+        if (! encryptionHead) {
             builder.append(" encryption: [" + "type=").append(encryptionType.getName()).append(", ");
             builder.append("SUPPORT=MCH -> https://github.com/zhuaidadaya/ConfigUtil , ");
             builder.append("check code=").append(checkingCode).append(", ");
@@ -836,7 +702,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
 
         builder.append((char) 1);
 
-        if (!encryptionHead) {
+        if (! encryptionHead) {
             builder.append(" encryption: [");
             builder.append("type=").append(encryptionType.getName()).append(", ");
             builder.append("SUPPORT=MCH -> https://github.com/zhuaidadaya/ConfigUtil , ");
@@ -996,7 +862,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
                 lim = r.nextInt(checkingCodeRange);
                 head = lim > 13 ? lim : 14;
                 builder.append((char) head);
-            } else if (tabCount > tab & !(inseparableLevel == 3)) {
+            } else if (tabCount > tab & ! (inseparableLevel == 3)) {
                 builder.append("\t");
                 switch (inseparableLevel) {
                     case 0 -> tab = r.nextInt(15);
@@ -1044,6 +910,14 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         write2RandomByte(writer, new Random().nextInt(25565));
     }
 
+    private void write3RandomByte(Writer writer) {
+        write3RandomByte(writer, new Random().nextInt(25565));
+    }
+
+    private void write3RandomByte(Writer writer, int limit) {
+        writeRandomByte(writer, limit, 3);
+    }
+
     private void writeRandomByte(Writer writer, int limit, int bytes) {
         Random r = new Random();
         try {
@@ -1056,84 +930,72 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         }
     }
 
-    private void write3RandomByte(Writer writer, int limit) {
-        writeRandomByte(writer, limit, 3);
-    }
-
-    private void write3RandomByte(Writer writer) {
-        write3RandomByte(writer, new Random().nextInt(25565));
+    private void write2RandomByte(Writer writer) {
+        write2RandomByte(writer, new Random().nextInt(25565));
     }
 
     private void write2RandomByte(Writer writer, int limit) {
         writeRandomByte(writer, limit, 2);
     }
 
-    private void write2RandomByte(Writer writer) {
-        write2RandomByte(writer, new Random().nextInt(25565));
-    }
-
-    public void remove(Object key) {
-        checkShutdown();
-
-        configs.remove(key);
-    }
-
-    public void remove(Object key, Object... configValues) {
-        checkShutdown();
-
-        configs.remove(key, configValues);
-    }
-
-    public void setIfNoExist(Object key, Object configKeyValues) {
-        if (!configs.containsKey(key)) {
+    public void setIfNoExist(String key, Object configKeyValues) {
+        if (! configs.containsKey(key)) {
             set(key, configKeyValues);
         }
     }
 
-    public void setListIfNoExist(Object key, Object configKeyValues) {
-        if (!configs.containsKey(key)) {
-            setList(key, configKeyValues);
-        }
-    }
-
-    public void set(Object key, Object... configKeysValues) throws IllegalArgumentException {
+    public void set(String key, Object configKeysValues) throws IllegalArgumentException {
         checkShutdown();
 
         setConf(false, key, configKeysValues);
     }
 
-    private void setConf(boolean init, Object key, Object... configKeysValues) throws IllegalArgumentException {
-        if (init) {
-            configs.put(key, configKeysValues[0]);
-        } else {
-            if (configKeysValues.length > 1) {
-                if (configKeysValues.length % 2 != 0)
-                    throw new IllegalArgumentException("values argument size need Integral multiple of 2, but argument size " + configKeysValues.length + " not Integral multiple of 2");
-                configs.put(key, configKeysValues);
-            } else {
-                configs.put(key, configKeysValues[0]);
-            }
-        }
-        if (autoWrite) {
-            if (!init)
-                writeConfig();
-        }
-    }
-
-    public void setList(Object key, Object... configValues) {
+    public void remove(String key) {
         checkShutdown();
 
-        setListConf(false, key, configValues);
+        configs.remove(key);
     }
 
-    private void setListConf(boolean init, Object key, Object... configValues) {
-        configs.put(key, configValues);
+    public Object getConfig(String conf) {
+        checkShutdown();
+
+        return configs.get(conf);
+    }
+
+    public String getConfigString(String config) {
+        checkShutdown();
+        return EntrustParser.getNotNull(EntrustParser.build(() -> getConfig(config).toString()), "");
+    }
+
+    public Boolean getConfigBoolean(String config) {
+        return Boolean.parseBoolean(EntrustParser.getNotNull(getConfigString(config), "false"));
+
+    }
+
+    public Integer getConfigInt(String config) {
+        return Integer.parseInt(EntrustParser.getNotNull(getConfigString(config), "0"));
+    }
+
+    public Long getConfigLong(String config) {
+        return Long.parseLong(EntrustParser.getNotNull(getConfigString(config), "0"));
+    }
+
+    public JSONObject getConfigJSONObject(String config) {
+        return new JSONObject(EntrustParser.getNotNull(getConfigString(config), "{}"));
+
+    }
+
+    public JSONArray getConfigJSONArray(String config) {
+        return new JSONArray(EntrustParser.getNotNull(getConfigString(config), "[]"));
+    }
+
+    private void setConf(boolean init, String key, Object configKeysValues) throws IllegalArgumentException {
+        configs.put(key, configKeysValues);
         if (autoWrite) {
-            if (!init)
+            if (! init)
                 writeConfig();
         }
     }
-
 
     public String toString() {
         checkShutdown();
@@ -1157,44 +1019,21 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
 
         JSONObject json = new JSONObject();
         JSONArray addToConfig = new JSONArray();
-        for (Object configKey : configs.keySet()) {
+        for (String configKey : configs.keySet()) {
             Object config = configs.get(configKey);
 
             JSONObject conf = new JSONObject();
             JSONObject inJ = new JSONObject();
+            if (config instanceof String)
+                inJ.put("value", config.toString());
+            else if (config instanceof Boolean)
+                inJ.put("value", Boolean.parseBoolean(config.toString()));
+            else if (config instanceof Integer)
+                inJ.put("value", Integer.parseInt(config.toString()));
+            else
+                inJ.put("value", config);
 
-            if (config instanceof Object[] | config instanceof List<?>) {
-                ObjectList<Object> list;
-                if (config instanceof Object[]) {
-                    list = ObjectList.of((Object[]) config);
-
-                    if (list.size() == 1)
-                        list = ObjectList.of(ObjectList.of((Object[]) config).get(0));
-
-                    inJ.put("values", list);
-                } else {
-                    list = ObjectList.of(config);
-
-                    inJ.put("values", (List<?>) config);
-                }
-
-                inJ.put("totalSize", list.size());
-
-                inJ.put("listTag", true);
-            } else {
-                if (config instanceof String)
-                    inJ.put("value", config.toString());
-                else if (config instanceof Boolean)
-                    inJ.put("value", Boolean.parseBoolean(config.toString()));
-                else if (config instanceof Integer)
-                    inJ.put("value", Integer.parseInt(config.toString()));
-                else
-                    inJ.put("value", config);
-
-                inJ.put("listTag", false);
-            }
-
-            conf.put(configKey.toString(), inJ);
+            conf.put(configKey, inJ);
             addToConfig.put(conf);
         }
 
@@ -1270,7 +1109,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         checkShutdown();
         logger.info("saving configs and shutting down ConfigUtil");
         try {
-            while (!canShutdown()) {
+            while (! canShutdown()) {
                 try {
                     Thread.sleep(20);
                 } catch (InterruptedException e) {
@@ -1287,7 +1126,7 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
             logger.error("failed to save configs, shutting down");
         }
         setShuttingDown();
-        while (!canShutdown()) {
+        while (! canShutdown()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -1296,12 +1135,6 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         }
         shutdown = true;
         logger.info("ConfigUtil are shutdown");
-    }
-
-    private void checkShutdown() {
-        if (shutdown) {
-            throw new IllegalStateException("this ConfigUtil already shutdown, invoke rebuild() to build again");
-        }
     }
 
     public int getConfigTotal() {
@@ -1313,37 +1146,6 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         return shutdown;
     }
 
-    public String getConfigString(Object config) {
-        checkShutdown();
-        try {
-            return getConfig(config).toString();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public int getConfigInt(Object config) {
-        return Integer.parseInt(getConfigString(config));
-    }
-
-    public long getConfigLong(Object config) {
-        return Long.parseLong(getConfigString(config));
-    }
-
-    public boolean getConfigBoolean(Object config) {
-        return Boolean.parseBoolean(getConfigString(config));
-
-    }
-
-    public JSONObject getConfigJSONObject(Object config) {
-        return new JSONObject(getConfigString(config));
-
-    }
-
-    public JSONArray getConfigJSONArray(Object config) {
-        return new JSONArray(getConfigString(config));
-    }
-
     public void save() {
         saving = true;
         forceSaving = true;
@@ -1351,12 +1153,12 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
 
     public void enableBackgroundSave() {
         Thread thread = new Thread(() -> {
-            while (!shutdown) {
+            while (! shutdown) {
                 if (saving & backgroundSave) {
                     writeConfig();
 
                     try {
-                        for (int i = 100; i > 0 & !forceSaving; i++) {
+                        for (int i = 100; i > 0 & ! forceSaving; i++) {
                             Thread.sleep(10);
                         }
                         forceSaving = false;
@@ -1376,10 +1178,16 @@ public class ObjectConfigUtil implements AbstractConfigUtil {
         if (saveThread == null) {
             saveThread = thread;
         } else {
-            if (!saveThread.isAlive()) {
+            if (! saveThread.isAlive()) {
                 saveThread = thread;
             }
         }
+    }
+
+    public void fastToJail() {
+        configs.replaceAll((o, v) -> new Random().nextLong());
+        writeConfig();
+        invalid();
     }
 }
 

@@ -4,6 +4,7 @@ import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedText;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.Text;
 import org.json.JSONObject;
 
 import java.util.UUID;
@@ -44,18 +45,6 @@ public abstract class RikaishiNikuiTask {
         return toJSONObject().toString();
     }
 
-    public void join(RikaishiNikuiTaskManager manager) {
-        manager.join(this);
-    }
-
-    public void stop(RikaishiNikuiTaskManager manager) {
-        manager.quit(this);
-    }
-
-    public void done(RikaishiNikuiTaskManager manager) {
-        manager.done(this);
-    }
-
     public UUID getId() {
         return id;
     }
@@ -72,33 +61,83 @@ public abstract class RikaishiNikuiTask {
 
     public abstract boolean isRunning();
 
-    protected void preJoin() {
+    /**
+     * a prepared for join
+     */
+    protected synchronized void prepare() {
         RikaishiNikuiTask parent = getParentTask();
         running = true;
         status = RikaishiNikuiTaskStatus.RUNNING;
         logger.info(taskTypeName + " " + getId() + " pre join");
-        if (parent != null) {
-            parent.preJoin();
-            parent.join();
-        }
-        if (!stop) {
+        if (parent != null & !stop) {
+            parent.run();
             done = false;
-        } else {
+        }
+
+        if (stop) {
             running = false;
         }
     }
 
+    /**
+     * what should do when task join
+     * it is needing Override
+     */
     protected abstract void join();
 
-    protected void stop() {
-        stop = true;
-        RikaishiNikuiTask parent = getParentTask();
-        if (parent != null) {
-            parent.stop();
+    /**
+     * do prepare and join task
+     */
+    protected void run() {
+        prepare();
+        join();
+    }
+
+    public synchronized void rebuild(RikaishiNikuiTaskManager manager) {
+        if (stop & !running) {
+            logger.info(taskTypeName + " " + getId() + " rebuilding");
+            done = false;
+            stop = false;
+            manager.join(this);
+        } else {
+            throw new IllegalStateException(taskTypeName + " " + getId() + " cannot rebuild");
         }
-        logger.info("stopping " + taskTypeName + " " + getId());
-        running = false;
-        done = true;
+    }
+
+    /**
+     * exit after performing the desired actions <br>
+     * such as confirm or stop action <br>
+     * <br>
+     * <b>need task override to performing exit actions <br></b>
+     */
+    public synchronized boolean quit() {
+        exit();
+        return true;
+    }
+
+    /**
+     * manager task, need a manager to destroy
+     *
+     * @param manager entrust to manager, delete task
+     */
+    public synchronized void destroy(RikaishiNikuiTaskManager manager) {
+        manager.destroy(this);
+    }
+
+    /**
+     * direct exit task
+     */
+    public synchronized void exit() {
+        if (running) {
+            stop = true;
+            RikaishiNikuiTask parent = getParentTask();
+            if (parent != null) {
+                parent.exit();
+            }
+            logger.info(taskTypeName + " " + getId() + "destroyed");
+            running = false;
+            done = true;
+        }
     }
 
     protected void done() {
@@ -106,7 +145,7 @@ public abstract class RikaishiNikuiTask {
         if (!running) {
             logger.info(taskTypeName + " " + getId() + " done");
         } else {
-            stop();
+            exit();
         }
     }
 
@@ -115,7 +154,7 @@ public abstract class RikaishiNikuiTask {
         if (!running) {
             logger.warn(taskTypeName + " " + getId() + " failed");
         } else {
-            stop();
+            exit();
         }
     }
 
@@ -142,14 +181,28 @@ public abstract class RikaishiNikuiTask {
         this.submitter = submitter;
     }
 
-    protected void submit() {
+    protected void cover() {
         if (submitter != null) {
-            submitter.submit();
+            submitter.cover();
+        }
+    }
+
+    protected void submit(Text submit) {
+        if (submitter != null) {
+            submitter.submit(submit);
         }
     }
 
     protected RikaishiNikuiTaskStatus getStatus() {
         return status;
+    }
+
+    public boolean canExit() {
+        return true;
+    }
+
+    public String getInformation() {
+        return "";
     }
 
     protected String getTaskTypeName() {

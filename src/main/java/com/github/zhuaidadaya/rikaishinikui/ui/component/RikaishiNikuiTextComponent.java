@@ -25,13 +25,16 @@ public interface RikaishiNikuiTextComponent {
 
     default void updateText() {
         setSuperDoc(getDoc());
+    }
+
+    default void coverText() {
+        updateText();
         setDoc(new DefaultStyledDocument());
     }
 
     default void appendText(Text text, boolean clear) {
         try {
-            Document doc = getDoc();
-            text.applyToDoc(doc, clear, getForeground());
+            text.applyToDoc(getDoc(), clear, getForeground());
         } catch (Exception e) {
 
         }

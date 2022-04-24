@@ -1,8 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.pagination.PaginationCachedString;
-import com.github.zhuaidadaya.rikaishinikui.handler.network.downloader.RikaishiNikuiMinecraftDownloader;
+import com.github.zhuaidadaya.rikaishinikui.handler.text.SingleText;
 
 import java.util.UUID;
 
@@ -23,13 +24,13 @@ public class RikaishiNikuiDownloadRefreshTask extends RikaishiNikuiTask {
     }
 
     @Override
-    protected void join() {
+    protected synchronized void join() {
         boolean failed = false;
         if(running) {
             logger.info(getTaskTypeName() + " " + getId() + " join to manager");
             synchronized(this) {
                 try {
-                    launcher.downloadVersions = downloader.getVersions();
+                    launcher.setDownloadVersions(downloader.getVersions());
                 } catch (Exception e) {
                     failed = true;
                 }
@@ -60,7 +61,7 @@ public class RikaishiNikuiDownloadRefreshTask extends RikaishiNikuiTask {
 
     public void log(String log, LogLevel level) {
         logs.append(log);
-        submit();
+        submit(new SingleText(log));
     }
 
     public PaginationCachedString getPaginateCachedLog() {

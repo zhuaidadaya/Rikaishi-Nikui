@@ -1,6 +1,6 @@
 package com.github.zhuaidadaya.rikaishinikui.ui.color;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.integer.IntegerUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust.EntrustParser;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -37,7 +37,7 @@ public class RikaishiNikuiColor extends Color {
     }
 
     public RikaishiNikuiColor(JSONObject color) {
-        super(color.getInt("r"), color.getInt("g"), color.getInt("b"), IntegerUtil.getIntFromJSON(color, "alpha", 255));
+        super(color.getInt("r"), color.getInt("g"), color.getInt("b"), EntrustParser.tryInstance(Integer.class, () -> color.getInt("alpha"), 255));
         apply(color);
     }
 
@@ -53,7 +53,7 @@ public class RikaishiNikuiColor extends Color {
         this.r = json.getInt("r");
         this.g = json.getInt("g");
         this.b = json.getInt("b");
-        this.alpha = IntegerUtil.getIntFromJSON(json, "alpha", 255);
+        this.alpha = EntrustParser.tryInstance(Integer.class,() -> json.getInt("alpha"), 255);
     }
 
     public boolean isEmpty() {

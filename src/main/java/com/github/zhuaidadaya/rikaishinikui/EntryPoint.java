@@ -6,6 +6,9 @@ import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
 
 public class EntryPoint {
     public static void main(String[] args) {
-        taskManager.join(new RikaishiNikuiLauncherTask(rikaishiNikuiLauncherTaskId, launcher));
+        RikaishiNikuiLauncherTask task = new RikaishiNikuiLauncherTask(rikaishiNikuiLauncherTaskId, launcher, args);
+        taskManager.join(task);
+
+//        taskManager.rebuild(task);
     }
 }

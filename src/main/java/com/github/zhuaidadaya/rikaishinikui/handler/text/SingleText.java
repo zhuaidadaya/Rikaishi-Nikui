@@ -116,7 +116,9 @@ public class SingleText extends Text {
         } catch (Exception e) {
             asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, defaultForeground);
         }
-        if (clear) doc.remove(0, doc.getLength());
+        if (clear) {
+            doc.remove(0, doc.getLength());
+        }
         doc.insertString(doc.getLength(), getText(), asset);
     }
 }

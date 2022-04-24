@@ -6,13 +6,12 @@ import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.fabric.Fabr
 import com.github.zhuaidadaya.rikaishinikui.handler.minecraft.parser.vanilla.*;
 import com.github.zhuaidadaya.rikaishinikui.handler.network.NetworkUtil;
 import com.github.zhuaidadaya.rikaishinikui.handler.option.vm.VmOption;
+import com.github.zhuaidadaya.rikaishinikui.handler.resource.Resources;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.download.MinecraftDownloadEntrustType;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsConcurrentWaiting;
 import com.github.zhuaidadaya.rikaishinikui.handler.threads.waiting.ThreadsDoneCondition;
+import com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust.EntrustParser;
 import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
-import com.github.zhuaidadaya.rikaishinikui.handler.integer.IntegerUtil;
-import com.github.zhuaidadaya.rikaishinikui.handler.resource.Resources;
-import com.github.zhuaidadaya.rikaishinikui.handler.string.checker.StringCheckUtil;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
 
@@ -37,7 +36,7 @@ public class RikaishiNikuiMinecraftDownloader {
     }
 
     public void apply(JSONObject json) {
-        threads = IntegerUtil.getIntFromJSON(json, "threads", -1);
+        threads = EntrustParser.tryInstance(Integer.class, () -> json.getInt("threads"), -1);
     }
 
     public JSONObject toJSONObject() {
@@ -155,11 +154,11 @@ public class RikaishiNikuiMinecraftDownloader {
             ThreadsConcurrentWaiting threads = new ThreadsConcurrentWaiting(ThreadsDoneCondition.ALIVE);
 
             String url;
-            url = StringCheckUtil.getNotNull(config.getConfigString("minecraft-versions-manifest-url"), DEFAULT_MANIFEST);
+            url = EntrustParser.getNotNull(config.getConfigString("minecraft-versions-manifest-url"), DEFAULT_MANIFEST);
             config.set("minecraft-versions-manifest-url", url);
 
             String resourceUrl;
-            resourceUrl = StringCheckUtil.getNotNull(config.getConfigString("minecraft-versions-resource-url"), DEFAULT_RESOURCE);
+            resourceUrl = EntrustParser.getNotNull(config.getConfigString("minecraft-versions-resource-url"), DEFAULT_RESOURCE);
             config.set("minecraft-versions-resource-url", resourceUrl);
 
             information.setStatus("status.parsing");

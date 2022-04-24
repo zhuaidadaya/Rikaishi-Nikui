@@ -1,9 +1,12 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.task;
 
+import com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust.EntrustExecution;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.level.LogLevel;
 import com.github.zhuaidadaya.rikaishinikui.handler.task.log.submitter.RikaishiNikuiSubmitter;
+import com.github.zhuaidadaya.rikaishinikui.logger.RikaishiNikuiLogger;
 import com.github.zhuaidadaya.rikaishinikui.ui.component.RikaishiNikuiLogComponent;
 import it.unimi.dsi.fastutil.objects.Object2ObjectRBTreeMap;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,7 +14,10 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.github.zhuaidadaya.rikaishinikui.storage.Variables.*;
+
 public class RikaishiNikuiTaskManager {
+    public static RikaishiNikuiLogger logger = new RikaishiNikuiLogger(rikaishiNikuiLauncherTaskId, taskManager, "%t=s [%c/%level] %msg", LogManager.getLogger("TaskManager"));
     private final Object2ObjectRBTreeMap<UUID, RikaishiNikuiTask> tasks = new Object2ObjectRBTreeMap<>();
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -27,22 +33,45 @@ public class RikaishiNikuiTaskManager {
         RikaishiNikuiTask old = tasks.get(task.getId());
         if (old == null || !old.isRunning()) {
             tasks.put(task.getId(), task);
-            Thread thread = new Thread(() -> {
-                task.preJoin();
-                task.join();
-            });
-            threadPool.execute(thread);
+            threadPool.execute(new Thread(task::run));
         }
     }
 
-    public void quit(RikaishiNikuiTask task) {
-        if (task.isRunning())
-            task.stop();
+    public void destroy(RikaishiNikuiTask task) {
+        if (task.isRunning()) task.exit();
         tasks.remove(task.getId());
     }
 
-    public void quit(UUID task) {
-        quit(tasks.get(task));
+    public void destroy(UUID task) {
+        destroy(tasks.get(task));
+    }
+
+    public boolean quit(RikaishiNikuiTask task) {
+        if (task.canExit()) {
+            return task.quit();
+        } else {
+            return false;
+        }
+    }
+
+    public boolean quit(UUID task) {
+        return quit(tasks.get(task));
+    }
+
+    public void exit(UUID task) {
+        exit(tasks.get(task));
+    }
+
+    public void exit(RikaishiNikuiTask task) {
+        if (task.canExit()) task.exit();
+    }
+
+    public void rebuild(UUID task) {
+        rebuild(tasks.get(task));
+    }
+
+    public void rebuild(RikaishiNikuiTask task) {
+        task.rebuild(this);
     }
 
     public StringBuilder getLog(RikaishiNikuiTask task) {
@@ -53,12 +82,10 @@ public class RikaishiNikuiTaskManager {
         return getLog(tasks.get(task));
     }
 
-    public void done(RikaishiNikuiTask task) {
-        task.done();
-    }
-
     public void log(UUID id, String log) {
-        tasks.get(id).log(log);
+        EntrustExecution.notNull(tasks.get(id), e -> {
+            e.log(log);
+        });
     }
 
     public void log(String id, String log) {
@@ -66,10 +93,13 @@ public class RikaishiNikuiTaskManager {
     }
 
     public void log(UUID id, String log, LogLevel level) {
-        tasks.get(id).log(log, level);
+        EntrustExecution.notNull(tasks.get(id), e -> {
+            e.log(log, level);
+        });
+//        tasks.get(id).log(log, level);
     }
 
-    public void log(String id, String log,  LogLevel level) {
+    public void log(String id, String log, LogLevel level) {
         log(UUID.fromString(id), log, level);
     }
 

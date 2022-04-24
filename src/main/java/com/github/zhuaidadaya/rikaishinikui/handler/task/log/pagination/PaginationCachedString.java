@@ -36,11 +36,11 @@ public class PaginationCachedString extends PaginationCachedText<String, String>
         this.base = base;
     }
 
-    public void append(String log) {
+    public void append(String text) {
         if (this.log.length() > pageSize) {
             cache();
         }
-        this.log.append(log).append("\n");
+        this.log.append(text).append("\n");
     }
 
     public void cache() {

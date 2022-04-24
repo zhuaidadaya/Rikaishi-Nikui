@@ -72,7 +72,7 @@ public class JavaVersionChecker {
                         information.setVersion(Integer.parseInt(version.substring(0, 2)));
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+
                 }
 
                 return information;

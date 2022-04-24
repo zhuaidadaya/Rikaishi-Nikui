@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Objects;
@@ -43,15 +44,12 @@ public class FileUtil {
                     dir.mkdirs();
                 } else {
                     File targetFile = new File(path + "/" + entry.getName());
-                    if (!targetFile.getParentFile().exists()) {
-                        targetFile.getParentFile().mkdirs();
-                    }
-                    targetFile.createNewFile();
+                    Resources.createFile(targetFile.getAbsolutePath());
                     FastBufferedInputStream is = new FastBufferedInputStream(zipFile.getInputStream(entry));
                     FastBufferedOutputStream fos = new FastBufferedOutputStream(new FileOutputStream(targetFile));
                     int len;
                     byte[] buf = new byte[1024 * 1024];
-                    while ((len = is.read(buf)) != -1) {
+                    while ((len = is.read(buf)) != - 1) {
                         fos.write(buf, 0, len);
                     }
                     fos.close();
@@ -71,11 +69,42 @@ public class FileUtil {
         }
     }
 
+    public static String strictRead(BufferedReader reader) {
+        String cache;
+        StringBuilder builder = new StringBuilder();
+        try {
+            while ((cache = reader.readLine()) != null)
+                builder.append(cache).append("\n");
+        } catch (Exception e) {
+            return "";
+        }
+        return builder.delete(builder.length() - 1, builder.length()).toString();
+    }
+
+    public static String readZip(String zip, String inZipFile) throws RuntimeException {
+        try {
+            FastBufferedInputStream is = new FastBufferedInputStream(new ZipFile(zip).getInputStream(new ZipEntry(inZipFile)));
+            StringBuilder builder = new StringBuilder();
+            int length;
+            byte[] buf = new byte[1024];
+            while ((length = is.read(buf)) != - 1) {
+                String s = new String(buf, 0, length, StandardCharsets.UTF_8);
+                builder.append(s);
+            }
+            is.close();
+            return builder.toString();
+        } catch (Exception e) {
+
+        }
+        return "";
+    }
+
     public static String read(BufferedReader reader) {
         String cache;
         StringBuilder builder = new StringBuilder();
         try {
-            while ((cache = reader.readLine()) != null) builder.append(cache).append("\n");
+            while ((cache = reader.readLine()) != null)
+                builder.append(cache).append("\n");
         } catch (Exception e) {
             return "";
         }
@@ -86,7 +115,8 @@ public class FileUtil {
         String cache;
         StringBuilder builder = new StringBuilder();
         try {
-            while ((cache = reader.readLine()) != null) builder.append(cache).append("\n");
+            while ((cache = reader.readLine()) != null)
+                builder.append(cache).append("\n");
         } catch (Exception e) {
 
         }
@@ -132,18 +162,18 @@ public class FileUtil {
     }
 
     public static void openInExplorer(String s) throws IOException {
-        Runtime.getRuntime().exec("explorer.exe \"" + s.replace("/", "\\") + "\"");
+        Runtime.getRuntime().exec(new String[]{"explorer.exe", "\"" + s.replace("/", "\\") + "\""});
     }
 
     public static void openInNautilus(String s) throws IOException {
-        Runtime.getRuntime().exec("nautilus " + s);
+        Runtime.getRuntime().exec(new String[]{"nautilus", s});
     }
 
     public static String absPath(String path) {
         return new File(path).getAbsolutePath();
     }
 
-    public static void clone(String from,String to) {
+    public static void clone(String from, String to) {
         for (File f : Objects.requireNonNull(new File(from).listFiles())) {
             try {
                 if (f.isDirectory()) {
@@ -159,14 +189,14 @@ public class FileUtil {
         }
     }
 
-    public static void copy(String from,String to) throws Exception{
+    public static void copy(String from, String to) throws Exception {
         Resources.createFile(to);
         FastBufferedInputStream input = new FastBufferedInputStream(new FileInputStream(from));
         FastBufferedOutputStream output = new FastBufferedOutputStream(new FileOutputStream(to));
         byte[] buff = new byte[8192];
         int length;
-        while ((length = input.read(buff,0,buff.length)) != -1) {
-            output.write(buff, 0,length);
+        while ((length = input.read(buff, 0, buff.length)) != - 1) {
+            output.write(buff, 0, length);
         }
         input.close();
         output.close();
