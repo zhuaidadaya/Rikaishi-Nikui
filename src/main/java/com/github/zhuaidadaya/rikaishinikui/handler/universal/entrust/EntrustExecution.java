@@ -1,7 +1,9 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust.function.*;
+
+import java.util.*;
+import java.util.function.*;
 
 public class EntrustExecution {
     private static final Object o = new Object();
@@ -20,7 +22,7 @@ public class EntrustExecution {
 
     public static <T> void executeNull(T target, Consumer<T> asNotNull, Consumer<T> asNull) {
         if (target == null) {
-            asNull.accept((T) o);
+            asNull.accept(null);
         } else {
             asNotNull.accept(target);
         }
@@ -47,11 +49,7 @@ public class EntrustExecution {
         }
     }
 
-    public static <T> void noArg(Consumer<T> action) {
-        action.accept(null);
-    }
-
-    public static <T> void action(T target, Consumer<T> action) {
+    public static <T> void operation(T target, Consumer<T> action) {
         action.accept(target);
     }
 
@@ -62,7 +60,7 @@ public class EntrustExecution {
         }
     }
 
-    public static <T> void trying(Consumer<T> action) {
+    public static <T> void trying(ExceptingConsumer<T> action) {
         try {
             action.accept((T) o);
         } catch (Exception e) {
@@ -70,7 +68,7 @@ public class EntrustExecution {
         }
     }
 
-    public static <T> void trying(Consumer<T> action, Consumer<T> actionWhenException) {
+    public static <T> void trying(ExceptingConsumer<T> action, Consumer<T> actionWhenException) {
         try {
             action.accept((T) o);
         } catch (Exception e) {
@@ -78,7 +76,7 @@ public class EntrustExecution {
         }
     }
 
-    public static <T> void trying(T target, Consumer<T> action) {
+    public static <T> void trying(T target, ExceptingConsumer<T> action) {
         try {
             action.accept(target);
         } catch (Exception e) {
@@ -86,12 +84,104 @@ public class EntrustExecution {
         }
     }
 
-    public static <T> void trying(T target, Consumer<T> action, Consumer<T> actionWhenException) {
+    public static <T> void trying(T target, ExceptingConsumer<T> action, Consumer<T> actionWhenException) {
         try {
             action.accept(target);
         } catch (Exception e) {
             actionWhenException.accept(target);
         }
+    }
+
+    public static <T> void tryFor(Collection<T> targets, ExceptingConsumer<T> action) {
+        if (targets != null) {
+            for (T target : targets) {
+                try {
+                    action.accept(target);
+                } catch (Exception e) {
+
+                }
+            }
+        }
+    }
+
+    public static <T> void tryFor(Collection<T> targets, ExceptingConsumer<T> action, Consumer<T> whenException) {
+        if (targets != null) {
+            for (T target : targets) {
+                try {
+                    action.accept(target);
+                } catch (Exception e) {
+                    whenException.accept(target);
+                }
+            }
+        }
+    }
+
+    public static <T> void temporary(Temporary action) {
+        action.apply();
+    }
+
+    public static <T> void tryTemporary(ExceptingTemporary action, Temporary whenException) {
+        try {
+            action.apply();
+        } catch (Exception e) {
+            whenException.apply();
+        }
+    }
+
+    public static <T> void tryTemporary(ExceptingTemporary action) {
+        try {
+            action.apply();
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static <T> void tryAssertNotNull(T target, ExceptingConsumer<T> action) {
+        try {
+            if (target != null) {
+                action.accept(target);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static <T> void tryAssertNotNull(T target, ExceptingConsumer<T> action, Consumer<T> whenException) {
+        try {
+            if (target != null) {
+                action.accept(target);
+            }
+        } catch (Exception e) {
+            whenException.accept(target);
+        }
+    }
+
+    public static <T> void tryExecuteNull(T target, ExceptingConsumer<T> asNotNull, ExceptingConsumer<T> asNull) {
+        try {
+            if (target != null) {
+                asNotNull.accept(target);
+            } else {
+                asNull.accept(null);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static <T> void tryExecuteNull(T target, ExceptingConsumer<T> asNotNull, ExceptingConsumer<T> asNull, Consumer<T> whenException) {
+        try {
+            if (target != null) {
+                asNotNull.accept(target);
+            } else {
+                asNull.accept(null);
+            }
+        } catch (Exception e) {
+            whenException.accept(target);
+        }
+    }
+
+    public static void main(String[] args) {
+
     }
 }
 

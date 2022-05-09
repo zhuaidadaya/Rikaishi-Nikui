@@ -1,12 +1,25 @@
 package com.github.zhuaidadaya.rikaishinikui.handler.network;
 
 import com.github.zhuaidadaya.rikaishinikui.handler.resource.Resources;
+import com.github.zhuaidadaya.rikaishinikui.handler.universal.entrust.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class NetworkUtil {
+    public static void main(String[] args) {
+        try {
+            System.out.println(
+                    NetworkUtil.downloadToStringBuilder(
+                            "http://yysk.yitzu.cn.qingf.top/api/x/fanyi.php?msg=%E4%BD%A0%E5%A5%BD"
+                    )
+            );
+        } catch (Exception e) {
+
+        }
+    }
+
     public static HttpURLConnection getHttp(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setReadTimeout(5000);
@@ -16,7 +29,7 @@ public class NetworkUtil {
     }
 
     public static StringBuilder downloadToStringBuilder(String url) {
-        try {
+        return EntrustParser.trying(() -> {
             StringBuilder builder = new StringBuilder();
             HttpURLConnection connection = null;
             try {
@@ -39,11 +52,7 @@ public class NetworkUtil {
             br.close();
 
             return builder;
-        } catch (Exception e) {
-
-        }
-
-        return new StringBuilder();
+        }, StringBuilder::new);
     }
 
     public static void downloadToFile(String url, String filePath) throws Exception {
