@@ -24,6 +24,6 @@ public class TimeUtil {
     }
 
     public static void barricade(long millions) throws InterruptedException {
-        sleep(millions);
+        Thread.sleep(millions);
     }
 }

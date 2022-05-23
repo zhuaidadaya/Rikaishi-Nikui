@@ -1,38 +1,147 @@
 package t;
 
-import com.github.zhuaidadaya.rikaishinikui.handler.times.TimeUtil;
+import com.github.zhuaidadaya.rikaishinikui.handler.times.*;
 
-import java.util.Arrays;
+import java.math.*;
 
 public class Test {
     public static void main(String[] args) {
-        long nano = TimeUtil.nano();
+        new Thread(() -> {
+            long nano = TimeUtil.nano();
 
-        System.out.println(Solution.isPalindrome(1020201));
+            //        System.out.println(Solution.isPalindrome(1110111));
+            //
+            //        int[] nums1 = new int[]{0, 0, 3, 0, 0, 0, 0, 0, 0};
+            //        int[] nums2 = new int[]{- 1, 1, 1, 1, 2, 3};
 
-        System.out.println(Arrays.toString(Solution.runningSum(new int[]{1, 2, 3, 4})));
+            //        Solution.merge(nums1, 3, nums2, 6);
 
-        System.out.println((TimeUtil.nano() - nano) / 1000000d + "ms");
+            System.out.println(String.valueOf(Solution.pow(new BigInteger(String.valueOf(Solution.pow(new BigInteger("160"), 2))), 10)));
 
-//        ArrayList<Integer> integers = new ArrayList<>();
-//        integers.add(0,1);
-//        integers.add(1,0);
-//        integers.add(2,1);
-//        System.out.println(Arrays.toString(integers.stream().sorted().toList().toArray(new Integer[0])));
+            System.out.println((TimeUtil.nano() - nano) / 1000000d + "ms");
+        }).start();
+
+        //        ArrayList<Integer> integers = new ArrayList<>();
+        //        integers.add(0,1);
+        //        integers.add(1,0);
+        //        integers.add(2,1);
+        //        System.out.println(Arrays.toString(integers.stream().sorted().toList().toArray(new Integer[0])));
     }
 }
 
 class Solution {
-    public static boolean isPalindrome(int x) {
-        String s = String.valueOf(x);
-        int left = 0, right = s.length() - 1;
-        char[] chars = s.toCharArray();
-        while (left < right) {
-            if (chars[left++] != chars[right--]) {
-                return false;
+    public static BigInteger pow(BigInteger source, Integer count) {
+        source = source.pow(count);
+        return source;
+    }
+
+    public static void merge(int[] nums1, int m, int[] nums2, int n) {
+        if (m == 0) {
+            int ref = 0;
+            for (int num : nums2) {
+                nums1[ref++] = num;
+            }
+            return;
+        }
+
+        if (n == 0) {
+            return;
+        }
+
+        computing(nums2, nums1, n, m);
+
+        sort(nums1);
+    }
+
+    public static void computing(int[] nums, int[] computing, int n, int ref) {
+        for (int num : nums) {
+            computing[ref++] = num;
+            if (-- n == 0) {
+                return;
             }
         }
+    }
+
+    public static void sort(int[] array) {
+        for (int i = (array.length - 1) / 2; i >= 0; i--) {
+            toBigRootHeap(array, array.length, i);
+        }
+        for (int i = array.length - 1; i > 0; i--) {
+            swapValue(array, i, 0);
+            toBigRootHeap(array, i, 0);
+        }
+    }
+
+    private static void toBigRootHeap(int[] array, int size, int index) {
+        int leftChildIndex = index * 2 + 1;
+        int rightChildIndex = index * 2 + 2;
+        int maxIndex = index;
+        if ((leftChildIndex < size) && (array[leftChildIndex] > array[maxIndex])) {
+            maxIndex = leftChildIndex;
+        }
+        if ((rightChildIndex < size) && (array[rightChildIndex] > array[maxIndex])) {
+            maxIndex = rightChildIndex;
+        }
+        if (maxIndex == index) {
+            return;
+        }
+        swapValue(array, index, maxIndex);
+        toBigRootHeap(array, size, maxIndex);
+    }
+
+    private static void swapValue(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    public static boolean isPalindrome(int x) {
+        if (x < 0) {
+            return false;
+        }
+        int[] ints = new int[14];
+        int num;
+        int count = 0;
+        while (x != 0) {
+            num = x % 10;
+            x /= 10;
+            ints[count] = num;
+            count++;
+        }
+
+        int left = 0, right = count - 1;
+
+        while (left < right) {
+            if (ints[left++] == ints[right--]) {
+                continue;
+            }
+            return false;
+        }
         return true;
+    }
+
+    public static double myPow(double x, int n) {
+        if (n == 0) {
+            return 1;
+        }
+        boolean powAbv = n > 0;
+        boolean onceAbv = ! (powAbv && x > 0);
+        if (x == 1 || x == - 1) {
+            if ((n % 2) == 0) {
+                return 1;
+            } else {
+                return onceAbv ? - 1 : 1;
+            }
+        }
+        double c = x;
+        int times = (n < 0) ? - n : n;
+        while (-- times > 0) {
+            x *= c;
+            if (x == Double.POSITIVE_INFINITY) {
+                return 0;
+            }
+        }
+        return powAbv ? x : 1 / x;
     }
 
     public static int[] plusOne(int[] digits) {
@@ -180,8 +289,8 @@ class Solution {
 
     public static int[] runningSum(int[] nums) {
         int[] counted = new int[nums.length];
-        int countedIndex = -1;
-        for (int i = 0;i < nums.length;) {
+        int countedIndex = - 1;
+        for (int i = 0; i < nums.length; ) {
             counted[i] = counted[Math.max(0, countedIndex++)] + nums[i++];
         }
         return counted;
